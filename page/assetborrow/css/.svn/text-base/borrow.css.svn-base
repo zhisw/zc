@@ -1,0 +1,29 @@
+.header{
+	padding-top:10px;
+}
+.layui-form-label{width:60px !important;padding:7px 5px !important;}
+.layui-input-inline{width:135px;}
+.layui-input-inline input{height:32px !important;}
+.anniu{float:right;}
+.anniu button{
+	display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    width:85px;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 14px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-right:10px;
+}
+
+
+.layui-form-checkbox {
+	height: 15px !important;
+    line-height: 15px !important;
+    padding-right: 15px !important;
+}
+

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>报废单</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">报废单号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dumpingCode"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>报废日期:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dumpdate"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">处理人:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dealUserName"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">备注:</label>
+        <div class="nine-xs8">
+            <input type="text" id="dumpingRemark" placeholder="请输入备注" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="btn-box">
+        <button class="layui-btn btns-blue" type="button" id="select-asset">选择资产</button>
+        <button class="layui-btn btns-blue" type="button" id="del-btn" data-type="getCheckData">删除</button>
+    </div>
+    <button class="layui-btn submitLY layui-hide" lay-submit="" lay-filter="form-submit" type="button" >立即提交</button>
+</form>
+<table id="sure-table" lay-filter="table-checkbox"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['form','laydate','table'], function() { //独立版的layer无需执行这一句
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var table = layui.table;
+        var $=layui.$;
+        laydate.render({
+            elem: '#test1'
+            ,position: 'fixed'
+        });
+        //获取报废单号
+        var dumpingCode;//报废单号
+        var dumpdate;//报废日期
+        $.ajax({
+            url:ApiUrl+"dump/getdumpingforadd",
+            async:false,
+            type:'GET',
+            success : function(result) {//返回数据根据结果进行相应的处理
+                if(result.code==0){
+                    dumpingCode = result.data.dumpingCode;
+                    dumpdate = result.data.dumpdate
+                    $("#dumpingCode").html(dumpingCode);
+                    $("#dumpdate").html(dumpdate);
+                    $("#dealUserName").html($.cookie("realName"));
+                }else{
+                    layer.msg(result.message);
+                }
+            }
+        });
+        //监听表单提交
+        form.on('submit(form-submit)', function(data){
+            var tableId1 = JSON.parse(localStorage.getItem("data1"));  //没经过删除的数据
+            var tableId2 = JSON.parse(localStorage.getItem("dataDel")); //经过删除的数据
+            var arrId = [];
+            if(tableId1){
+                for(var a = 0;a<tableId1.length;a++){
+                    arrId.push(tableId1[a].propertyCode);
+                }
+            }else if(tableId2){
+                for(var a = 0;a<tableId2.length;a++){
+                    arrId.push(tableId2[a].propertyCode);
+                }
+            }
+            if(arrId.length<1){
+                layer.msg('请选择资产');
+            }else{
+                //表单提交
+                var parm={
+                    dumpingCode:dumpingCode,
+                    dumpingRemark:$("#dumpingRemark").val(),
+                    dealUserName:$.cookie("realName"),//$.cookie("realName"),
+                    dealUserId:$.cookie("userCode"),//$.cookie("userCode"),
+                    propertyCodes:arrId
+                }
+                parm=JSON.stringify(parm);
+                $(this).attr("disabled","disabled");
+                $.ajax({
+                    type:"POST",
+                    url: ApiUrl+'dump/confirmdumping',
+                    dataType:'json',
+                    contentType:"application/json",
+                    data: parm,
+                    success:function(data){
+                        if(data.code == 0){
+                            layer.msg("新增成功",{time:2000},function () {
+                                parent.location.reload()
+                            });
+                            /*//先获取窗口索引，才能关闭窗口
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                            localStorage.clear();//清除領用單的存儲數據
+                            parent.location.reload(); //刷新包含该弹窗的页面*/
+                        }else{
+
+                        }
+                    }
+                });
+            }
+        });
+    })
+    //渲染已选择资产表格
+    function renderTable(obj){
+        layui.use(['jquery','form','layer','table'], function(){
+            var $ = layui.jquery;
+            var table = layui.table;
+            var layer = layui.layer;
+            table.render({
+                elem: '#sure-table'
+                ,id:'idTest'
+                ,data: JSON.parse(obj)
+                ,cols: [[ //标题栏
+                    {checkbox: true}
+                    ,{field: 'id', title: 'ID', width: 20}
+                    ,{field: 'propertyCode', title: '资产条码', width: 170}
+                    ,{field: 'propertyName', title: '资产名称', width: 100}
+                    ,{field: 'categoryName', title: '资产类别', width: 120}
+                    ,{field: 'specification', title: '规格型号', width: 120}
+                    ,{field: 'brand', title: '品牌', width: 100}
+                    ,{field: 'unit', title: '单位', width: 100}
+                    ,{field: 'price', title: '金额', width: 100}
+                    ,{field: 'snno', title: '序列号', width: 120}
+                    ,{field: 'createat', title: '入库时间', width: 160}
+                    ,{field: 'serviceLife', title: '使用期限', width: 160}
+                    ,{field: 'createOrganizationName', title: '所属公司', width: 160}
+                ]]
+                ,skin: 'row' //表格风格
+                ,even: true
+                ,height:210
+            });
+        })
+    }
+    //多次选择资产
+    function selectData(i,data){
+        if(i==1){
+            var data1 = localStorage.setItem("data1",data);
+        }else if(i>1){
+            var data1 = localStorage.getItem("data1");
+            var oldArr = JSON.parse(data1);
+            var newArr = JSON.parse(data);
+            var oldArrId = [];
+            //去重
+            for(var j = 0;j<oldArr.length;j++){
+                oldArrId.push(oldArr[j].id);
+            }
+            for(var k = 0;k<newArr.length;k++){
+                if(oldArrId.indexOf(newArr[k].id) == -1){
+                    oldArr.push(newArr[k]);
+                }
+            }
+            var data1 = localStorage.setItem("data1",JSON.stringify(oldArr));
+        }
+    }
+    //多次选择资产删除
+    function selectDataDel(dataDel){
+        var data1 = localStorage.getItem("data1");
+        var oldArr = JSON.parse(data1);
+        var newArr = JSON.parse(dataDel);
+        var numArr = [];
+        //删除
+        for(var m = 0;m<oldArr.length;m++){
+            for(var n = 0;n<newArr.length;n++){
+                if(oldArr[m].id == newArr[n].id){
+                    oldArr.remove(m); //m为选择数据删除的第几条
+                }
+            }
+        }
+        localStorage.setItem("dataDel",JSON.stringify(oldArr));
+    }
+    /*删除数组指定下标或指定对象 */
+    Array.prototype.remove=function(obj){
+        for(var i =0;i <this.length;i++){
+            var temp = this[i];
+            if(!isNaN(obj)){
+                temp=i;
+            }
+            if(temp == obj){
+                for(var j = i;j <this.length;j++){
+                    this[j]=this[j+1];
+                }
+                this.length = this.length-1;
+            }
+        }
+    }
+</script>
+</body>
+</html>

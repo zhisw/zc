@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>新增借用单</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/main.css">
+	<style>
+	.header{
+		padding-top:10px;
+	}
+	    .layui-inline{margin-left:30px;float:left;}
+	    .layui-form-label{
+	    	margin-top:-3px;
+	    }
+	    .layui-form-label{width:100px !important;}
+		.layui-input-inline select{
+			width:135px;
+			height:30px;
+			border: 1px solid #e6e6e6;
+            background-color: #fff;
+            border-radius: 2px;
+		}
+		.layui-input-inline input{
+			width:135px;
+			height:30px;
+			padding:0 4px;
+			border: 1px solid #e6e6e6;
+            background-color: #fff;
+            border-radius: 2px;
+		}
+		.layui-inline button{
+			display: inline-block;
+		    height: 30px;
+		    line-height: 30px;
+		    width:75px;
+		    color: #fff;
+		    background:#6866E9;
+		    white-space: nowrap;
+		    text-align: center;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 15px;
+		    cursor: pointer;
+		    margin-right:10px;
+		}
+		.xuanzezichan{
+			display: inline-block;
+		    height: 30px;
+		    line-height: 30px;
+		    width:75px;
+		    color: #fff;
+		    background:#6866E9;
+		    white-space: nowrap;
+		    text-align: center;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 15px;
+		    cursor: pointer;
+		    margin-right:10px;
+		    margin-left:20px;
+		}
+		.zichandel{
+			display: inline-block;
+		    height: 30px;
+		    line-height: 30px;
+		    width:75px;
+		    color: #fff;
+		    background:#6866E9;
+		    white-space: nowrap;
+		    text-align: center;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 15px;
+		    cursor: pointer;
+		    margin-right:10px;
+		}
+		.component{
+			border:1px solid #d9d9d9;
+			border-radius:4px;
+			margin-left:10px;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="header">
+	<div class="layui-inline">
+	      <label class="layui-form-label">借用单号</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="jieyongdanhao" disabled="disabled">
+	      </div>    
+     </div>
+	<div class="layui-inline">
+	      <label class="layui-form-label">借用人</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="jieyongren" disabled="disabled">
+	      </div>    
+     </div>
+     <div class="layui-inline">
+	      <label class="layui-form-label">借用日期</label>
+	      <div class="layui-input-inline">
+	      	<input type="text" name="jieyongriqi" disabled="disabled">
+	      </div>
+	 </div>
+	  <div class="layui-inline">
+	      <label class="layui-form-label">预计归还时间</label>
+	      <div class="layui-input-inline">
+	      	<input type="text" name="yujiguihuanriqi" disabled="disabled">
+	      </div>
+	 </div>
+	 <div class="layui-inline">
+		      <label class="layui-form-label">借出处理人 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="jiechuchuliren" lay-verify="title" autocomplete="off" placeholder="" class="layui-input" disabled="disabled" style="width:145px;">
+		      </div>
+        </div>
+    </div>	
+    <div class="layui-inline" style="float:left;margin-left:20px;">
+		      <label class="layui-form-label" style="width:110px !important";>归还处理人 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="guihuanchuliren" lay-verify="title" autocomplete="off" placeholder="" class="layui-input" disabled="disabled" style="width:145px;">
+		      </div>
+        </div>
+    </div>
+    <div class="layui-inline" style="width:90%">
+		      <label class="layui-form-label">说明 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="shuoming" lay-verify="title" autocomplete="off" placeholder="" class="layui-input" style="width:450px" disabled="disabled">
+		      </div>
+        </div>
+    </div>	
+		<table id="idText" style="clear:both;"></table>
+	</div>
+	</body>
+</html>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+layui.use('table', function(){
+  var table = layui.table,$ = layui.$;
+  var data = JSON.parse(localStorage.getItem("detalisdata"));
+  //console.log(data);
+  $.ajax({
+         	type:"get",
+         	url:ApiUrl+"borrow/borrowInfo?idBorrow="+data.idBorrow,
+         	xhrFields:{
+    			withCredentials:true,
+    		    },
+            crossDomain:true,
+         	
+         	success:function(res){
+         		  table.render({
+					    elem: '#idText'
+					    ,id:'idText'
+						,data:res.data
+					    ,height: 200
+					    ,cols: [[ //标题栏
+					      {field: 'property_code', title: '资产条码', width: 90}
+					      ,{field: 'property_name', title: '资产名称', width: 90}
+					      ,{field: 'category_name' , title: '资产类别',width:90}
+					      ,{field: 'specification', title: '规格型号', width: 110}
+					      ,{field: 'brand', title: '品牌', width: 100}
+					      ,{field: 'unit', title: '单位', width: 90}
+					      ,{field: 'price', title: '金额', width: 90}
+					      ,{field: 'snNo', title: '序列号', width: 90}
+					      ,{field:'createOrganizationName',title:'所属公司',width:120}
+					      ,{field: 'storageinDate1', title: '入库时间', width: 90}
+					      ,{field: 'service_life1', title: '使用期限', width: 90}
+					    ]] 
+					    ,skin: 'row' //表格风格
+					    ,even: true
+					    ,page: true //是否显示分页
+					    ,limits: [20, 50, 100]
+					    ,limit: 20 //每页默认显示的数量
+					  });
+			          $("input[name=jieyongdanhao]").val(res.BorrowHeadInfo.idBorrow);//借用单号
+					  $("input[name=jieyongren]").val(res.BorrowHeadInfo.userBorrow);//借用人
+					  $("input[name=jieyongriqi]").val(res.BorrowHeadInfo.dateBorrow);//借用日期
+					  $("input[name=yujiguihuanriqi]").val(res.BorrowHeadInfo.datePredictGiveback);//预计归还日期
+					  $("input[name=jiechuchuliren]").val(res.BorrowHeadInfo.userHanddleBorrow);//借出处理人
+					  $("input[name=guihuanchuliren]").val(res.BorrowHeadInfo.userHanddleGiveback);//归还处理人
+					  $("input[name=shuoming]").val(res.BorrowHeadInfo.remark);//说明
+         	}
+  })
+  
+  
+  //展示已知数据
+
+});
+</script>

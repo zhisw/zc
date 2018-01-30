@@ -1,0 +1,136 @@
+[{
+	"title" : "首页",
+	"icon" : "",
+	"href" : "",
+	"spread" : false
+},{
+	"title" : "溯源采购管理",
+	"icon" : "",
+	"href" : "page/consumable/purchaseManage.html",
+	"spread" : false
+},{
+	"title" : "资产管理",
+	"icon" : "",
+	"href" : "",
+	"spread" : false,
+	"children":[
+	           {
+				"title" : "资产入库",
+				"icon" : "",
+				"href" : "page/property/property.html",
+				"spread" : false
+               },{
+			    "title" : "资产领用&退库",
+				"icon" : "",
+				"href" : "page/assetProcess/assetProcess.html",
+				"spread" : false
+			   },{
+			    "title" : "资产借用",
+				"icon" : "",
+				"href" : "page/assetborrow/borrow.html",
+				"spread" : false
+			   },{
+			    "title" : "资产调拨",
+				"icon" : "",
+				"href" : "page/assetallocation/allocation.html",
+				"spread" : false
+			   },{
+			    "title" : "资产维修",
+				"icon" : "",
+				"href" : "page/repair/repair.html",
+				"spread" : false
+			   },{
+				"title" : "资产报废",
+				"icon" : "",
+				"href" : "page/scrap/scrap.html",
+				"spread" : false
+			   },{
+			    "title" : "资产回收",
+				"icon" : "",
+				"href" : "page/assetProcess/assetRecover.html",
+				"spread" : false
+			   },{
+			    "title" : "资产盘点",
+				"icon" : "",
+				"href" : "page/assetinvent/assetinvent.html",
+				"spread" : false
+			   },
+					           {
+								"title" : "资产清单",
+								"icon" : "",
+								"href" : "page/property/inventory.html",
+								"spread" : false
+							   },{
+								"title" : "报废资产查询清单",
+								"icon" : "",
+								"href" : "page/scrapQuery/scrapQuery.html",
+								"spread" : false
+								},{
+								    "title" : "资产分类使用清单",
+									"icon" : "",
+									"href" : "page/assetallocation/assetclassified.html",
+									"spread" : false
+								}
+				           
+	]
+},{
+	"title" : "耗材管理",
+	"icon" : "",
+	"href" : "",
+	"spread" : false,
+	"children" : [
+		{
+			"title" : "耗材入库",
+			"icon" : "",
+			"href" : "page/consumable/consumable.html",
+			"spread" : false
+		},{
+			"title" : "耗材领用和退库",
+			"icon" : "",
+			"href" : "page/assetProcess/consumeProcess.html",
+			"spread" : false
+		},{
+			"title" : "物品档案",
+			"icon" : "",
+			"href" : "page/goods/good.html",
+			"spread" : false
+
+		},{
+			"title" : "耗材盘点",
+			"icon" : "",
+			"href" : "page/consumable/ConsumableInventory.html",
+			"spread" : false
+
+		}
+	]
+},{
+	"title" : "系统设置",
+	"icon" : "",
+	"href" : "",
+	"spread" : false,
+	"children" : [
+	          {
+				"title" : "组织机构",
+				"icon" : "",
+				"href" : "page/Organization/Organization.html",
+				"spread" : false
+			 },{
+				"title" : "人员管理",
+				"icon" : "",
+				"href" : "page/peopleManagement/peopleManagement.html",
+				"spread" : false
+			 },{
+				"title" : "角色管理",
+				"icon" : "",
+				"href" : "page/roleManagement/roleManagement.html",
+				"spread" : false
+			 },{
+			    "title" : "资产类别",
+				"icon" : "",
+				"href" : "page/assetborrow/category.html",
+				"spread" : false
+			 }
+	]
+}
+
+]

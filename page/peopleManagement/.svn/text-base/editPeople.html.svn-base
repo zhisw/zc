@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<style>
+		html,body{
+			width: 100%;
+			height: 100%;
+		}
+		body .layui-tree-skin-shihuang .layui-tree-branch{color: #EDCA50;}    
+		.childrenBody{
+			width: 100%;
+			height: 100%;
+			padding: 15px 0;
+		}
+		.addPeople .layui-input-block{
+			margin-right: 20px;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+ <div class="layui-row editPeople" id="editPeople" > 
+     		<form class="layui-form">
+     			<div class="layui-form-item">
+				    <label class="layui-form-label">员工编号</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="staffCode" required  lay-verify="required" placeholder="请输入员工编号" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">员工姓名</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="username" required  lay-verify="required" placeholder="请输入员工姓名" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">登录密码</label>
+				    <div class="layui-input-block">
+				       <input type="password" name="userPassword" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">所属机构</label>
+				     <div class="layui-input-block">
+				      <select name="organization" lay-verify="required" class="organization">
+				        <option value=""></option>
+				        <option value="0">北京</option>
+				        <option value="1">上海</option>
+				        <option value="2">广州</option>
+				        <option value="3">深圳</option>
+				        <option value="4">杭州</option>
+				      </select>
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">所属部门</label>
+				     <div class="layui-input-block">
+				      <select name="department" lay-verify="required" class="department">
+				        <option value=""></option>
+				        <option value="0">北京</option>
+				        <option value="1">上海</option>
+				        <option value="2">广州</option>
+				        <option value="3">深圳</option>
+				        <option value="4">杭州</option>
+				      </select>
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">手机号码</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="phoneNum" required  lay-verify="required|phone" placeholder="请输入手机号码" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">电子邮箱</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="email" required  lay-verify="required|email" placeholder="请输入电子邮箱" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">在职状态</label>
+				     <div class="layui-input-block">
+				      <select name="workingState" lay-verify="required">
+				        <option value="0">在职</option>
+				        <option value="1">离职</option>
+				      </select>
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">是否保管员</label>
+				     <div class="layui-input-block">
+				      <select name="iskeeper" lay-verify="required">
+				        <option value="0">是</option>
+				        <option value="1">否</option>
+				      </select>
+				    </div>
+				</div>	
+				<div class="layui-form-item" style="display: none;">
+				    <div class="layui-input-block">
+				      <button class="layui-btn submitEdit" lay-submit lay-filter="formEdit">立即提交</button>
+				      <input type="button"  value="取消" class="layui-btn layui-btn-primary cancleOpen">
+				    </div>
+				</div>
+     	</form>
+    </div>
+ 	<script type="text/javascript" src="../../layui/layui.js"></script>
+<script>
+//Demo
+
+
+	layui.use('form', function(){
+  var form = layui.form;
+ 
+  	form.render('select');
+ 	form.on('submit(formEdit)', function(data){
+    layer.msg(JSON.stringify(data.field));
+   // layer.closeAll();
+    $.ajax({
+    	type:"get",
+    	url:"www.baidu.com",
+    	async:true,
+    	xhrFields:{
+    			withCredentials:true,
+    		    },
+                crossDomain:true,
+
+    	success:function(data){
+    		layer.msg("保存成功");
+    		layer.closeAll();
+    	}
+    });
+ 
+    return false;
+  });
+});
+
+
+//window.selectRender = selectRender;
+</script>
+</body>
+</html>

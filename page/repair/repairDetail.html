@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>维修单详情</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <p class="print-hide printtitle">资产维修单</p>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">维修单号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="idRepairs"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">维修日期:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dateRepairs"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">完成日期:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dateOverRepairs"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">维修花费:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="moneyRepairs"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">处理人:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="userRepairs"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">状态:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="statusRepairs"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">维修内容:</label>
+        <div class="nine-xs8">
+            <div class="layui-form-mid layui-word-aux" id="remark"></div>
+        </div>
+    </div>
+</form>
+<table class="layui-hide" id="repair_table" lay-filter="user"></table>
+<table class="layui-table print-hide" id="print_table">
+    <thead>
+    <tr>
+        <th>资产条码</th>
+        <th>资产名称</th>
+        <th>资产类别</th>
+        <th>规格型号</th>
+        <th>品牌</th>
+        <th>单位</th>
+        <th>金额</th>
+        <th>序列号</th>
+        <th>入库时间</th>
+        <th>使用期限</th>
+        <th>所属公司</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+        var $ = layui.$;
+        var data;
+        //按报废号查询
+        var params ={
+            'idRepairs':localStorage.idRepairs
+        }
+        $.ajax({
+            url:ApiUrl+"repairs/repairsInfo",
+            data:params,
+            type:'GET',
+            success : function(result) {//返回数据根据结果进行相应的处理
+                console.log(result)
+                if(result.code==0){
+                    $("#moneyRepairs").html(result.repairsHeadInfo.moneyRepairs);
+                    $("#remark").html(result.repairsHeadInfo.remark);
+                    $("#dateOverRepairs").html(result.repairsHeadInfo.dateOverRepairs);
+                    $("#dateRepairs").html(result.repairsHeadInfo.dateRepairs);
+                    $("#idRepairs").html(result.repairsHeadInfo.idRepairs);
+                    $("#userRepairs").html(result.repairsHeadInfo.userRepairs);
+                    $("#statusRepairs").html(result.repairsHeadInfo.statusRepairs1);
+                    var data = result.data;
+                    //表格渲染
+                    table.render({
+                        elem: '#repair_table'
+                        ,data:data
+                        ,cols: [[
+                            {field:'property_code', title: '资产编码', width:180}
+                            ,{field:'property_name', title: '资产名称', width:140}
+                            ,{field:'category_name', title: '资产类别', width:140}
+                            ,{field:'specification', title: '规格型号', width:120}
+                            ,{field:'brand', title: '品牌', width:120}
+                            ,{field:'unit', title: '单位', width:120}
+                            ,{field:'price', title: '金额', width:120}
+                            ,{field:'snNo', title: '序列号', width:120}
+                            ,{field:'storageinDate', title: '入库时间', width:120}
+                            ,{field:'service_life', title: '使用期限', width:120}
+                            ,{field: 'createOrganizationName', title: '所属公司', width: 160}
+                        ]]
+                        ,height:200
+                    });
+                    //打印表格
+                    var print=''
+                    for(var i=0;i<data.length;i++){
+                        print+="<tr>"
+                            +"<td>"+ data[i].property_code +"</td>"
+                            +"<td>"+ data[i].property_name +"</td>"
+                            +"<td>"+ data[i].category_name +"</td>"
+                            +"<td>"+ data[i].specification +"</td>"
+                            +"<td>"+ data[i].brand +"</td>"
+                            +"<td>"+ data[i].unit +"</td>"
+                            +"<td>"+ data[i].price +"</td>"
+                            +"<td>"+ data[i].snNo +"</td>"
+                            +"<td>"+ data[i].storageinDate +"</td>"
+                            +"<td>"+ data[i].service_life +"</td>"
+                            +"<td>"+ data[i].createOrganizationName +"</td>"
+                            +"</tr>";
+                    }
+                    $("#print_table tbody").html(print)
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

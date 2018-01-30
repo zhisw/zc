@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<style>
+			.clearfix:after {
+			    content: "";
+			    display: block;
+			    height: 0;
+			    clear: both;
+			}
+			.clearfix {
+			    zoom: 1;
+			}
+			@media screen and (min-width: 768px){
+				.layui-container {
+				    width: 880px;
+				}
+			}
+			.layui-container{
+				padding: 0 20px;
+			}
+			.layui-form .item{
+				margin-top: 1.6%;
+			}
+			.item .left{
+				display: inline-block;
+				height: 38px;
+				line-height: 38px;
+				text-align: right;
+    			padding-right: 15px;
+			}
+			.left .red-star{
+				color: red;
+			}
+			.left .white-star{
+				color: #FFFFFF;
+			}
+			.item #add-people{
+				display: inline-block;
+				height: 38px;
+				line-height: 38px;
+				color: blue;
+				padding-left: 2%;
+				cursor: pointer;
+			}
+			.item .no-border{
+				height: 38px;
+    			line-height: 38px;
+			}
+			.item input[name="remark"]{
+				width: 95%;
+			} 
+			/*下拉框*/
+			.layui-form-select dl{
+			    max-height: 188px;
+			}
+			.btn-box{
+				margin-top: 20px;
+    			margin-left: 24px;
+			}
+			/*按钮*/
+			.btn-box .btns{
+			height: 30px;
+			line-height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			filter: alpha(opacity=70);
+			border-radius: 15px;
+			}
+			.btn-box .btns:hover{
+				opacity: 1;
+				filter: alpha(opacity=100);
+			}
+			/*隐藏id列*/
+			td[data-field=id],th[data-field=id]{
+		        display: none;
+		    }
+		</style>
+	</head>
+	<body>
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]>
+		  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+		  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]--> 
+		
+		<form class="layui-form layui-container clearfix" action="">
+		    <div class="layui-col-xs6 item">
+		        <label class="layui-col-xs4 left">
+		        	<span class="red-star">*</span>
+					<span>回收日期:</span>
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7">
+			        <input type="text" name="createAt" id="date" autocomplete="off" lay-verify="required" class="layui-input">
+	        	</div>
+		    </div>
+		    <div class="layui-col-xs6 item">
+		    	<label class="layui-col-xs4 left">
+		        	<span class="red-star">*</span>
+					<span>回收金额:</span>
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7">
+			       	<input type="text" name="recyclePrice" class="layui-input" lay-verify="required|number|price">
+			    </div>
+		    </div>
+		    <div class="layui-col-xs6 item">
+		    	<label class="layui-col-xs4 left">
+		        	<span class="white-star">*</span>
+					<span>处理人:</span>
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7 no-border login-name">
+			       <!--	徐-->
+			    </div>
+		    </div>
+		    <div class="layui-col-xs6 item">
+		    	<label class="layui-col-xs4 left">
+					<!--<span>回收单号</span>-->
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7 no-border order-num">
+			       <!--	12345678-->
+			    </div>
+		    </div>
+		    <div class="layui-col-xs12 item">
+			    <div class="layui-col-xs2 left">
+					<span class="white-star">*</span>
+					<span>说明:</span>
+				</div> 
+				<div class="layui-input-inline layui-col-xs10">
+					<input type="text" name="remark" class="layui-input">
+				</div>
+			</div>
+		    <button class="layui-btn submitLY" lay-submit="" lay-filter="form-submit" type="button" style="display: none;">立即提交</button>
+  		</form>
+		<div class="btn-box">
+			<button class="layui-btn btns" id="select-asset">选择资产</button>
+			<button class="layui-btn btns" id="del-btn" data-type="getCheckData">删除</button>
+		</div>
+		<table id="sure-table"></table>
+		
+	</body>
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/peizhi.js"></script>
+	<script>
+		layui.use(['jquery','form','laydate','layer','table'], function(){
+			var $ = layui.jquery;
+ 		 	var form = layui.form;
+ 		 	var laydate = layui.laydate;
+ 		 	var layer = layui.layer;
+ 		 	var table = layui.table;
+ 		 	
+ 		 	//登录后获取
+ 		 	var realName = $.cookie("realName");     //登录人
+ 		 	$(".item .login-name").html(realName);
+ 		 	
+ 		 	
+ 		 	//回收单号
+ 		 	/*var currentdate = "HS"+getNowFormatDate()+"000";
+ 		 	$(".item .order-num").html(currentdate);
+ 		 	function getNowFormatDate() {
+			    var date = new Date();
+			    var month = date.getMonth() + 1;
+			    var strDate = date.getDate();
+			    if (month >= 1 && month <= 9) {
+			        month = "0" + month;
+			    }
+			    if (strDate >= 0 && strDate <= 9) {
+			        strDate = "0" + strDate;
+			    }
+			    var currentdate = date.getFullYear() +""+ month +""+ strDate +""
+			            		+ date.getHours() +"" + date.getMinutes() +"" + date.getSeconds();
+			    return currentdate;
+			}*/
+ 		 	
+ 		 	//回收日期
+ 		 	laydate.render({
+			    elem: '#date',
+			    position: 'fixed'
+			});
+
+ 		 	
+			//监听表单提交
+			form.on('submit(form-submit)', function(data){
+				var tableId1 = JSON.parse(localStorage.getItem("data1"));  //没经过删除的数据
+				var tableId2 = JSON.parse(localStorage.getItem("dataDel")); //经过删除的数据
+				var arrId = [];
+				if(tableId1){
+					for(var a = 0;a<tableId1.length;a++){
+						arrId.push(tableId1[a].id);
+					}
+				}else if(tableId2){
+					for(var a = 0;a<tableId2.length;a++){
+						arrId.push(tableId2[a].id);
+					}
+				}
+				if(arrId.length<1){
+					layer.msg('请选择资产'); 
+				}else{
+					data.field.rddoIdList = arrId;  //资产列表id
+					var data = data.field;
+					dataStr=JSON.stringify(data);
+//					console.log(dataStr);
+					//按钮只能点击一次，再点击就无效
+					$(this).attr("disabled","disabled");
+					
+					$.ajax({
+				    	type:"post",
+				    	url: ApiUrl + "recycle/addRecycle",
+				    	contentType:'application/json',
+				    	dataType:'json',
+				    	data: dataStr,
+				    	success:function(data){
+                   			if(data.code == 1){
+                   				layer.msg('保存成功!',{
+								  time: 500 //   （如果不配置，默认是3秒）
+								},function(){
+								  	//先获取窗口索引，才能关闭窗口  
+					    			var index = parent.layer.getFrameIndex(window.name);  
+	                   				parent.layer.close(index);
+					    			localStorage.removeItem('data1');    //清除选择资产的存储
+					    			localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+					    			parent.location.reload(); //刷新包含该 窗的页面
+//					    			window.parent.layui.table.reload('recoverTable');
+								});  
+                   			}else{
+                   				console.log(data);
+                   				layer.msg('保存失败!',{
+								  time: 500 //   （如果不配置，默认是3秒）
+								},function(){
+								  	//先获取窗口索引，才能关闭窗口  
+					    			var index = parent.layer.getFrameIndex(window.name);  
+	                   				parent.layer.close(index);
+					    			localStorage.removeItem('data1');    //清除选择资产的存储
+					    			localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+								});
+                   			}
+				    	},
+				    	error:function(xhr){
+				    		console.log(xhr)
+				    	}
+				    });
+				}
+				return false;
+			});
+			
+			form.verify({
+				price: function(value, item){ //value：表单的值、item：表单的DOM对象
+					var reg = /(^[1-9]{1}[0-9]*$)|(^[0-9]*\.[0-9]{2}$)/;
+				    if(!reg.test(value)){
+				      	return '输入金额格式为首位大于0或者最多保留两位小数的数字';
+				    }
+				}	  
+			});  
+		});
+		
+		//渲染已选择资产表格
+		function renderTable(obj){
+			layui.use(['jquery','form','layer','table'], function(){
+				var $ = layui.jquery;
+ 		 		var table = layui.table;
+ 		 		var layer = layui.layer;
+				table.render({
+			    	elem: '#sure-table'
+			    	,id:'idTest'
+			    	,data: JSON.parse(obj)
+				    ,cols: [[ //标题栏
+					   {checkbox: true}
+				      ,{field: 'id', title: 'ID', width: 20}
+				      ,{field: 'propertyCode', title: '资产条码', width: 170}
+				      ,{field: 'propertyName', title: '资产名称', width: 100}
+				      ,{field: 'categoryName', title: '资产类别', width: 120}
+				      ,{field: 'specification', title: '规格型号', width: 120}
+				      ,{field: 'brand', title: '品牌', width: 100}
+				      ,{field: 'unit', title: '单位', width: 100}
+				      ,{field: 'price', title: '金额', width: 100}
+				      ,{field: 'snno', title: '序列号', width: 120}
+				      ,{field: 'createat', title: '入库时间', width: 160}
+				      ,{field: 'serviceLife', title: '使用期限', width: 160}
+				      ,{field: 'createOrganizationName', title: '所属公司', width: 120}
+					]] 
+					,height: '156'
+				    ,skin: 'row' //表格风格
+				    ,even: true
+				});	
+			})
+		}
+		
+		//多次选择资产
+		function selectData(i,data){
+			if(i==1){
+				var data1 = localStorage.setItem("data1",data);
+			}else if(i>1){
+				var data1 = localStorage.getItem("data1");
+				var oldArr = JSON.parse(data1);
+				var newArr = JSON.parse(data);
+				var oldArrId = [];
+				//去重
+				for(var j = 0;j<oldArr.length;j++){
+					oldArrId.push(oldArr[j].id);
+				}
+				for(var k = 0;k<newArr.length;k++){
+				    if(oldArrId.indexOf(newArr[k].id) == -1){  
+				        oldArr.push(newArr[k]);
+				    }
+				}
+				var data1 = localStorage.setItem("data1",JSON.stringify(oldArr));
+			}
+		}
+		
+		//多次选择资产删除
+		function selectDataDel(dataDel){
+			var data1 = localStorage.getItem("data1");
+			var oldArr = JSON.parse(data1);
+			var newArr = JSON.parse(dataDel);
+			var numArr = [];
+			//删除
+			for(var m = 0;m<oldArr.length;m++){
+		    	for(var n = 0;n<newArr.length;n++){
+		    		if(oldArr[m].id == newArr[n].id){  
+				       oldArr.remove(m); //m为选择数据删除的第几条
+				    }
+		    	}
+		   	}
+			localStorage.setItem("dataDel",JSON.stringify(oldArr));
+		}
+		
+		/*删除数组指定下标或指定对象 */ 
+		Array.prototype.remove=function(obj){ 
+			for(var i =0;i <this.length;i++){ 
+				var temp = this[i]; 
+				if(!isNaN(obj)){ 
+					temp=i; 
+				} 
+				if(temp == obj){ 
+					for(var j = i;j <this.length;j++){ 
+						this[j]=this[j+1]; 
+					} 
+					this.length = this.length-1; 
+				} 
+			} 
+		} 
+	</script>
+</html>

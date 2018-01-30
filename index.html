@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>资产管理系统</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="icon" href="favicon.ico">
+	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/main.css" media="all" />
+	<link rel="stylesheet" href="css/new-css/admin.css">
+	<style>
+		.layui-tab-refresh{
+			position: relative;
+		    display: inline-block;
+		    width: 18px;
+		    height: 18px;
+		    line-height: 20px;
+		    margin-left: 8px;
+		    top: 1px;
+		    text-align: center;
+		    font-size: 14px;
+		    color: #c2c2c2;
+		    transition: all .2s;
+		    -webkit-transition: all .2s;
+		}
+		.layui-tab-refresh:hover{
+			background:blue;
+			color:#fff;
+		}
+		#firstPageBox{
+			position:absolute;
+			left: 0;
+		}
+		.layui-tab-title{
+			/*position: absolute;*/
+			/*left: 40px;*/
+		}
+		.leftArrow{
+			position:absolute;
+			left: 0;
+			width: 40px;
+			height: 40px;
+			line-height: 40px;
+			background: #F2F2F2;
+			z-index: 99999999;
+			color: #9C9C9C;
+			text-align: center;
+			cursor: pointer;
+			display: none;
+			}
+		.leftArrow:hover{
+			background: #4E5465;
+			color: #FFFFFF;
+		}
+		.rightArrow{
+			width: 40px;
+			height: 40px;
+			background: #F2F2F2;
+			line-height: 40px;
+			color: #9C9C9C;
+			text-align: center;
+			cursor: pointer;
+			width: 0;
+			}
+		.rightArrow:hover{
+			background: #4E5465;
+			color: #FFFFFF;
+		}
+		.rightArrowChilren{
+			display: none;
+		}
+	</style>
+</head>
+<body class="main_body">
+	<div class="layui-layout layui-layout-admin">
+		<!-- 顶部 -->
+		<div class="layui-header header">
+			<div class="layui-main">
+				<div class="header-name"></div>  
+			    <!-- 顶部右侧菜单 -->
+			    <ul class="layui-nav top_menu">
+			    	<li class="layui-nav-item showNotice" id="showNotice" pc>
+						<a href="javascript:;"><i class="add-danwei"></i><cite class="userdanwei"></cite></a>
+					</li>
+			    	<li class="layui-nav-item" mobile>
+			    		<a href="javascript:;" class="mobileAddTab" data-url="page/user/changePwd.html"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>设置</cite></a>
+			    	</li>
+			    	<li class="layui-nav-item" mobile>
+			    		<a href="page/login/login.html" class="signOut"><i class="iconfont icon-loginout"></i> 退出</a>
+			    	</li>
+			    	<li class="layui-nav-item" pc>
+						<a href="javascript:;">
+							<i class="add-user"></i>
+							<cite class="username"></cite>
+						</a>
+						<dl class="layui-nav-child">
+							<dd><a href="javascript:;" data-url="page/assetProcess/changePwd.html"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>修改密码</cite></a></dd>
+							<!--<dd><a href="javascript:;" data-url="page/user/userInfo.html"><i class="iconfont icon-zhanghu" data-icon="icon-zhanghu"></i><cite>个人资料</cite></a></dd>
+							<dd><a href="javascript:;" class="changeSkin"><i class="iconfont icon-huanfu"></i><cite>更换皮肤</cite></a></dd>
+							<dd><a href="page/login/login.html" class="signOut"><i class="iconfont icon-loginout"></i><cite>退出</cite></a></dd>-->
+						</dl>
+					</li>
+					<!--<li class="layui-nav-item" pc>
+						<a href="javascript:;"><i class="add-help"></i><cite>帮助中心</cite></a>
+					</li>-->
+					<li class="layui-nav-item" pc>
+						<a href="javascript:;"><i class="add-sign"></i><cite class="leaveload">退出登录</cite></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!-- 左侧导航 -->
+		<div class="layui-side layui-bg-black">
+			
+			<div class="navBar layui-side-scroll"></div>
+		</div>
+		<!-- 右侧内容 -->
+		<div class="layui-body layui-form">
+			
+			<div class="layui-tab marg0" lay-filter="bodyTab" id="top_tabs_box">
+				<div class="layui-inline leftArrow">
+					<i class="layui-icon ">&#xe603;</i>  
+				</div>
+				<ul class="layui-tab-title top_tab" id="top_tabs">
+					<li class="layui-this" lay-id="" id="" style=""></i> <cite>首页</cite></li>
+				</ul>
+				
+				<ul class="layui-nav closeBox" style="">
+					<div class="layui-inline rightArrow" >
+						<i class="layui-icon rightArrowChilren">&#xe602;</i>  
+					</div>
+				  <li class="layui-nav-item">
+				    <a href="javascript:;">页面操作</a>
+				    <dl class="layui-nav-child">
+				      <dd><a href="javascript:;" class="closePageOther"><i class="iconfont icon-prohibit"></i> 关闭其他</a></dd>
+				      <dd><a href="javascript:;" class="closePageAll"><i class="iconfont icon-guanbi"></i> 关闭全部</a></dd>
+				    </dl>
+				  </li>
+				</ul>
+				<div class="layui-tab-content clildFrame">
+					<div class="layui-tab-item layui-show">
+						<iframe src="page/main.html"></iframe>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<!-- 底部 -->
+		<div class="layui-footer" style="z-index:10000;text-align:center;background:#fff;">Copyright ©2017 浙江完美物联科技有限公司 技术支持：集合科技</div>
+	</div>
+	
+	<!-- 移动导航 -->
+	<div class="site-tree-mobile layui-hide"><i class="layui-icon">&#xe602;</i></div>
+	<div class="site-mobile-shade"></div>
+
+	<script type="text/javascript" src="./layui/layui.js"></script>
+	<script type="text/javascript" src="./js/leftNav.js"></script>
+	<script type="text/javascript" src="./js/index.js"></script>
+	<script type="text/javascript" src="js/peizhi.js"></script>
+	<!--<script type="text/javascript" src="jquery-1.10.1.min.js"></script>-->
+	<script src="js/jquery-1.11.3.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" src="jquery.cookie.js"></script>
+	<script>
+	layui.use('layer', function(){
+		var layer = layui.layer;
+		$(".userdanwei").html($.cookie("organizationTitle"));
+	    $(".username").html($.cookie("realName"));
+		$(".leaveload").on('click',function(){
+			layer.alert('确定退出登录吗', function(index){
+			           $.ajax({
+						  		type:"post",
+								dataType:'json',
+						  		url: ApiUrl+"login/loginout",
+						  		async:true,
+						  		success:function(res){
+						  			if(res.data==1){
+						  				
+						  				$.cookie("id", null,{ expires: 1 ,path: '/' });//用户id
+										$.cookie("realName", null,{ expires: 1 ,path: '/' });//用户姓名
+										$.cookie("userCode", null,{ expires: 1 ,path: '/' });//用户编号
+										$.cookie("organizationId", null,{ expires: 1 ,path: '/' });//机构ID
+										$.cookie("organizationTitle", null,{ expires: 1 ,path: '/' });//机构名称
+										$.cookie("deptId",null,{ expires: 1 ,path: '/' });//部门ID
+										$.cookie("deptName", null,{ expires: 1 ,path: '/' });//部门名称
+										$.cookie("photo", null,{ expires: 1 ,path: '/' });//头像
+										$.cookie("jobState", null,{ expires: 1 ,path: '/' });//在职状态
+										$.cookie("isStoreman", null,{ expires: 1 ,path: '/' });//是否是保管员(1-是,-1-不是）
+										$.cookie("isAdmin", null,{ expires: 1 ,path: '/' });//是否是管理员(1-是,-1-不是）
+										$.cookie("adminId", null,{ expires: 1 ,path: '/' });//管理员id
+										$.cookie("roleIds", null,{ expires: 1 ,path: '/' });//权限ID
+										$.cookie("groupCode",null,{expires:1 ,path: '/'});//集团ID
+										window.location.href='login.html';
+						  			}
+						  		}
+							})
+                        layer.close(index);
+      });
+				
+		})
+	
+		$('.rightArrow').on('click',function(){
+				if(!$("#top_tabs").is(":animated")){
+					$('#top_tabs').stop().animate({'left':40+'px'},function(){
+					$('.top_tabs').css('left',40+'px')
+					$('.leftArrow').show()
+					})
+				}
+				
+		})
+		$('.leftArrow').on('click',function(){
+			if(!$("#top_tabs").is(":animated")){
+				$('#top_tabs').stop().animate({'left':window.sessionStorage.topLeft})
+			}
+		})
+	})
+	
+	</script>
+</body>
+</html>

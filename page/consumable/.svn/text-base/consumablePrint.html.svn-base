@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>耗材详情</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <p class="print-hide printtitle">耗材入库单</p>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">入库单号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="orderNo"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">入库时间:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="grnDate"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">单据类型:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="orderType"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">经办人:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="disposeName"></div>
+            </div>
+        </div>
+    </div>
+</form>
+<table class="layui-hide" id="scrap_table" lay-filter="user"></table>
+<table class="layui-table print-hide" id="print_table">
+    <thead>
+    <tr>
+        <th>物品编码</th>
+        <th>物品名称</th>
+        <th>物品类别</th>
+        <th>规格型号</th>
+        <th>品牌</th>
+        <th>单位</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>金额</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+        var $ = layui.$;
+        var data;
+        //按报废号查询
+        var params ={
+            'id':localStorage.consumableid
+        }
+        $.ajax({
+            url:ApiUrl+"zhpropertyconsumablegrn/getZhPropertyConsumableGrnorderDetail",
+            async:false,
+            data:params,
+            type:'GET',
+            contentType:"application/json",
+            success : function(result) {//返回数据根据结果进行相应的处理
+                console.log(result)
+                if(result.code==0){
+                    $("#disposeName").html(result.data.disposeName);
+                    $("#grnDate").html(result.data.grnDate);
+                    $("#orderNo").html(result.data.orderNo);
+                    if(result.data.orderType==1){
+                        $("#orderType").html('入库单');
+                    }else if(result.data.orderType==2){
+                        $("#orderType").html('冲销单');
+                    }
+                    data = result.data.detailList;
+                    //表格渲染
+                    table.render({
+                        elem: '#scrap_table'
+                        ,data:data
+                        ,cols: [[
+                            {field:'propertyCode', title: '物品编码', width:170}
+                            ,{field:'propertyName', title: '物品名称', width:140}
+                            ,{field:'categoryName', title: '物品类别', width:100}
+                            ,{field:'specification', title: '规格型号', width:100}
+                            ,{field:'unit', title: '单位',width:80}
+                            ,{field:'brand', title: '品牌', width:80}
+                            ,{field:'grnnum', title: '数量', width:80}
+                            ,{field:'grnprice', title: '单价', width:80}
+                            ,{field:'grnsum', title: '金额', width:120}
+                        ]]
+                        ,height:250
+                    });
+                    //打印表格
+                    var print=''
+                    for(var i=0;i<data.length;i++){
+                        print+="<tr>"
+                            +"<td>"+ data[i].propertyCode +"</td>"
+                            +"<td>"+ data[i].propertyName +"</td>"
+                            +"<td>"+ data[i].categoryName +"</td>"
+                            +"<td>"+ data[i].specification +"</td>"
+                            +"<td>"+ data[i].unit +"</td>"
+                            +"<td>"+ data[i].brand +"</td>"
+                            +"<td>"+ data[i].grnnum +"</td>"
+                            +"<td>"+ data[i].grnprice +"</td>"
+                            +"<td>"+ data[i].grnsum +"</td>"
+                            +"</tr>";
+                    }
+                    $("#print_table tbody").html(print)
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

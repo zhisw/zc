@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>报废单详情</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+    <style>
+
+    </style>
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <p class="print-hide printtitle">资产报废单</p>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">报废单号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dumpingCode"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">报废日期:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dumpingDate"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">处理人:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="dealUserName"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">备注:</label>
+        <div class="nine-xs8">
+            <div class="layui-form-mid layui-word-aux" id="dumpingRemark"></div>
+        </div>
+    </div>
+</form>
+<table class="layui-hide" id="scrap_table" lay-filter="user"></table>
+<table class="layui-table print-hide" id="print_table">
+    <thead>
+    <tr>
+        <th>资产条码</th>
+        <th>资产名称</th>
+        <th>资产类别</th>
+        <th>规格型号</th>
+        <th>品牌</th>
+        <th>单位</th>
+        <th>金额</th>
+        <th>序列号</th>
+        <th>入库时间</th>
+        <th>使用期限</th>
+        <th>所属公司</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+        var $ = layui.$;
+        var data;
+        //按报废号查询
+        var params ={
+            'dumpingCode':localStorage.dumpingCode
+        }
+        $.ajax({
+            url:ApiUrl+"dump/printdumping",
+            data:params,
+            type:'GET',
+            success : function(result) {//返回数据根据结果进行相应的处理
+                if(result.code==0){
+                    $("#dumpingCode").html(result.data.dumpingCode);
+                    $("#dumpingDate").html((result.data.dumpingDate).substring(0,10));
+                    $("#dealUserName").html(result.data.dealUserName);
+                    $("#dumpingRemark").html(result.data.dumpingRemark);
+                    var data = result.data.dumpdetaillist;
+                    //表格渲染
+                    table.render({
+                        elem: '#scrap_table'
+                        ,data:data
+                        ,cols: [[
+                            {field:'propertyCode', title: '资产编码', width:180}
+                            ,{field:'propertyName', title: '资产名称', width:140}
+                            ,{field:'propertyCatagory', title: '资产类别', width:140}
+                            ,{field:'skuSpecs', title: '规格型号', width:120}
+                            ,{field:'brand', title: '品牌', width:120}
+                            ,{field:'unit', title: '单位', width:120}
+                            ,{field:'dumpingMoney', title: '金额', width:120}
+                            ,{field:'snno', title: '序列号', width:120}
+                            ,{field:'createAt', title: '入库时间', width:120}
+                            ,{field:'serviceLife', title: '使用期限', width:120}
+                            ,{field: 'createOrganizationName', title: '所属公司', width: 160}
+                        ]]
+                        ,height:255
+                    });
+                    //打印表格
+                    var print=''
+                    for(var i=0;i<data.length;i++){
+                        print+="<tr>"
+                            +"<td>"+ data[i].propertyCode +"</td>"
+                            +"<td>"+ data[i].propertyName +"</td>"
+                            +"<td>"+ data[i].propertyCatagory +"</td>"
+                            +"<td>"+ data[i].skuSpecs +"</td>"
+                            +"<td>"+ data[i].brand +"</td>"
+                            +"<td>"+ data[i].unit +"</td>"
+                            +"<td>"+ data[i].dumpingMoney +"</td>"
+                            +"<td>"+ data[i].snno +"</td>"
+                            +"<td>"+ data[i].createAt +"</td>"
+                            +"<td>"+ data[i].serviceLife +"</td>"
+                            +"<td>"+ data[i].createOrganizationName +"</td>"
+                            +"</tr>";
+                    }
+                    $("#print_table tbody").html(print)
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

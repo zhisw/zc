@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>维修修改</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>维修花费:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="moneyRepairs" name="moneyRepairs" lay-verify="required" lay-verify="price" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">维修内容:</label>
+        <div class="nine-xs8">
+            <input type="text" id="remark" placeholder="请输入维修内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <input type="hidden" id="repairNo">
+    <input type="hidden" id="repairDate">
+    <button class="layui-btn submitLY layui-hide" lay-submit="" lay-filter="form-submit" id="sumbit" type="button" >立即提交</button>
+</form>
+<table id="repair_table" lay-filter="table-checkbox"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['form','jquery','laydate','table'], function() { //独立版的layer无需执行这一句
+        var form = layui.form;
+        var $=layui.$;
+        var laydate = layui.laydate;
+        var table = layui.table;
+        //获取表单数据
+        var params ={
+            'idRepairs':localStorage.idRepairs
+        }
+        $.ajax({
+            url:ApiUrl+"repairs/repairsInfo",
+            data:params,
+            type:'GET',
+            success : function(result) {//返回数据根据结果进行相应的处理
+                if(result.code==0){
+                    $("#moneyRepairs").val(result.repairsHeadInfo.moneyRepairs);
+                    $("#remark").val(result.repairsHeadInfo.remark);
+                    $("#idRepairs").val(result.repairsHeadInfo.idRepairs);
+                    var data = result.data
+                    //表格渲染
+                    table.render({
+                        elem: '#repair_table'
+                        ,data:data
+                        ,cols: [[
+                            {field:'property_code', title: '资产编码', width:180}
+                            ,{field:'property_name', title: '资产名称', width:140}
+                            ,{field:'category_name', title: '资产类别', width:140}
+                            ,{field:'specification', title: '规格型号', width:120}
+                            ,{field:'brand', title: '品牌', width:120}
+                            ,{field:'unit', title: '单位', width:120}
+                            ,{field:'price', title: '金额', width:120}
+                            ,{field:'snNo', title: '序列号', width:120}
+                            ,{field:'storageinDate', title: '入库时间', width:120}
+                            ,{field:'service_life', title: '使用期限', width:120}
+                            ,{field: 'createOrganizationName', title: '所属公司', width: 160}
+                        ]]
+                        ,height:240
+                    });
+                }
+            }
+        });
+        //监听表单提交
+        form.verify({
+            moneyRepairs: [/(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/, '输入正确的金额'],
+        });
+        //表单提交
+        form.on('submit(form-submit)', function(data){
+            var parm={
+                idRepairs:localStorage.idRepairs,
+                moneyRepairs:$("#moneyRepairs").val(),
+                remark:$("#remark").val(),
+            }
+            parm=JSON.stringify(parm);
+            $(this).attr("disabled","disabled");
+            $.ajax({
+                type:"POST",
+                url: ApiUrl+'repairs/updateRepairs',
+                dataType:'json',
+                contentType:"application/json",
+                data: parm,
+                success:function(result){
+                    if(result.code==0){
+                        layer.msg("保存成功",{time:2000},function () {
+                            parent.location.reload()
+                        });
+                    }else{
+                        layer.msg(result.message)
+                    }
+                }
+            });
+        });
+    })
+</script>
+</body>
+</html>

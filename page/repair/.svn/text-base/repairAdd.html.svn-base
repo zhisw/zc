@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>维修单</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>维修日期:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="dateRepairs" name="dateRepairs" class="layui-input" lay-verify="required" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">维修花费:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="moneyRepairs" name="moneyRepairs" lay-verify="price" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title"><span class="red-point">*</span>维修内容:</label>
+        <div class="nine-xs8">
+            <input type="text" id="remark" lay-verify="required" placeholder="请输入维修内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="btn-box">
+        <button class="layui-btn btns-blue" type="button" id="select-asset">选择资产</button>
+        <button class="layui-btn btns-blue" type="button" id="del-btn" data-type="getCheckData">删除</button>
+    </div>
+    <button class="layui-btn submitLY layui-hide" lay-submit="" lay-filter="form-submit" type="button" >立即提交</button>
+</form>
+<table id="sure-table" lay-filter="table-checkbox"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['form','laydate'], function() { //独立版的layer无需执行这一句
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var $=layui.$;
+        laydate.render({
+            elem: '#dateRepairs'
+            ,position: 'fixed'
+            ,value:new Date()
+        });
+        //监听表单提交
+        form.verify({
+            moneyRepairs: [/(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/, '输入正确的金额'],
+        });
+        form.on('submit(form-submit)', function(data){
+            var tableId1 = JSON.parse(localStorage.getItem("data1"));  //没经过删除的数据
+            var tableId2 = JSON.parse(localStorage.getItem("dataDel")); //经过删除的数据
+            var arrId = [];
+            if(tableId1){
+                for(var a = 0;a<tableId1.length;a++){
+                    arrId[a]=tableId1[a].id;
+                }
+            }else if(tableId2){
+                for(var a = 0;a<tableId2.length;a++){
+                    arrId[a]=tableId2[a].id;
+                }
+            }
+            if(arrId.length<1){
+                layer.msg('请选择资产');
+            }else{
+                //表单提交
+                var parm={
+                    dateRepairs:$("#dateRepairs").val(),
+                    moneyRepairs:$("#moneyRepairs").val(),
+                    remark:$("#remark").val(),
+                    propArr:arrId
+                }
+                parm=JSON.stringify(parm);
+                $(this).attr("disabled","disabled");
+                $.ajax({
+                    type:"POST",
+                    url: ApiUrl+'repairs/addRepairsProperty',
+                    dataType:'json',
+                    contentType:"application/json",
+                    data: parm,
+                    success:function(result){
+                        if(result.code==0){
+                            layer.msg("新增成功",{time:2000},function () {
+                                parent.location.reload()
+                            });
+                        }else{
+                            layer.msg(result.message)
+                        }
+                    }
+                });
+            }
+        });
+    })
+    //渲染已选择资产表格
+    function renderTable(obj){
+        layui.use(['jquery','form','layer','table'], function(){
+            var $ = layui.jquery;
+            var table = layui.table;
+            var layer = layui.layer;
+            table.render({
+                elem: '#sure-table'
+                ,id:'idTest'
+                ,data: JSON.parse(obj)
+                ,cols: [[ //标题栏
+                    {checkbox: true}
+                    ,{field: 'id', title: 'ID', width: 20}
+                    ,{field: 'propertyCode', title: '资产条码', width: 170}
+                    ,{field: 'propertyName', title: '资产名称', width: 100}
+                    ,{field: 'categoryName', title: '资产类别', width: 120}
+                    ,{field: 'specification', title: '规格型号', width: 120}
+                    ,{field: 'brand', title: '品牌', width: 100}
+                    ,{field: 'unit', title: '单位', width: 100}
+                    ,{field: 'price', title: '金额', width: 100}
+                    ,{field: 'snno', title: '序列号', width: 120}
+                    ,{field: 'createat', title: '入库时间', width: 160}
+                    ,{field: 'serviceLife', title: '使用期限', width: 160}
+                    ,{field: 'createOrganizationName', title: '所属公司', width: 160}
+                ]]
+                ,skin: 'row' //表格风格
+                ,even: true
+                ,height:210
+            });
+        })
+    }
+    //多次选择资产
+    function selectData(i,data){
+        if(i==1){
+            var data1 = localStorage.setItem("data1",data);
+        }else if(i>1){
+            var data1 = localStorage.getItem("data1");
+            var oldArr = JSON.parse(data1);
+            var newArr = JSON.parse(data);
+            var oldArrId = [];
+            //去重
+            for(var j = 0;j<oldArr.length;j++){
+                oldArrId.push(oldArr[j].id);
+            }
+            for(var k = 0;k<newArr.length;k++){
+                if(oldArrId.indexOf(newArr[k].id) == -1){
+                    oldArr.push(newArr[k]);
+                }
+            }
+            var data1 = localStorage.setItem("data1",JSON.stringify(oldArr));
+        }
+    }
+    //多次选择资产删除
+    function selectDataDel(dataDel){
+        var data1 = localStorage.getItem("data1");
+        var oldArr = JSON.parse(data1);
+        var newArr = JSON.parse(dataDel);
+        var numArr = [];
+        //删除
+        for(var m = 0;m<oldArr.length;m++){
+            for(var n = 0;n<newArr.length;n++){
+                if(oldArr[m].id == newArr[n].id){
+                    oldArr.remove(m); //m为选择数据删除的第几条
+                }
+            }
+        }
+        localStorage.setItem("dataDel",JSON.stringify(oldArr));
+    }
+    /*删除数组指定下标或指定对象 */
+    Array.prototype.remove=function(obj){
+        for(var i =0;i <this.length;i++){
+            var temp = this[i];
+            if(!isNaN(obj)){
+                temp=i;
+            }
+            if(temp == obj){
+                for(var j = i;j <this.length;j++){
+                    this[j]=this[j+1];
+                }
+                this.length = this.length-1;
+            }
+        }
+    }
+</script>
+</body>
+</html>

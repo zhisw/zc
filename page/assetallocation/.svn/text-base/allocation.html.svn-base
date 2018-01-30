@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>资产调拨 </title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/allocation.css">
+	<link rel="stylesheet" href="../../css/public.css">
+</head>
+<body class="childrenBody">
+	<div class="header">
+		<form class="layui-form">
+		<div class="layui-form-item">
+		    <label class="layui-form-label">筛选条件</label>
+		    <div class="layui-input-block">
+		      <select name="interest" lay-filter="aihao">
+		      
+		        <option value="0">全部</option>
+		        <option value="1" selected="selected">未确认的</option>
+		        <option value="2">我调出的</option>
+		        <option value="3">调入我的</option>
+		      </select>
+		      
+		    </div>
+        </div>
+		<div class="layui-inline">
+		      <label class="layui-form-label">调出日期 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input">
+		      </div>
+        </div>
+        <div class="layui-inline">
+		      <label class="layui-form-label" style="width:10px !important;padding:7px 5px !important;text-align:center !important;">至</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="date2" id="date1" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input">
+		      </div>
+        </div>
+        <div class="layui-inline">
+		      <label class="layui-form-label">资产查询 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="资产编码，名称" class="layui-input">
+		      </div>
+        </div>
+        </form>
+        <div class="layui-inline btn-box">
+        	<button class="layui-btn btns-blue chaxun">查询</button> 
+            <button class="layui-btn btns-green newadd" data-method="setTop">新增</button>
+            <button class="layui-btn btns-blue queren" data-method="setTop2" data-type="getCheckData">调入确认</button>
+            <button class="layui-btn btns-blue restqueren" data-method="setTop3" data-type="getCheckData">取消调拨</button>
+            <button class="layui-btn btns-blue print" data-type="getCheckData">打印</button>
+           
+        </div>
+        <div class="foot">
+        	<table class="layui-table" id="idText"  lay-filter="demo">
+			  
+            </table>
+        </div>
+	</div>
+</body>
+</html>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/jscript" src="../../js/peizhi.js"></script>
+<script>
+var str = "";
+var prints = "";
+var arry = new Array();
+var brry = new Array();
+var printarr = new Array();
+layui.use(['form', 'layedit', 'laydate'], function(){
+  var form = layui.form
+  ,layer = layui.layer
+  ,layedit = layui.layedit
+  ,laydate = layui.laydate;
+  dateFunc('#date','#date1');
+  //日期
+  laydate.render({
+    elem: '#date'
+  });
+  laydate.render({
+    elem: '#date1'
+  });
+  
+  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+ 
+  //自定义验证规则
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '标题至少得5个字符啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+  
+  //监听提交
+  form.on('submit(demo1)', function(data){
+    layer.alert(JSON.stringify(data.field), {
+      title: '最终的提交信息'
+    })
+    return false;
+  });
+  
+  
+});
+
+layui.use(['layer','table','form'],function(){
+var $ = layui.jquery, layer = layui.layer,table = layui.table,form = layui.form;
+table.on('checkbox(demo)', function(obj){
+   
+  });
+table.render({
+	    elem: '#idText'
+	    ,id:'idText'
+	   	,url:ApiUrl+"allocation/getallocationlist"
+	   	,where:{'state':'1'}
+	    ,height: 'full-125'
+	    ,cols: [[ //标题栏
+	    {checkbox:true, fixed: true}
+			    ,{field:'allocationState',title: '状态', width:80}
+			    ,{field:'calloutDate',title: '调出日期', width:110}
+			    ,{field:'calloutAdmin', title:'调出管理员',width:110}
+			    ,{field:'propertyCode', title:'资产条码',width:80}
+			    ,{field:'propertyName', title:'资产名称',width:110}
+			    ,{field:'propertyCatagory',title:'资产类别', width:110}
+			    ,{field:'brand',title:'品牌', width:80}
+			    ,{field:'skuSpecs',title:'规格型号', width:110}
+			    ,{field:'unit', title:'单位',width:80}
+			    ,{field:'allotMoney',title:'金额', width:80}
+			    ,{field:'calloutOrganization',title:'调出公司', width:80}
+			    ,{field:'calloutDeptName',title:'调出部门', width:100}
+			    ,{field:'originalAddress',title:'原存放地', width:100}
+			    ,{field:'callinAdmin',title:'调入管理员' , width:100}
+			    ,{field:'callinDate',title:'调入日期' , width:100}
+			    ,{field:'callinOrganization',title:'调入公司' , width:100}
+			    ,{field:'callinDeptName',title:'调入部门' , width:100}
+			    ,{field:'callinUserName',title:'调入使用人' , width:100}
+			    ,{field:'callinAddress',title:'调入存放地' , width:100}
+			    ,{field:'createOrganizationName',title:'所属公司', width:120}
+	     
+	    ]] 
+	    //,skin: 'row' //表格风格
+	    //,even: true
+	    ,page: true //是否显示分页
+	    ,limits: [20, 50, 100]
+	    ,limit: 20 //每页默认显示的数量
+	});
+var iframe = ""
+var active = {
+  setTop: function(){
+      var that = this; 
+      //多窗口模式，层叠置顶
+      layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '调拨单'
+        ,area: ['900px', '500px']
+        ,shade: 0.3
+        ,maxmin: true
+        ,btnAlign: 'r'
+        ,content: 'newaddlist.html'
+        ,btn: ['确定', '取消'] //只是为了演示
+        ,yes: function(){
+        var indexiframe =  "layui-layer-iframe"+localStorage.getItem("indexztb");
+        var body = $(document.getElementById(indexiframe).contentWindow.document.body)
+        body.find("#allocationtijiao").click();
+        //var srt =  body.find("#qurendiaobotijiao").click(); 
+         //layer.close(layer.index);
+        }
+        ,btn2: function(){
+         layer.close(layer.index);
+        }
+        ,cancel: function(){ 
+    //右上角关闭回调
+         layer.close(layer.index);
+         //return false //开启该代码可禁止点击该按钮关闭
+        }
+        
+        ,zIndex: layer.zIndex //重点1
+        ,success: function(layero,index){
+        	var body = layer.getChildFrame('body', index);
+        	//debugger;
+        	localStorage.setItem("indexztb",layer.index);
+			var iframeWin = window[layero.find('iframe')[0]['name']]; 
+			        		//选择资产
+			body.find('.xuanzezichan').on('click', function(){
+					active.selectAsset();
+					count = 0;
+
+        })
+          layer.setTop(layero); //重点2
+        }
+      });
+  },
+ selectAsset: function(){
+		var that = this; 
+			//count++;
+			      	//多窗口模式，层叠置顶
+		layer.open({
+				type: 2 //此处以iframe举例
+				,title: '选择资产'
+				,area: ['700px', '460px']
+				,offset: '50px'
+				,shade: 0.3
+				,content: 'choice.html'
+			    ,resize:false
+			    ,maxmin: true
+			    ,zIndex: layer.zIndex
+			    ,success: function(layero, index){
+			        		
+				}
+			    ,cancel: function(index, layero){  //右上角关闭回调
+					localStorage.setItem("data1","[]");
+				}
+			});
+	    }
+}
+var active2 = {
+  setTop2: function(){
+      var that = this; 
+      //多窗口模式，层叠置顶
+      layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '调入确认'
+        ,area: ['900px', '500px']
+        ,shade: 0.3
+        ,maxmin: true
+        ,btnAlign: 'r'
+        ,content: 'confirmlist.html  '
+        ,btn: ['确认', '取消'] //只是为了演示
+        ,yes: function(){
+         var indexiframe =  "layui-layer-iframe"+layer.index;
+         var body = $(document.getElementById(indexiframe).contentWindow.document.body)
+         body.find("#qurendiaobotijiao").click();         
+       
+        }
+        ,btn2: function(){
+        localStorage.setItem("organizationId","");//组织ID
+	    localStorage.setItem("organization","");//组织名称
+	    localStorage.setItem("deptId","");//部门ID
+	    localStorage.setItem("deptName","");//部门名称
+	    localStorage.setItem("callinUserId","");//调入使用人ID
+	    localStorage.setItem("callinUserName","");//调入使用人名称
+	    localStorage.setItem("callinAddress","");//存放地
+	    localStorage.setItem("allotRemark","");//调入说明
+        layer.close(layer.index);
+         
+        }
+        ,cancel: function(){ 
+    //右上角关闭回调
+         layer.close(layer.index);
+         //return false //开启该代码可禁止点击该按钮关闭
+        }
+        
+        ,zIndex: 0 //重点1
+        ,success: function(layero){
+          layer.setTop(layero); //重点2
+        }
+      });
+   }
+}
+var active3 = {
+    getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('idText')
+      ,data = checkStatus.data
+      ,fxcheck = "";
+      for(i in data){
+      	if(data[i].allocationState!="已调出"){
+      		fxcheck = 'mmp';
+      	}
+      }
+      if(JSON.stringify(data)=='[]'){
+      	str = false;
+      	layer.msg("未选中任何项");
+      }else if(fxcheck=='mmp'){
+      	str = false;
+      	layer.msg("选中资产中有状态不允许，确认以及取消");
+      }else{
+      	str = true;
+      	for(var i=0;i<data.length;i++){
+      		arry.push(data[i].propertyCode);
+      		localStorage.setItem("arry",arry);
+      		localStorage.setItem("callinAddress",data[0].callinAddress);
+      		localStorage.setItem("callinDeptName",data[0].callinDeptName);
+      		localStorage.setItem("callinDeptId",data[0].callinDeptId);
+      		localStorage.setItem("callinOrganization",data[0].callinOrganization);
+      		localStorage.setItem("callinOrganizationId",data[0].callinOrganizationId);
+      		localStorage.setItem("allotRemark",data[0].allotRemark);
+      		var qurendata = JSON.stringify(data);
+      		localStorage.setItem("qurendata",qurendata);
+      	}
+      	
+      //layer.alert(JSON.stringify(data));
+      }
+    }
+  };
+var activeprint = {
+    getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('idText')
+      ,data = checkStatus.data
+      ,fxcheck = "";
+      if(JSON.stringify(data)=='[]'){
+      	prints = false;
+      	layer.msg("未选中任何项");
+      }else{
+      	prints = true;
+      	for(var i=0;i<data.length;i++){
+      		printarr.push(data[i].id);		
+      	}
+      	var printdata = JSON.stringify(printarr);
+      	localStorage.setItem("printdata",printdata);
+      //layer.alert(JSON.stringify(data));
+      }
+    }
+  };
+var active4 = {
+	setTop3: function(){
+      var that = this; 
+      layer.confirm('是否确定取消此资产的调拨', {icon: 3, title:'提示'}, function(index){
+      //do something
+      	var property = {'propertyCodes':arry};
+        	var propertyCodes = JSON.stringify(property);
+         $.ajax({
+         	type:"post",
+         	url:ApiUrl+"allocation/canclealocation",
+          	contentType:'application/json',
+         	data:propertyCodes,
+         	xhrFields: {
+            withCredentials: true,
+            },
+            crossDomain: true,
+         	success:function(res){
+         		
+         		if(res.status==true){
+         	   // alert("取消调拨成功");
+         	    layer.close(layer.index);
+         	    layer.msg("取消调拨成功");
+         		var state = $("input[name=interest]").val();//筛选条件
+				var startTime = $("input[name=date]").val();//调出时间
+				var endTime = $("input[name=date2]").val();//
+				var keywork = $("input[name=title]").val(); //资产关键字
+         	    table.reload('idText',{
+         				url:ApiUrl+"allocation/getallocationlist"
+	   	                ,where:{'state':state,'startTime':startTime,'endTime':endTime,'keywork':keywork}
+	                    ,height: '400'
+         			});
+         		}else{
+         			layer.msg("取消调拨失败");
+         		}
+         	}
+         });
+      });
+      //多窗口模式，层叠置顶
+ 
+   }
+}
+$('.newadd').on('click', function(){
+	localStorage.setItem("choicdataa",null);
+    var othis = $(this), method = othis.data('method');
+    active[method] ? active[method].call(this, othis) : '';
+  });
+$('.queren').on('click', function(){
+	var type = $(this).data('type');
+    active3[type] ? active3[type].call(this) : '';
+	if(str==true){
+	var othis = $(this), method = othis.data('method');
+    active2[method] ? active2[method].call(this, othis) : '';	
+	}  
+  });
+$(".restqueren").on('click',function(){
+	var type = $(this).data('type');
+    active3[type] ? active3[type].call(this) : '';
+    if(str==true){
+	var othis = $(this), method = othis.data('method');
+    active4[method] ? active4[method].call(this, othis) : '';	
+	}  
+});
+$(".chaxun").on('click',function(){
+	var state = $("select[name=interest]").val();//筛选条件
+	var startTime = $("input[name=date]").val();//调出时间
+	var endTime = $("input[name=date2]").val();//
+	var keywork = $("input[name=title]").val(); //资产关键字
+	//var gound = $.cookie("groupCode");
+	if(state==""&&startTime==""&&endTime==""&&keywork==""){
+		layer.msg("没有查询条件")
+	}else{
+		
+		table.render({
+	    elem: '#idText'
+	    ,id:'idText'
+	   	,url:ApiUrl+"allocation/getallocationlist"
+	   	,where:{'state':state,'startTime':startTime,'endTime':endTime,'keyword':keywork}
+	    ,height: 'full-125'
+	    ,cols: [[ //标题栏
+	    {checkbox:true, fixed: true}
+			    ,{field:'allocationState',title: '状态', width:80}
+			    ,{field:'calloutDate',title: '调出日期', width:110}
+			    ,{field:'calloutAdmin', title:'调出管理员',width:110}
+			    ,{field:'propertyCode', title:'资产条码',width:80}
+			    ,{field:'propertyName', title:'资产名称',width:110}
+			    ,{field:'propertyCatagory',title:'资产类别', width:110}
+			    ,{field:'brand',title:'品牌', width:80}
+			    ,{field:'skuSpecs',title:'规格型号', width:110}
+			    ,{field:'unit', title:'单位',width:80}
+			    ,{field:'allotMoney',title:'金额', width:80}
+			    ,{field:'calloutOrganization',title:'调出公司', width:100}
+			    ,{field:'calloutDeptName',title:'调出部门', width:100}
+			    ,{field:'originalAddress',title:'原存放地', width:100}
+			    ,{field:'callinAdmin',title:'调入管理员' , width:100}
+			    ,{field:'callinDate',title:'调入日期' , width:100}
+			    ,{field:'callinOrganization',title:'调入公司' , width:100}
+			    ,{field:'callinDeptName',title:'调入部门' , width:100}
+			    ,{field:'callinUserName',title:'调入使用人' , width:100}
+			    ,{field:'callinAddress',title:'调入存放地' , width:100}
+			    ,{field:'createOrganizationName',title:'所属公司', width:120}
+	     
+	    ]] 
+	    //,skin: 'row' //表格风格
+	    //,even: true
+	    ,page: true //是否显示分页
+	    ,limits: [20, 50, 100]
+	    ,limit: 20 //每页默认显示的数量
+	  });
+	
+		}
+	
+});
+$(".print").on('click',function(){
+	var type = $(this).data('type');
+    activeprint[type] ? activeprint[type].call(this) : '';
+	if(prints==true){
+	window.location.href="printallocation.html";
+	}  
+})
+})
+</script>

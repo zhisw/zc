@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/public.css" media="all" />
+	<style>
+		.btn-box {
+		    margin-left: 10px;
+		}
+		.search-bar1{
+			margin-top: 20px;
+			margin-bottom: 10px;
+			padding-left: 20px;
+		}
+		.search-bar1 .distance{
+			margin-left: 5px;
+			margin-right: 10px;
+			width: 176px;
+		}
+		.search-bar1 .distance1{
+			margin-left: 5px;
+			margin-right: 10px;
+			width: 146px;
+		}
+		.search-bar2{
+			margin-top: 20px;
+			margin-bottom: 10px;
+			padding-left: 20px;
+		}
+		.search-bar2 .distance{
+			margin-left: 5px;
+			margin-right: 10px;
+			width: 176px;
+		}
+		.search-bar2 .distance1{
+			margin-left: 5px;
+			margin-right: 10px;
+			width: 146px;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="layui-tab layui-tab-card" lay-filter="tab">
+		<ul class="layui-tab-title">
+		    <li class="layui-this" lay-id="1">领用</li>
+		    <li lay-id="2">退库</li>
+		</ul>
+		<div class="layui-tab-content">
+		    <div class="layui-tab-item layui-show">
+		    	<!--领用-->
+		    	<div class="search-bar1 layui-form">
+			  		领用单号
+					<div class="layui-inline distance">
+				      	<input type="text" class="layui-input idReceive">
+				    </div>    
+					领用人
+					<div class="layui-inline distance">
+				        <input type="text" class="layui-input userReceive">
+				    </div> 
+					领用日期
+					<div class="layui-inline distance1">
+						<input type="text" placeholder="yyyy-mm-dd" class="layui-input" id="start-time1">
+					</div>
+					至
+					<div class="layui-inline distance1">
+						<input type="text" placeholder="yyyy-mm-dd" class="layui-input" id="end-time1">
+					</div>
+					<div class="layui-inline btn-box">
+				        <button class="layui-btn btns-blue" id="search-btn1">查询</button>
+						<button class="layui-btn btns-green" id="add-btn" data-method="lingYong" data-type="auto">新增</button>
+				    </div>
+		    	</div>
+		    	<table class="layui-table" id="use-table" lay-filter="use-table"></table>
+		   </div>
+		    <div class="layui-tab-item">
+		    	<!--退库-->
+		    	<div class="search-bar2 layui-form">
+			  		退库单号
+					<div class="layui-inline distance">
+				        <input type="text" class="layui-input idReturnStock">
+				    </div> 
+					退库日期
+					<div class="layui-inline distance1">
+						<input type="text" placeholder="yyyy-mm-dd" class="layui-input" id="start-time2">
+					</div>
+					至
+					<div class="layui-inline distance1">
+						<input type="text" placeholder="yyyy-mm-dd" class="layui-input" id="end-time2">
+					</div>
+					
+					<div class="layui-inline btn-box">
+						<button class="layui-btn btns-blue" id="search-btn2">查询</button>
+						<button class="layui-btn btns-green" id="add1-btn" data-method="tuiKu" data-type="auto">新增</button>
+				    </div>
+					
+		    	</div>
+		    	<table class="layui-table" id="return-table" lay-filter="return-table"></table>
+		    </div>
+		</div>
+	</div>
+</body>
+	<script type="text/html" id="operation-bar">
+	  <a class="layui-btn layui-btn-mini" lay-event="detail">详情</a>
+	</script>
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/peizhi.js"></script>
+	<script>
+		layui.use(['element','form','laydate','layer','table'],function(){
+			//必须先声明 
+			var $ = layui.jquery;
+			var element = layui.element;	//选项卡
+			var form = layui.form;			//表单
+			var laydate = layui.laydate;	//日期选择
+			var layer = layui.layer;		//弹窗
+			var table = layui.table;		//表格
+			
+//领用
+			//日期选择
+			/*laydate.render({
+			    elem: '#start-time1'
+			});
+			laydate.render({
+			    elem: '#end-time1'
+			});*/
+			dateFunc('#start-time1','#end-time1');
+			
+			//退库打印返回到当前的tab页
+			var tab = localStorage.getItem("tab");
+			if(tab == 2){
+				element.tabChange('tab', 2);
+				localStorage.clear("tab");
+			}
+			
+			var renerData={};
+			var selectData = {};
+			var selectDataDel = {};
+			var count=0;
+			var submitLYObj={}
+			//弹窗
+			var dialog = {
+			  	lingYong: function(othis){
+			        var type = othis.data('type');	
+			      	layer.open({
+			        	type: 2  
+			        	,title: '领用单'
+			        	,content: 'lingYongDan.html'
+			        	,area:  ['900px', '480px']
+			        	,offset: '15px'
+			        	,btn: ['保存', '取消'] 
+			        	,btnAlign: 'r' 
+			        	,shade: 0.3 
+			        	,resize:false 
+			        	,maxmin: true
+			        	,btn1: function(index){
+							submitLYObj.submitLYFunc();
+							return false;
+				        }
+			        	,btn2: function(index){
+			          		layer.close(index);
+			        	}
+			        	,success:function(layero, index){
+			        		var body = layer.getChildFrame('body', index);
+			        		
+			        		var iframeWin = window[layero.find('iframe')[0]['name']]; 
+			        		//得到iframe页的窗口对象，执行iframe页的方法：
+			        		renerData = {
+			        		 	renerDataFunc:function(obj){
+			        		 		iframeWin.renderTable(obj);
+			        		 	}
+			        		}		 
+			        		//添加人员
+						    body.find('#add-people').on('click', function(){
+						    	dialog.addPeople();
+						  	});
+						  	//表單提交
+						  	submitLYObj.submitLYFunc = function(){
+						  		body.find('.submitLY').click();
+						  	}
+			        		//选择资产
+						    body.find('#select-asset').on('click', function(){
+						    	dialog.selectAsset();
+						    	//多次选择资产
+						    	selectData = {
+				        		 	selectDataFunc:function(i,data){
+				        		 		iframeWin.selectData(i,data);
+				        		 	}
+				        		}
+						    	//删除资产
+						    	selectDataDel = {
+				        		 	selectDataDelFunc:function(dataDel){
+				        		 		iframeWin.selectDataDel(dataDel);
+				        		 	}
+				        		}
+						  	});
+						  	//选择资产的删除
+						  	body.find('#del-btn').on('click', function(){
+						  		//选择删除的数据	
+						  		var checkStatusDel = iframeWin.layui.table.checkStatus('idTest');
+					        	var dataDel = checkStatusDel.data;
+					        	var myDataDel = JSON.stringify(dataDel);
+					        	if(!dataDel || dataDel.length<1){
+					        		layer.msg('未选择资产',{
+										time: 2000 //   （如果不配置，默认是3秒）
+									});
+					        	}else{
+					        		selectDataDel.selectDataDelFunc(myDataDel);
+						        	var selectDataDelStr = localStorage.getItem("dataDel"); //获得删除的字符串
+						        	renerData.renerDataFunc(selectDataDelStr);
+						        	localStorage.setItem("data1",selectDataDelStr);  //保存删除后的数据
+					        	}
+						  	});
+			        	}
+			        	,cancel: function(index, layero){  //右上角关闭回调
+						    layer.close(layer.index);
+						}
+			        	,end: function(index, layero){   //层销毁后触发的回调
+			        		localStorage.removeItem('companyReceive');      //清除公司
+               				localStorage.removeItem('deptReceive');        //清除部门
+               				localStorage.removeItem('userReceive');       //清除人
+               				localStorage.removeItem('idOrganization');   //清除公司id
+               				localStorage.removeItem('deptId');			//清除部门id
+               				localStorage.removeItem('personnelId');	   //清除人id
+			          		localStorage.removeItem('data1');    //清除选择资产的存储
+				    		localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+			          		count=0;   //选择资产的次数初始化
+						}
+			      	});
+			    },
+			    selectAsset: function(){
+			      	var that = this; 
+			      	count++;
+			      	//多窗口模式，层叠置顶
+			      	layer.open({
+				        type: 2 //此处以iframe举例
+				        ,title: '选择资产'
+				        ,area: ['700px', '450px']
+				        ,offset: '30px'
+				        ,shade: 0.3
+				        ,content: 'selectAssetUse.html'
+			        	,resize:false
+			        	,maxmin: true
+			        	,zIndex: layer.zIndex
+			        	,success: function(layero, index){
+			        		var propertyStatus = [0];
+			        		localStorage.setItem("propertyStatus",JSON.stringify(propertyStatus));  //传资产状态值,闲置为0
+			        		
+						    var body = layer.getChildFrame('body', index);
+						    var iframeWin = window[layero.find('iframe')[0]['name']]; 
+						    //选择资产添加按钮事件
+						    body.find('#sure-btn').on('click', function(){	
+						       //选中数据
+						        var checkStatus = iframeWin.layui.table.checkStatus('asset-table');
+					        	var data = checkStatus.data;
+					        	var myData = JSON.stringify(data);
+					        	if(myData=="[]"){
+							      	layer.msg('未选择任何资产',{
+										time: 1000 //   （如果不配置，默认是3秒）
+									});
+							    }else{
+							      	selectData.selectDataFunc(count,myData);
+						        	var concatDataStr = localStorage.getItem("data1"); //获得合并的字符串
+						        	renerData.renerDataFunc(concatDataStr);
+						        	layer.close(index);
+							    }
+						  	});
+						}
+			        	,cancel: function(index, layero){  //右上角关闭回调
+						   localStorage.setItem("data1","[]");
+						}
+				    });
+			    }
+			}; 
+			
+		    $('.search-bar1 #add-btn').on('click', function(){
+		    	var othis = $(this), method = othis.data('method');
+		    	dialog[method] ? dialog[method].call(this, othis) : '';
+		  	});
+			 
+			
+			//加载领用初始数据
+			getData();
+			
+			//条件查询领用数据
+			$('.search-bar1 #search-btn1').on('click',function(){
+				getData();
+			});
+			
+			//领用获得数据方法
+			function getData(){
+				var groupCode = $.cookie("groupCode");   //当前登录人的集团id
+				var idReceive = $(".search-bar1 .idReceive").val();
+				var userReceive = $(".search-bar1 .userReceive").val();
+				var startDate = $(".search-bar1 #start-time1").val();
+				var endDate = $(".search-bar1 #end-time1").val();
+				table.render({
+			    	elem: '#use-table'
+			    	,id: 'useTable'
+			    	,url: ApiUrl + "receive/qryReceiveListByCondition"
+				    ,where: {
+				    	groupCode: groupCode, 
+				    	idReceive: idReceive,
+				    	userReceive: userReceive,
+				    	startDate: startDate,
+				    	endDate: endDate,
+				    }
+				    ,cols: [[ //标题栏
+				       {field: 'num', title: '序号', width: 60}
+				      ,{field: 'idReceive', title: '领用单号', width: 190}
+				      ,{field: 'dateReceive', title: '领用日期', width: 105}
+				      ,{field: 'companyReceive', title: '领用公司', width: 130}
+				      ,{field: 'deptReceive', title: '领用部门', width: 110}
+				      ,{field: 'userReceive', title: '领用人', width: 100}
+				      ,{field: 'userHanddle', title: '处理人', width: 100}
+				      ,{field: 'datePredictReturnstock', title: '预计退库时间', width: 115}
+				      ,{field: 'digest', title: '摘要', width: 124}
+				      ,{field: '', title: '操作', width: 70, toolbar: '#operation-bar'}
+				    ]] 
+				    ,width: '90%'
+				    ,height: 'full-176'
+//				    ,skin: 'row' //表格风格
+				    ,page: true //是否显示分页
+				    ,limit: 20 //每页默认显示的数量
+				    ,limits:[20,50,100]
+				});
+			}
+
+			//监听工具条
+			table.on('tool(use-table)', function(obj){
+			    if(obj.event === 'detail'){
+	                //查看领用单
+	                var idReceive = obj.data.idReceive;  //领用单号
+	                localStorage.setItem("idReceive",idReceive);
+	                layer.open({
+	                    type: 2
+	                    ,title:'领用单详情'
+	                    ,content: 'printUse.html'
+	                    ,area:  ['900px', '500px']
+	                    ,btn: ['打印'] //只是为了演示
+	                    ,yes: function(index){
+	                        document.getElementsByTagName('iframe')[0].contentWindow.print();
+	                    }
+	                });
+			    } 
+			});
+			
+			
+			
+//退库~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//日期选择
+			/*laydate.render({
+			    elem: '#start-time2'
+			});
+			laydate.render({
+			    elem: '#end-time2'
+			});*/
+			dateFunc('#start-time2','#end-time2');
+		
+			//弹出层
+			var dialog1 = {
+			  	tuiKu: function(othis){
+			        var type = othis.data('type');		      
+			      	layer.open({
+			        	type: 2  
+			        	,title: '退库单'
+			        	,content: 'tuiKuDan.html'
+			        	,area:  ['900px', '480px']
+			        	,offset: '15px'
+			        	,btn: ['保存', '取消']
+			        	,btnAlign: 'r' 
+			        	,shade: 0.3 
+			        	,resize:false 
+			        	,maxmin: true
+			        	,btn1: function(index){
+							submitLYObj.submitLYFunc();
+							return false;
+				        }
+			        	,btn2: function(index){
+			          		layer.close(index);
+			        	}
+			        	,success:function(layero, index){
+			        		var body = layer.getChildFrame('body', index);
+			        		var iframeWin = window[layero.find('iframe')[0]['name']]; 
+			        		//得到iframe页的窗口对象，执行iframe页的方法：
+			        		renerData = {
+			        		 	renerDataFunc:function(obj){
+			        		 		iframeWin.renderTable(obj);
+			        		 	}
+			        		}		 
+						  	//表單提交
+						  	submitLYObj.submitLYFunc = function(){
+						  		body.find('.submitLY').click();
+						  	}
+			        		//选择资产
+						    body.find('#select-asset').on('click', function(){
+						    	dialog1.selectAsset();
+						    	//多次选择资产
+						    	selectData = {
+				        		 	selectDataFunc:function(i,data){
+				        		 		iframeWin.selectData(i,data);
+				        		 	}
+				        		}
+						    	//删除资产
+						    	selectDataDel = {
+				        		 	selectDataDelFunc:function(dataDel){
+				        		 		iframeWin.selectDataDel(dataDel);
+				        		 	}
+				        		}
+						  	});
+						  	//选择资产的删除
+						  	body.find('#del-btn').on('click', function(){
+						  		//选择删除的数据	
+						  		var checkStatusDel = iframeWin.layui.table.checkStatus('idTest');
+					        	var dataDel = checkStatusDel.data;
+					        	var myDataDel = JSON.stringify(dataDel);
+					        	if(!dataDel || dataDel.length<1){
+					        		layer.msg('未选择资产',{
+										time: 2000 //   （如果不配置，默认是3秒）
+									});
+					        	}else{
+					        		selectDataDel.selectDataDelFunc(myDataDel);
+						        	var selectDataDelStr = localStorage.getItem("dataDel"); //获得删除的字符串
+						        	renerData.renerDataFunc(selectDataDelStr);
+						        	localStorage.setItem("data1",selectDataDelStr);  //保存删除后的数据
+					        	}
+						  	});
+			        	}
+			        	,cancel: function(index, layero){  //右上角关闭回调
+						    layer.close(layer.index);
+						}
+			        	,end: function(index, layero){   //层销毁后触发的回调
+			          		localStorage.removeItem('data1');    //清除选择资产的存储
+				    		localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+			          		count=0;   //选择资产的次数初始化
+						}
+			      	});
+			    },
+			    selectAsset: function(){
+			      	var that = this; 
+			      	count++;
+			      	//多窗口模式，层叠置顶
+			      	layer.open({
+				        type: 2 //此处以iframe举例
+				        ,title: '选择资产'
+				        ,area: ['700px', '450px']
+				        ,offset: '30px'
+				        ,shade: 0.3
+				        ,content: 'selectAsset.html'
+			        	,resize:false
+			        	,maxmin: true
+			        	,zIndex: layer.zIndex
+			        	,success: function(layero, index){
+							var propertyStatus = [1];
+			        		localStorage.setItem("propertyStatus",JSON.stringify(propertyStatus));  //传资产状态值,领用为1
+						    var body = layer.getChildFrame('body', index);
+						    var iframeWin = window[layero.find('iframe')[0]['name']]; 
+						    //选择资产添加按钮事件
+						    body.find('#sure-btn').on('click', function(){	
+						       //选中数据
+						        var checkStatus = iframeWin.layui.table.checkStatus('asset-table');
+					        	var data = checkStatus.data;
+					        	var myData = JSON.stringify(data);
+					        	if(myData == "[]"){
+							      	layer.msg('未选择任何资产',{
+										time: 1000 //   （如果不配置，默认是3秒）
+									});
+							    }else{
+							      	selectData.selectDataFunc(count,myData);
+						        	var concatDataStr = localStorage.getItem("data1"); //获得合并的字符串
+						        	renerData.renerDataFunc(concatDataStr);
+						        	layer.close(index);
+							    }
+						  	});
+						}
+			        	,cancel: function(index, layero){  //右上角关闭回调
+						   localStorage.setItem("data1","[]");
+						}
+				    });
+			    }
+			};
+			
+			$('.search-bar2 #add1-btn').on('click', function(){
+		    	var othis = $(this), method = othis.data('method');
+		    	dialog1[method] ? dialog1[method].call(this, othis) : '';
+		  	});	
+		
+			//退库数据初始化
+			getData1();
+			
+			//条件查询退库数据
+			$('.search-bar2 #search-btn2').on('click',function(){
+				getData1();
+			});
+			
+			//退库获得数据方法
+			function getData1(){
+				var groupCode = $.cookie("groupCode");   //当前登录人的集团id
+				var idReturnStock = $(".search-bar2 .idReturnStock").val();
+				var startDate = $(".search-bar2 #start-time2").val();
+				var endDate = $(".search-bar2 #end-time2").val();
+				table.render({
+			    	elem: '#return-table'
+			    	,id: 'returnTable'
+			    	,url: ApiUrl + "returnStock/qryReturnStockListByCondition"
+				    ,where: {
+				    	groupCode: groupCode,
+				    	idReturnStock: idReturnStock,
+				    	startDate: startDate,
+				    	endDate: endDate,
+				    }
+				    ,cols: [[ //标题栏
+				       {field: 'num', title: '序号', width: 60}
+				      ,{field: 'idReturnStock', title: '退库单号', width: 220}
+				      ,{field: 'dateHanddleReturnStock', title: '退库日期', width: 220}
+				      ,{field: 'companyReturnStock', title: '退库后使用公司', width: 220}
+				      ,{field: 'userReturnStock', title: '退库处理人', width: 290}
+				      ,{field: '', title: '操作', width: 98, toolbar: '#operation-bar'}
+				    ]] 
+				    ,width: '90%'
+				    ,height: 'full-176'
+//				    ,skin: 'row' //表格风格
+				    ,page: true //是否显示分页
+				    ,limit: 20 //每页默认显示的数量
+				    ,limits:[20,50,100]
+				});
+			}
+
+		  	//监听工具条
+		  	table.on('tool(return-table)', function(obj){
+			    if(obj.event === 'detail'){
+			    	//查看退库单
+			    	var idReturnStock = obj.data.idReturnStock;  //退库编号
+	                localStorage.setItem("idReturnStock",idReturnStock);
+	                layer.open({
+	                    type: 2
+	                    ,title:'退库单详情'
+	                    ,content: 'printReturn.html'
+	                    ,area:  ['900px', '500px']
+	                    ,btn: ['打印'] //只是为了演示
+	                    ,yes: function(index){
+	                        document.getElementsByTagName('iframe')[0].contentWindow.print();
+	                    }
+	                });
+			    }
+			});
+		});
+	</script>
+</html>

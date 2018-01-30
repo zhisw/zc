@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>处理记录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<div class="layui-row layui-form-item popup-form">
+    <div class="layui-col-xs4">
+        <label class="layui-col-xs4 title">资产条码:</label>
+        <div class="layui-col-xs6">
+            <div class="layui-form-mid layui-word-aux" id="propertyCode"></div>
+        </div>
+    </div>
+    <div class="layui-col-xs4">
+        <label class="layui-col-xs4 title">资产名称:</label>
+        <div class="layui-col-xs6">
+            <div class="layui-form-mid layui-word-aux" id="propertyName"></div>
+        </div>
+    </div>
+    <div class="layui-col-xs4">
+        <label class="layui-col-xs4 title">资产类别:</label>
+        <div class="layui-col-xs6">
+            <div class="layui-form-mid layui-word-aux" id="categoryName"></div>
+        </div>
+    </div>
+</div>
+<div class="layui-row layui-form-item">
+    <div class="layui-col-xs4">
+        <label class="layui-col-xs4 title">规格型号:</label>
+        <div class="layui-col-xs6">
+            <div class="layui-form-mid layui-word-aux" id="specification"></div>
+        </div>
+    </div>
+</div>
+<table class="layui-hide" id="record_table" lay-filter="user"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['table','jquery'], function(){
+        var table = layui.table;
+        var $ = layui.$;
+        $("#propertyCode").html(localStorage.propertyCode);
+        $("#propertyName").html(localStorage.propertyName);
+        $("#categoryName").html(localStorage.categoryName);
+        $("#specification").html(localStorage.specification);
+        //方法级渲染
+        table.render({
+            elem: '#record_table'
+            ,url: ApiUrl+'zhProperty/getZhPropertyLogPage'
+            ,cols: [[
+                {field:'createat', title: '处理日期', width:180}
+                ,{field:'disposePersonName', title: '处理人', width:110}
+                ,{field:'disposeType', title: '处理方式', width:140,templet: '#statusTpl'}
+                ,{field:'describes', title: '处理内容', width:520}
+            ]]
+            ,height:270
+            ,page: false
+            ,where: {
+                propertyId:localStorage.propertyId//localStorage.propertyCode
+            }
+        });
+    });
+</script>
+<script type="text/html" id="statusTpl">
+    {{#  if(d.disposeType === 1){ }}
+    {{ '入库' }}
+    {{#  } else if(d.disposeType === 2){ }}
+    {{ '领用' }}
+    {{#  } else if(d.disposeType === 3){ }}
+    {{ '退库' }}
+    {{#  } else if(d.disposeType === 4){ }}
+    {{ '借用' }}
+    {{#  } else if(d.disposeType === 5){ }}
+    {{ '调拨' }}
+    {{#  } else if(d.disposeType === 6){ }}
+    {{ '维修' }}
+    {{#  } else if(d.disposeType === 7){ }}
+    {{ '报废' }}
+    {{#  } else if(d.disposeType === 8){ }}
+    {{ '回收' }}
+    {{#  } else if(d.disposeType === 9){ }}
+    {{ '撤销回收' }}
+    {{#  } else if(d.disposeType === 10){ }}
+    {{ '归还' }}
+    {{#  } else if(d.disposeType === 11){ }}
+    {{ '调拨中' }}
+    {{#  } else if(d.disposeType === 12){ }}
+    {{ '调入确认' }}
+    {{#  } else if(d.disposeType === 13){ }}
+    {{ '取消调拨' }}
+    {{#  } else if(d.disposeType === 14){ }}
+    {{ '维修完成' }}
+    {{#  } else if(d.disposeType === 15){ }}
+    {{ '维修撤销' }}
+    {{#  } else if(d.disposeType === 16){ }}
+    {{ '物资报废' }}
+    {{#  } else if(d.disposeType === 17){ }}
+    {{ '撤销报废' }}
+    {{#  } }}
+</script>
+</body>
+</html>

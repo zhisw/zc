@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>资产报废</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<div class="layui-form search-wrap" action="">
+    <div class="layui-inline">
+        <lable class="title">报废单号:</lable>
+        <div class="layui-input-inline">
+            <input type="text" name="title" id="dumpingCode" lay-verify="title" autocomplete="off" placeholder="请输入报废单号" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">处理人:</lable>
+        <div class="layui-input-inline">
+            <input type="text" name="title" id="dealUserName" lay-verify="title" autocomplete="off" placeholder="请输入处理人" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">报废日期:</lable>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="startTime" placeholder="yyyy-MM-dd" style="width:110px">
+        </div>
+        至
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="endTime" placeholder="yyyy-MM-dd" style="width:110px">
+        </div>
+    </div>
+    <div class="layui-inline btn-box">
+        <button class="layui-btn btns-blue" data-method="reload" id="search">查询</button>
+        <button class="layui-btn btns-green" data-method="scrapAdd">新建</button>
+        <button class="layui-btn btns-blue" data-method="revocation">撤销</button>
+    </div>
+</div>
+<table class="layui-hide" id="scrap_table" lay-filter="user"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['table','laydate','layer'], function(){
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var layer = layui.layer;
+        var $ = layui.$;
+        dateFunc('#startTime','#endTime')
+        //方法级渲染
+        table.render({
+            elem: '#scrap_table'
+            ,url: ApiUrl+'dump/getdumpinglist'
+            ,cols: [[
+                {checkbox: true}
+                ,{field:'dumpingCode', title: '报废单号', width:200}
+                ,{field:'dumpingDate', title: '报废日期', width:170}
+                ,{field:'dealUserName', title: '处理人', width:100}
+                ,{field:'dumpAbstract', title: '摘要', width:200}
+                ,{field:'dumpingRemark', title: '备注', width:300}
+                ,{fixed: 'right',title: '操作', width:80, toolbar: '#detail'}
+            ]]
+            ,id: 'scrap_table'
+            ,page: true
+            ,height: 'full-85'
+            ,limits:[20,50,100]
+            ,done: function(res, curr, count){
+
+            }
+        });
+        var renerData={};//资产表格
+        var selectData = {};//选择资产数据
+        var selectDataDel = {};//删除资产数据
+        var count=0;//选择条数
+        var submitLYObj={}
+        var active = {
+            //查询列表
+            reload: function(){
+                var dumpingCode = $('#dumpingCode').val();
+                var dealUserName = $('#dealUserName');
+                table.reload('scrap_table', {
+                    where: {
+                        dumpingCode: dumpingCode
+                        ,dealUserName:dealUserName.val()
+                        ,startTime:$('#startTime').val()
+                        ,endTime:$('#endTime').val()
+                    }
+                });
+            }
+            //撤销报废
+            ,revocation: function(){ //获取选中数据
+
+                var checkStatus = table.checkStatus('scrap_table')
+                var dumpingCodes =[]
+                for(var i=0;i<checkStatus.data.length;i++){
+                    dumpingCodes[i]=checkStatus.data[i].dumpingCode;
+                }
+                if(checkStatus.data.length==0){
+                    layer.msg('请选择记录撤销')
+                    return false
+                }
+                layer.confirm('确定要撤销？', function(index) {
+                    var params = {
+                        "dumpingCodes": dumpingCodes
+                    }
+                    params = JSON.stringify(params);
+                    $.ajax({
+                        url: ApiUrl + "dump/cancledumping",
+                        async: false,
+                        data: params,
+                        type: 'POST',
+                        contentType: "application/json",
+                        success: function (result) {//返回数据根据结果进行相应的处理
+                            if (result.status) {
+                                layer.msg('撤销成功');
+                                location.reload();
+                            } else {
+                                layer.msg(result.message);
+                            }
+                        }
+                    });
+                })
+            }
+            //新增报废单
+            ,scrapAdd: function(othis){
+                var sumbitagain=0
+                layer.open({
+                    type: 2
+                    ,title:'新增报废单'
+                    ,content: 'scrapAdd.html'
+                    ,btn: ['保存','取消']
+                    ,area: ['900px', '480px']
+                    ,resize:false
+                    ,maxmin: true
+                    ,btn1: function(index){
+                        count=0;
+                        submitLYObj.submitLYFunc();
+                        return false;
+                    }
+                    ,btn2: function(index){
+                        layer.close(index);
+                        localStorage.clear();
+                        count=0;
+                    }
+                    ,success:function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        //得到iframe页的窗口对象，执行iframe页的方法：
+                        renerData = {
+                            renerDataFunc:function(obj){
+                                iframeWin.renderTable(obj);
+                            }
+                        }
+                        //表單提交
+                        submitLYObj.submitLYFunc = function(){
+                            body.find('.submitLY').click();
+                        }
+                        //选择资产
+                        body.find('#select-asset').on('click', function(){
+                            active.selectAsset();
+                            //多次选择资产
+                            selectData = {
+                                selectDataFunc:function(i,data){
+                                    iframeWin.selectData(i,data);
+                                }
+                            }
+                            //删除资产
+                            selectDataDel = {
+                                selectDataDelFunc:function(dataDel){
+                                    iframeWin.selectDataDel(dataDel);
+                                }
+                            }
+                        });
+                        //选择资产的删除
+                        body.find('#del-btn').on('click', function(){
+                            //选择删除的数据
+                            var checkStatusDel = iframeWin.layui.table.checkStatus('idTest');
+                            var dataDel = checkStatusDel.data;
+                            var myDataDel = JSON.stringify(dataDel);
+                            selectDataDel.selectDataDelFunc(myDataDel);
+                            var selectDataDelStr = localStorage.getItem("dataDel"); //获得删除的字符串
+                            renerData.renerDataFunc(selectDataDelStr);
+                            localStorage.setItem("data1",selectDataDelStr);  //保存删除后的数据
+                        });
+
+
+                    }
+                });
+            }
+            //选择资产
+            ,selectAsset: function(){
+                var that = this;
+                count++;
+                localStorage.propertyStatus = JSON.stringify([0]) //选择资产类型
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2 //此处以iframe举例
+                    ,title: '选择资产'
+                    ,area: ['700px', '450px']
+                    ,content: '../assetProcess/selectAssetUse.html'
+                    ,resize:false
+                    ,maxmin: true
+                    ,zIndex: layer.zIndex
+                    ,success: function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        //添加事件
+                        body.find('#sure-btn').on('click', function(){
+                            //选中数据
+                            var checkStatus = iframeWin.layui.table.checkStatus('asset-table');
+                            var data = checkStatus.data;
+                            var myData = JSON.stringify(data);
+                            selectData.selectDataFunc(count,myData);
+                            var concatDataStr = localStorage.getItem("data1"); //获得合并的字符串
+                            renerData.renerDataFunc(concatDataStr);
+                            layer.close(index);
+                        });
+                    }
+                });
+            }
+        };
+        //按钮点击事件
+        $('.layui-form .layui-btn').on('click', function(){
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+        //监控操作栏
+        table.on('tool(user)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'detail'){
+                localStorage.dumpingCode= data.dumpingCode
+                //查看报废单
+                layer.open({
+                    type: 2
+                    ,title:'报废单详情'
+                    ,content: 'scrapDetail.html'
+                    ,area:  ['900px', '480px']
+                    ,resize:false
+                    ,maxmin: true
+                    ,btn: ['打印'] //只是为了演示
+                    ,yes: function(index){
+                        document.getElementsByTagName('iframe')[0].contentWindow.print();
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script type="text/html" id="detail">
+    <a class="layui-btn layui-btn-mini" lay-event="detail">详情</a>
+</script>
+<script>
+    layui.use(['table','laydate','layer'], function(){
+        var $ = layui.$;
+    });
+</script>
+</body>
+</html>

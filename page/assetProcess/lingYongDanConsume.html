@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<style>
+			.clearfix:after {
+			    content: "";
+			    display: block;
+			    height: 0;
+			    clear: both;
+			}
+			.clearfix {
+			    zoom: 1;
+			}
+			@media screen and (min-width: 768px){
+				.layui-container {
+				    width: 880px;
+				}
+			}
+			.layui-container{
+				padding: 0 20px;
+			}
+			.layui-form .item{
+				margin-top: 1.6%;
+			}
+			.item .left{
+				display: inline-block;
+				height: 38px;
+				line-height: 38px;
+				text-align: right;
+    			padding-right: 15px;
+			}
+			.left .red-star{
+				color: red;
+			}
+			.left .white-star{
+				color: #FFFFFF;
+			}
+			.item #add-people{
+				display: inline-block;
+				height: 38px;
+				line-height: 38px;
+				color: blue;
+				padding-left: 2%;
+				cursor: pointer;
+			}
+			.item .no-border{
+				height: 38px;
+    			line-height: 38px;
+			}
+			.item input[name="remark"]{
+				width: 95%;
+			} 
+			/*下拉框*/
+			.layui-form-select dl{
+			    max-height: 188px;
+			}
+			.btn-box{
+				margin-top: 20px;
+    			margin-left: 24px;
+			}
+			/*按钮*/
+			.btn-box .btns{
+			height: 30px;
+			line-height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			filter: alpha(opacity=70);
+			border-radius: 15px;
+			}
+			.btn-box .btns:hover{
+				opacity: 1;
+				filter: alpha(opacity=100);
+			}
+			/*隐藏id列*/
+			th[data-field=id],td[data-field=id]{
+		        display: none;
+		    }
+		    /*数量的可编辑单元格*/
+		   	th[data-field=initialNum]{
+		   		color: red;
+		   	}
+		    th[data-field=initialNum],td[data-field=initialNum]{
+		        cursor: pointer!important;
+		    }
+		</style>
+	</head>
+	<body>
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]>
+		  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+		  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]--> 
+		<form class="layui-form layui-container clearfix" action="">
+		    <div class="layui-col-xs6 item">
+		        <label class="layui-col-xs4 left">
+		        	<span class="red-star">*</span>
+					<span>领用公司:</span>
+		        </label>
+		        <div class="layui-input-inline layui-col-xs7">
+				    <select name="organizationId" lay-filter="companyReceive" lay-verify="required">
+				        <option value="">请选择</option>
+				    </select>
+				</div>
+		    </div>
+		    <div class="layui-col-xs6 item">
+		        <label class="layui-col-xs4 left">
+		        	<span class="red-star">*</span>
+					<span>领用部门:</span>
+		        </label>
+		        <div class="layui-input-inline layui-col-xs7">
+				    <select name="departId" lay-filter="deptReceive" lay-verify="required">
+				        <option value="">请选择</option>
+				    </select>
+				</div>
+		    </div>
+		    <div class="layui-col-xs6 item">
+		        <label class="layui-col-xs4 left">
+		        	<span class="red-star">*</span>
+					<span>领用人:</span>
+		        </label>
+	            <div class="layui-input-inline layui-col-xs7">
+				    <select name="receiverId" lay-filter="userReceive" lay-verify="required">
+				        <option value="">请选择</option>
+				    </select>
+				</div>
+				<!--<span class="add-btn layui-col-xs2" id="add-people" data-method="setTop" data-type="auto">新增</span>-->
+		    </div>
+		    <div class="layui-col-xs6 item">
+		        <label class="layui-col-xs4 left">
+		        	<span class="red-star">*</span>
+					<span>领用时间:</span>
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7">
+			        <input type="text" name="receiveDate" id="date1" autocomplete="off" lay-verify="required" class="layui-input">
+	        	</div>
+		    </div>
+		    <div class="layui-col-xs6 item">
+		    	<label class="layui-col-xs4 left">
+		        	<span class="white-star">*</span>
+					<span>处理人:</span>
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7 no-border" id="hiddenData">
+			       <!--	喜洋洋  -->
+			    </div>
+		    </div>
+		    <div class="layui-col-xs6 item item1">
+		        <label class="layui-col-xs4 left">
+		        	<span class="white-star">*</span>
+					<span></span>
+		        </label>
+	        	<div class="layui-input-inline layui-col-xs7">
+			        
+	        	</div>
+		    </div>
+		    <div class="layui-col-xs12 item">
+			    <div class="layui-col-xs2 left">
+					<span class="white-star">*</span>
+					<span>说明:</span>
+				</div> 
+				<div class="layui-input-inline layui-col-xs10">
+					<input type="text" name="remark" class="layui-input">
+				</div>
+			</div>
+		    <button class="layui-btn submitLY" lay-submit="" lay-filter="form-submit" type="button" style="display: none;">立即提交</button>
+  		</form>
+  		<div class="btn-box">
+			<button class="layui-btn btns" id="select-asset">选择物品</button>
+			<button class="layui-btn btns" id="del-btn" data-type="getCheckData">删除</button>
+		</div>
+		<table id="sure-table" lay-filter="table-checkbox"></table>
+	</body>
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/peizhi.js"></script>
+	<script>
+		layui.use(['jquery','form','laydate','layer','table'], function(){
+			var $ = layui.jquery;
+ 		 	var form = layui.form;
+ 		 	var laydate = layui.laydate;
+ 		 	var layer = layui.layer;
+ 		 	var table = layui.table;
+ 		 	
+ 		 	//登录后获取
+ 		 	var realName = $.cookie("realName");     //登录人
+ 		 	$("#hiddenData").html(realName);
+ 		 	
+ 		 	//领用时间
+ 		 	laydate.render({
+			    elem: '#date1',
+			    type: 'datetime',
+			    position: 'fixed',
+			    value: new Date()
+			});
+			
+			//退库时间
+			laydate.render({
+			    elem: '#date2',
+			    type: 'datetime',
+			    position: 'fixed'
+			});
+			
+			//三级联动
+			$.ajax({  //获取机构列表
+		    	type:"get",
+		    	url:ApiUrl + "org/getOrgInfoByCondition",
+		    	async:true,
+		    	success:function(res){
+		    		var departmentlist = "";
+		    		for(var i=0;i<res.length;i++){
+		    			departmentlist+="<option value='"+res[i].id+"'>"+res[i].name+"</option>"
+		    		}
+		    		$("select[name=organizationId]").append(departmentlist);
+		    		form.render('select');
+		    	}
+		    });
+		    //公司
+			form.on('select(companyReceive)', function(data){
+			    var organizationId = data.value;
+//	            localStorage.setItem("organizationId",data.value);  //机构id
+			    
+			    $("select[name=departId]").html("<option value=''>请选择</option>");
+			    $("select[name=receiverId]").html("<option value=''>请选择</option>");
+            	form.render('select');
+	            if(organizationId==''){
+	                return false;
+	            }
+	            
+			    $.ajax({
+			    	type:"get",
+			    	url:ApiUrl + "depart/getDepartmentByCondition?organizationId="+organizationId,
+			    	async:true,
+			    	success:function(res){
+			    		var res = res.data;
+			    		var departmentlist = "";
+			    		for(var i=0;i<res.length;i++){
+			    			departmentlist+="<option value='"+res[i].id+"'>"+res[i].departName+"</option>"
+			    		}
+			    		//下拉框填值
+			    		$("select[name=departId]").append(departmentlist);
+			    		form.render('select');
+			    	}
+			    });
+			});
+			//部门
+			form.on('select(deptReceive)',function(data){
+				var deptId = data.value;  //部门ID
+//				localStorage.setItem("departId",data.value);  //部门id
+				
+			    $("select[name=receiverId]").html("<option value=''>请选择</option>");
+            	form.render('select');
+	            if(deptId==''){
+	                return false;
+	            }
+				
+			    $.ajax({
+			    	type:"get",
+			    	url: ApiUrl+"system/UserFixedCtrl-getUserFixedList?deptId="+deptId,
+			    	async:true,
+			    	success:function(res){
+			    		var userlist = "";
+			    		var res = res.data;
+			    		for(var i=0;i<res.length;i++){
+			    			userlist+="<option value='"+res[i].id+"'>"+res[i].realName+"</option>"
+			    		}
+		    			//下拉框填值
+			    		$("select[name=receiverId]").append(userlist);
+			    		form.render('select');
+			    	}
+			    });
+			})
+			//选择人
+			form.on('select(userReceive)',function(data){
+//				localStorage.setItem("receiverId",data.value); //领用人id
+			});
+			
+			//监听表单提交
+			form.on('submit(form-submit)', function(data){
+            	var tableSelect = table.cache['idTest'];
+            	if(tableSelect == undefined||tableSelect.length<1){  //未选择资产时
+            		layer.msg('请选择物品');
+                	return false;
+            	}
+            	for(var i = 0; i<tableSelect.length; i++){
+            		//物品id
+	                data.field['detailList['+i+'].consumId'] = tableSelect[i].id;	
+	                //物品名称
+	                data.field['detailList['+i+'].consumName'] = tableSelect[i].consumableName;
+	                //物品类别
+	                data.field['detailList['+i+'].categoryName'] = tableSelect[i].categoryName;
+	                //领用数量
+	                data.field['detailList['+i+'].receiveNum'] = tableSelect[i].initialNum;
+	                //领用总金额
+	                data.field['detailList['+i+'].receiveMoney'] = tableSelect[i].initialPrice;
+	            }
+            	//按钮只能点击一次，再点击就无效
+				$(this).attr("disabled","disabled");
+				
+            	$.ajax({
+			    	type:"post",
+			    	url: ApiUrl + "consumable-receive/insertReceiveInfo",
+			    	dataType:'json',
+			    	data: data.field,
+			    	async: false,
+			    	success:function(res) {
+	                    if(res.code == 0){
+	                    	layer.msg('保存成功!',{
+							  time: 1000 //   （如果不配置，默认是3秒）
+							},function(){
+							  	//先获取窗口索引，才能关闭窗口  
+				    			var index = parent.layer.getFrameIndex(window.name);  
+                   				parent.layer.close(index);
+				    			localStorage.removeItem('data1');    //清除选择资产的存储
+				    			localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+				    			parent.location.reload(); //刷新包含该 窗的页面
+							});
+	                    }else{
+               				layer.msg('保存失败!',{
+							  time: 2000 //   （如果不配置，默认是3秒）
+							},function(){
+							  	//先获取窗口索引，才能关闭窗口  
+				    			var index = parent.layer.getFrameIndex(window.name);  
+                   				parent.layer.close(index);
+				    			localStorage.removeItem('data1');    //清除选择资产的存储
+				    			localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+							});
+	                    }
+	                }
+			    });
+			});
+			
+		});
+		
+		//渲染已选择资产表格
+		function renderTable(obj){
+			layui.use(['jquery','form','layer','table'], function(){
+				var $ = layui.jquery;
+ 		 		var table = layui.table;
+ 		 		var layer = layui.layer;
+				table.render({
+			    	elem: '#sure-table'
+			    	,id:'idTest'
+			    	,data: JSON.parse(obj)
+				    ,cols: [[ //标题栏
+				      {checkbox: true}
+				      ,{field: 'consumableCode', title: '物品编码', width: 170}
+				      ,{field: 'consumableName', title: '物品名称', width: 100}
+				      ,{field: 'categoryName', title: '物品类别', width: 120}
+				      ,{field: 'brand', title: '品牌', width: 100}
+				      ,{field: 'specification', title: '规格型号', width: 120}
+				      ,{field: 'stockNum', title: '库存数量', width: 100}
+				      ,{field: 'price', title: '单价', width: 100}
+				      ,{field: 'initialNum', title: '领用数量(可编辑)', width: 140, edit: 'text', event: 'goodsNum'}
+				      ,{field: 'initialPrice', title: '领用金额', width: 160}
+					]] 
+					,height: '104'
+				    ,skin: 'row' //表格风格
+				    ,even: true
+				});
+				
+				//监听单元格事件
+				table.on('tool(table-checkbox)', function(obj1){
+				    if(obj1.event === 'goodsNum'){
+						table.on('edit(table-checkbox)', function(obj){
+						    //得到所在行所有键值
+						    var data = obj.data; 
+						    
+						    var reg = /^[1-9]\d*$/;
+					        if(!reg.test(data.initialNum)){  //验证只能为非零的正整数
+					            layer.msg('领用数量只能是非零的正整数', {
+									time: 1500 
+								}, function(index){
+								   	obj1.update({
+							          	initialNum: 1
+							        });
+							        obj1.update({
+							          	initialPrice: data.price
+							        });
+							        layer.close(index);
+								});
+					        }else{   //判断领用数量是否大于库存数量
+					        	$.ajax({  
+									type:"get",
+									url: ApiUrl + "consumable-receive/selectCountAfterReceive",
+									dataType:'json',
+									xhrFields: {
+					                     withCredentials: true,
+					                },
+					                crossDomain: true,
+									data: {
+										receiveNum: data.initialNum,    //领用数量	
+										consumId: data.id               //易耗品id
+									},
+									success:function(res){	
+										if(res.code == 1){   //失败
+											layer.msg('领用数量已经超过库存数量', {
+												time: 1500 
+											}, function(index){
+											   	obj1.update({
+										          	initialNum: 1
+										        });
+										        obj1.update({
+										          	initialPrice: data.price
+										        });
+										        layer.close(index);
+											});
+										}else if(res.code == 0){    //成功
+										    //得到修改后的总价
+										    var allMoney = data.price * data.initialNum;
+										    //保留两位小数
+										    var allPrice = allMoney.toFixed(2);
+										    
+										    //同步更新表格和缓存对应的值
+									    	obj1.update({
+									          	initialPrice: allPrice
+									        });
+									        //修改后所在行所有键值
+//									        console.log(data);
+										}	
+									}
+								});	
+					        }
+						}); 
+				    }
+				});
+			})
+		}
+		
+		//多次选择资产
+		function selectData(i,data){
+			if(i==1){
+				var data1 = localStorage.setItem("data1",data);
+			}else if(i>1){
+				var data1 = localStorage.getItem("data1");
+				var oldArr = JSON.parse(data1);
+				var newArr = JSON.parse(data);
+				var oldArrId = [];
+				//去重
+				for(var j = 0;j<oldArr.length;j++){
+					oldArrId.push(oldArr[j].id);
+				}
+				for(var k = 0;k<newArr.length;k++){
+				    if(oldArrId.indexOf(newArr[k].id) == -1){  
+				        oldArr.push(newArr[k]);
+				    }
+				}
+				var data1 = localStorage.setItem("data1",JSON.stringify(oldArr));
+			}
+		}
+		
+		//多次选择资产删除
+		function selectDataDel(dataDel){
+			var data1 = localStorage.getItem("data1");
+			var oldArr = JSON.parse(data1);
+			var newArr = JSON.parse(dataDel);
+			var numArr = [];
+			//删除
+			for(var m = 0;m<oldArr.length;m++){
+		    	for(var n = 0;n<newArr.length;n++){
+		    		if(oldArr[m].id == newArr[n].id){  
+				       oldArr.remove(m); //m为选择数据删除的第几条
+				    }
+		    	}
+		   	}
+			localStorage.setItem("dataDel",JSON.stringify(oldArr));
+		}
+		
+		/*删除数组指定下标或指定对象 */ 
+		Array.prototype.remove=function(obj){ 
+			for(var i =0;i <this.length;i++){ 
+				var temp = this[i]; 
+				if(!isNaN(obj)){ 
+					temp=i; 
+				} 
+				if(temp == obj){ 
+					for(var j = i;j <this.length;j++){ 
+						this[j]=this[j+1]; 
+					} 
+					this.length = this.length-1; 
+				} 
+			} 
+		} 
+		
+		
+	</script>
+</html>

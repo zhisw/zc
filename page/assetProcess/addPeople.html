@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>新增领用人</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<style>
+			.layui-container .layui-row{
+				margin-top: 1%;
+			}
+			.layui-row .left{
+				display: inline-block;
+				height: 38px;
+				line-height: 38px;
+			}
+			.left .red-star{
+				color: red;
+			}
+			.left .white-star{
+				color: #FFFFFF;
+			}
+			.layui-row .right{
+			}
+			.right .input-box1{
+				width: 93%;
+    			margin-left: 3%;
+			}
+			/*下拉框*/
+			.layui-form-select dl{
+			    max-height: 151px;
+			}
+			.layui-container .btn-box{
+				margin-top: 20px;
+    			margin-left: 8px;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]>
+		  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+		  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]--> 
+		<div class="layui-container layui-form">
+			<div class="layui-row layui-col-space15 ">
+				<div class="layui-col-xs6">
+					<div class="layui-col-xs4 left">
+						<span class="red-star">*</span>
+						<span>员工编号:</span>
+					</div>
+					<div class="layui-col-xs8 right">
+						<div class="layui-inline input-box1">
+							<input type="text" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs6">
+					<div class="layui-col-xs4 left">
+						<span class="red-star">*</span>
+						<span>员工名称:</span>
+					</div>
+					<div class="layui-col-xs8 right">
+						<div class="layui-inline input-box1">
+							<input type="text" class="layui-input">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-row layui-col-space15 ">
+				<div class="layui-col-xs6">
+					<div class="layui-col-xs4 left">
+						<span class="red-star">*</span>
+						<span>所属公司:</span>
+					</div>
+					<div class="layui-col-xs8 right">
+						<div class="layui-inline input-box1">
+					        <div class="layui-input-inline">
+						        <select>
+							        <option value=""></option>
+							        <option value="0">写作</option>
+							        <option value="1" selected="">阅读</option>
+							        <option value="2">游戏</option>
+							        <option value="3">音乐</option>
+							        <option value="4">旅行</option>
+						        </select>
+						    </div>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs6">
+					<div class="layui-col-xs4 left">
+						<span class="white-star">*</span>
+						<span>所属部门:</span>
+					</div>
+					<div class="layui-col-xs8 right">
+						<div class="layui-inline input-box1">
+							<input type="text" class="layui-input">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-row layui-col-space15 ">
+				<div class="layui-col-xs6">
+					<div class="layui-col-xs4 left">
+						<span class="white-star">*</span>
+						<span>手机号码:</span>
+					</div>
+					<div class="layui-col-xs8 right">
+						<div class="layui-inline input-box1">
+							<input type="text" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs6">
+					<div class="layui-col-xs4 left">
+						<span class="white-star">*</span>
+						<span>邮箱:</span>
+					</div>
+					<div class="layui-col-xs8 right">
+						<div class="layui-inline input-box1">
+							<input type="text" class="layui-input">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../../layui/layui.js"></script>
+	<script>
+		//表单
+		layui.use('form', function(){
+ 		 	var form = layui.form;
+		});
+	</script>
+</html>

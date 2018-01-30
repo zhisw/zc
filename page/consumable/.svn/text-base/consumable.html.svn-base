@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>资产</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+    <style>
+        .layui-nav{
+            background-color: #FFFFFF;
+            padding: 0;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .layui-nav .layui-nav-item{
+            margin-left: 15px;
+        }
+        .search-wrap .layui-nav{
+            margin-left: 20px;
+        }
+        .layui-nav .layui-nav-item{
+            line-height: 48px;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form search-wrap">
+    <div class="layui-inline">
+        <lable class="title">单据类型:</lable>
+        <div class="layui-input-inline">
+            <select id="orderType">
+                <option value="" selected>全部</option>
+                <option value="1">入库单</option>
+                <option value="2">冲销单</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">入库单号:</lable>
+        <div class="layui-input-inline">
+            <input type="text" id="orderNo" lay-verify="title" autocomplete="off" placeholder="请输入入库单号" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <label class="title">物品名称:</label>
+        <div class="layui-input-inline">
+            <input type="text" id="goodsname" lay-verify="title" autocomplete="off" placeholder="请输入物品名称" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">入库日期:</lable>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="orderDateStrat" placeholder="yyyy-MM-dd" style="width:110px">
+        </div>
+        至
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="orderDateEnd" placeholder="yyyy-MM-dd" style="width:110px">
+        </div>
+    </div>
+    <ul class="layui-nav" lay-filter="">
+        <button class="layui-btn btns-blue" data-method="reload">查询</button>
+        <li class="layui-nav-item">
+            <button class="layui-btn btns-green" data-method="consumableAddIN">新建</button>
+            <dl class="layui-nav-child">
+                <dd><a href="javascript:;" data-method="consumableAddIN" data-type="auto" class="layui-btne">入库单</a></dd>
+                <dd><a href="javascript:;" data-method="consumableAddOUT" data-type="auto" class="layui-btne">冲销单</a></dd>
+            </dl>
+        </li>
+    </ul>
+</div>
+<table class="layui-hide" id="consumable_table" lay-filter="user"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['layer','table','laydate','element'], function(){ //独立版的layer无需执行这一句
+        var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var element = layui.element;
+        dateFunc('#orderDateStrat','#orderDateEnd')
+        table.render({
+            elem: '#consumable_table'
+            ,url: ApiUrl+'zhpropertyconsumablegrn/getgrnlist'
+            ,cols: [[
+                {field:'orderType', title: '单据类型', width:130,templet: '#statusTpl'}
+                ,{field:'orderNo', title: '入库单号', width:200}
+                ,{field:'grnDate', title: '入库日期', width:180}
+                ,{field:'disposeName', title: '处理人', width:170, sort: true}
+                ,{field:'goodsname', title: '摘要', width:250}
+                ,{title: '操作', width:130, toolbar: '#detail'}
+            ]]
+            ,id: 'consumable_table'
+            ,page: true
+            ,height: 'full-95'
+            ,limits:[20,50,100]
+        });
+        var renerData={};//资产表格
+        var selectData = {};//选择资产数据
+        var selectDataDel = {};//删除资产数据
+        var count=0;//选择条数
+        var submitLYObj={}
+        //触发事件
+        var active = {
+            //新增入库单
+            consumableAddIN: function(othis){
+                var type = othis.data('type')
+                    ,text = othis.text();
+                var submitLYObj={}
+                layer.open({
+                    type: 2
+                    ,offset: type
+                    ,title:'新增入库单产'
+                    ,content: 'consumableAddIN.html'
+                    ,resize:false
+                    ,maxmin: true
+                    ,btn: ['保存', '取消'] //只是为了演示
+                    ,yes: function(){
+                        submitLYObj.submitLYFunc()
+                    }
+                    ,btn2: function(index){
+                        layer.close(index);
+                    }
+                    ,area:  ['900px', '480px']
+                    ,success:function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        //得到iframe页的窗口对象，执行iframe页的方法：
+                        renerData = {
+                            renerDataFunc:function(obj){
+                                iframeWin.renderTable(obj);
+                            }
+                        }
+                        //表單提交
+                        submitLYObj.submitLYFunc = function(){
+                            body.find('.submitLY').click();
+                        }
+                        //选择资产
+                        body.find('#select-asset').on('click', function(){
+                            active.selectAsset();
+                            //多次选择资产
+                            selectData = {
+                                selectDataFunc:function(i,data){
+                                    iframeWin.selectData(i,data);
+                                }
+                            }
+                            //删除资产
+                            selectDataDel = {
+                                selectDataDelFunc:function(dataDel){
+                                    iframeWin.selectDataDel(dataDel);
+                                }
+                            }
+                        });
+                        //选择资产的删除
+                        body.find('#del-btn').on('click', function(){
+                            //选择删除的数据
+                            var checkStatusDel = iframeWin.layui.table.checkStatus('idTest');
+                            var dataDel = checkStatusDel.data;
+                            var myDataDel = JSON.stringify(dataDel);
+                            selectDataDel.selectDataDelFunc(myDataDel);
+                            var selectDataDelStr = localStorage.getItem("dataDel"); //获得删除的字符串
+                            renerData.renerDataFunc(selectDataDelStr);
+                            localStorage.setItem("data1",selectDataDelStr);  //保存删除后的数据
+                        });
+                    }
+                });
+            },
+            //新增冲销单
+            consumableAddOUT: function(othis){
+                var type = othis.data('type')
+                    ,text = othis.text();
+                var submitLYObj={}
+                layer.open({
+                    type: 2
+                    ,offset: type
+                    ,title:'新增冲销单'
+                    ,content: 'consumableAddOUT.html'
+                    ,resize:false
+                    ,maxmin: true
+                    ,btn: ['保存', '取消'] //只是为了演示
+                    ,yes: function(){
+                        submitLYObj.submitLYFunc()
+                    }
+                    ,btn2: function(index){
+                        layer.close(index);
+                    }
+                    ,area:  ['900px', '480px']
+                    ,success:function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        //得到iframe页的窗口对象，执行iframe页的方法：
+                        renerData = {
+                            renerDataFunc:function(obj){
+                                iframeWin.renderTable(obj);
+                            }
+                        }
+                        //表單提交
+                        submitLYObj.submitLYFunc = function(){
+                            body.find('.submitLY').click();
+                        }
+                        //选择资产
+                        body.find('#select-asset').on('click', function(){
+                            active.selectAsset();
+                            //多次选择资产
+                            selectData = {
+                                selectDataFunc:function(i,data){
+                                    iframeWin.selectData(i,data);
+                                }
+                            }
+                            //删除资产
+                            selectDataDel = {
+                                selectDataDelFunc:function(dataDel){
+                                    iframeWin.selectDataDel(dataDel);
+                                }
+                            }
+                        });
+                        //选择资产的删除
+                        body.find('#del-btn').on('click', function(){
+                            //选择删除的数据
+                            var checkStatusDel = iframeWin.layui.table.checkStatus('idTest');
+                            var dataDel = checkStatusDel.data;
+                            var myDataDel = JSON.stringify(dataDel);
+                            selectDataDel.selectDataDelFunc(myDataDel);
+                            var selectDataDelStr = localStorage.getItem("dataDel"); //获得删除的字符串
+                            renerData.renerDataFunc(selectDataDelStr);
+                            localStorage.setItem("data1",selectDataDelStr);  //保存删除后的数据
+                        });
+                    }
+                });
+            },
+            //查询
+            reload: function(){
+                table.reload('consumable_table', {
+                    where: {
+                        orderType:$("#orderType").val()
+                        ,orderNo:$("#orderNo").val()
+                        ,orderDateStrat:$("#orderDateStrat").val()
+                        ,orderDateEnd:$("#orderDateEnd").val()
+                        ,goodsname:$("#goodsname").val()
+                    }
+                });
+            }
+            //选择物品
+            ,selectAsset: function(){
+                count++;
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2 //此处以iframe举例
+                    ,title: '选择物品'
+                    ,area: ['720px', '420px']
+                    ,content: 'goodsSelect.html'
+                    ,resize:false
+                    ,maxmin: true
+                    ,zIndex: layer.zIndex
+                    ,success: function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+
+                        //选择资产添加按钮事件
+                        body.find('#sure-btn').on('click', function(){
+                            //选中数据
+                            var checkStatus = iframeWin.layui.table.checkStatus('assetTable');
+                            var data = checkStatus.data;
+                            var myData = JSON.stringify(data);  //数据转成字符串
+                            if(myData=="[]"){
+                                layer.msg('未选择任何物品',{
+                                    time: 1000 //   （如果不配置，默认是3秒）
+                                });
+                            }else{
+                                selectData.selectDataFunc(count,myData);
+                                var concatDataStr = localStorage.getItem("data1"); //获得合并的字符串
+                                renerData.renerDataFunc(concatDataStr); //渲染多次选择后的数据
+                                layer.close(index);
+                            }
+
+                        });
+                    }
+                    ,cancel: function(index, layero){  //右上角关闭回调
+                        layer.close(layer.index);
+                    }
+                });
+            }
+        };
+        $('.layui-nav .layui-btn,.layui-nav-child .layui-btne').on('click', function(){
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+        //监控操作栏
+        table.on('tool(user)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'detail'){
+                localStorage.consumableid= data.id
+                //查看耗材单
+                layer.open({
+                    type: 2
+                    ,title:'耗材详情'
+                    ,content: 'consumablePrint.html'
+                    ,resize:false
+                    ,maxmin: true
+                    ,area:  ['900px', '480px']
+                    ,btn: ['打印'] //只是为了演示
+                    ,yes: function(index){
+                        document.getElementsByTagName('iframe')[0].contentWindow.print();
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script type="text/html" id="statusTpl">
+    {{#  if(d.orderType === 1){ }}
+    {{ '入库单' }}
+    {{#  } else if(d.orderType === 2){ }}
+    {{ '冲销单' }}
+    {{#  } }}
+</script>
+<script type="text/html" id="detail">
+    <a class="layui-btn layui-btn-mini" lay-event="detail">详情</a>
+</script>
+</body>
+</html>

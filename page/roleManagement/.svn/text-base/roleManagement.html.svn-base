@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>角色管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<style>
+		html,body{
+			width: 100%;
+			height: 100%;
+		}
+		body .layui-tree-skin-shihuang .layui-tree-branch{color: #EDCA50;}    
+		.childrenBody{
+			width: 100%;
+			height: 100%;
+			padding: 15px 0;
+			overflow: hidden;
+		}
+		.addPeople,#chooseAuthority,#addDepartment{
+			padding: 15px 0;
+		} 
+		
+		.addPeople .layui-input-block,.editPeople .layui-input-block{
+			margin-right: 20px;
+		}
+		#chooseAuthority .layui-input-block,.editPeople .layui-input-block{
+			margin-right: 20px;
+		}
+		#addDepartment .layui-input-block,.editPeople .layui-input-block{
+			margin-right: 20px;
+		}
+		.peopleTable{
+			margin-left:-25px;
+		}
+		.red{
+			color: red;
+		}
+		.uploadExcelTitle{
+			line-height:50px;
+			font-weight: 600;
+		}
+		#uploadExcel{
+			padding: 20px;
+		}
+		#chooseFile{
+		
+			height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#chooseFile:hover{
+			opacity: 1;
+		}
+		#uploadBtn{
+	
+			height: 30px;
+			background: #46CE4E;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+			margin-left: 10px;
+		}
+		#uploadBtn:hover{
+			opacity: 1;
+		}
+		.startUpload{
+			margin-top: 10px;
+		}
+		.startUpload a:-webkit-any-link {
+	    color: -webkit-link;
+	    cursor: auto;
+	    text-decoration: underline;
+		}
+		.organizationTitle{
+			height: 40px;
+			line-height: 40px;
+			background: #e2e1eb;
+			margin-top: 20px;
+			padding-left: 10px;
+			font-size: 14px;
+			font-weight: 600;
+		}
+		.red{
+			color: red;
+		}
+		
+		/*导入文件*/
+		.uploadExcelTitle{
+			line-height:50px;
+			font-weight: 600;
+		}
+		#uploadExcel_Organization,#uploadExcel_department{
+			padding: 20px;
+		}
+		#chooseFile{
+			height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#chooseFile:hover{
+			opacity: 1;
+		}
+		#uploadBtn{
+			height: 30px;
+			background: #46CE4E;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+			margin-left: 10px;
+		}
+		#uploadBtn:hover{
+			opacity: 1;
+		}
+		.startUpload{
+			margin-top: 10px;
+		}
+		.startUpload a:-webkit-any-link {
+		    color: -webkit-link;
+		    cursor: auto;
+		    text-decoration: underline;
+		}
+		
+		#addOrganization {
+			padding: 15px 0;
+		} 
+		
+		#addOrganization .layui-input-block{
+			margin-right: 20px;
+		}
+		#btns{
+			height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#btns:hover{
+			opacity: 1;
+		}
+		#btns1{
+			height: 30px;
+			background: #6866E9;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+			opacity: 1;
+		}
+	
+		#delBtn{
+			height: 30px;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#delBtn:hover{
+			opacity: 1;
+		}
+		#nBtns{
+			opacity: 0.7;
+			border-radius: 15px ;
+			text-align: center;
+			color: #9594f0;
+			border: 1px solid #9594f0;
+			background: #FFFFFF;
+		}
+		#nBtns:hover{
+			opacity: 1;
+			color: #6c6aeb;
+			border: 1px solid #6c6aeb;
+		}
+		.newBox{
+			display: inline-block;
+			margin-right: 10px;
+			position: relative;
+		}
+		.newBtns{
+			display: none;
+			position:absolute;
+			left: 0;
+			top:30px;
+		}
+		
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="layui-fluid">
+		<div class="layui-row organizationBox">
+	     	<div class="layui-row">
+		    	<div class="layui-row layui-col-md4">
+		    		<button class="layui-btn toadd"  id="btns"  data-method="offset" data-type="auto" >新增</button>
+		    		<button class="layui-btn layui-btn-primary" id="delBtn" data-method="deleteRole">删除</button>
+		     </div>
+	     	</div>
+	   	 	<div class="layui-row">
+		    		<table id="roleData" lay-filter="roleDataFilter"></table>
+	     	</div>
+	  </div>
+  </div>
+</div>
+
+       <!--添加角色-->
+    <div class="layui-row addOrganization" id="addOrganization" style="display: none;"> 
+     		<form class="layui-form addroleForm">
+     			<div class="layui-form-item">
+				    <label class="layui-form-label">角色名<span class="red">*</span></label>
+				    <div class="layui-input-block">
+				      <input type="text" name="roleName"  required  lay-verify="required"  placeholder="请输入角色名" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">备注</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="remark"  placeholder="请输入备注信息" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item" style="display: none;">
+				    <div class="layui-input-block">
+				      <button class="layui-btn submitadd" lay-submit lay-filter="formEdit">立即提交</button>
+				      <input type="button"  value="取消" class="layui-btn layui-btn-primary cancleOpen">
+				    </div>
+				</div>
+     	</form>
+    </div>
+	       <!--分配权限-->
+    <div class="layui-row authority" id="authority" style="display: none;"> 
+		<!--<ul id="authorityTree"></ul>-->
+		 <form class="layui-form" action="">
+	        <div id="layui-xtree-demo1"></div>
+	    </form>
+    </div>
+  <script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-mini" lay-event="edit"  data-type="auto">分配权限</a>
+</script>
+	<script type="text/javascript" src="../../layui/layui.js"></script>
+	<script type="text/javascript" src="../../js/peizhi.js"></script>
+	<script src="../../layui/layui-xtree.js" type="text/javascript" charset="utf-8"></script>
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+	<script type="text/javascript">
+	var zswnnt = new Array();	
+	layui.use(['tree','layer','jquery','table','form','upload'], function(){
+		$ = layui.jquery;
+		var apiUrl=ApiUrl
+		var xtree;
+		var nodeParamObj={};
+		var table = layui.table,
+		 layer = layui.layer,
+		 upload = layui.upload,
+		 form = layui.form;
+
+		function hasClass(elem, cls) {
+		  cls = cls || '';
+		  if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+		  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+		}
+		 
+		function addClass(ele, cls) {
+		  if (!hasClass(ele, cls)) {
+		    ele.className = ele.className == '' ? cls : ele.className + ' ' + cls;
+		  }
+		}
+		 
+		function removeClass(elem, cls) {
+		  if (hasClass(elem, cls)) {
+		    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+		    while (newClass.indexOf(' ' + cls + ' ') >= 0) {
+		      newClass = newClass.replace(' ' + cls + ' ', ' ');
+		    }
+		    elem.className = newClass.replace(/^\s+|\s+$/g, '');
+		  }
+		} 
+		
+		
+ table.on('tool(roleDataFilter)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'detail'){
+      layer.msg('ID：'+ data.id + ' 的查看操作');
+    } else if(obj.event === 'del'){
+      layer.confirm('真的删除行么', function(index){
+        obj.del();
+        layer.close(index);
+      });
+    } else if(obj.event === 'edit'){
+      //layer.alert('编辑行：<br>'+ JSON.stringify(data))
+      active.offset_edit($(this),data);
+    }
+  });
+		
+			
+		
+		
+//展示已知数据
+  table.render({
+    elem: '#roleData'
+    ,id:'roleData'
+    ,height: 'full-56'
+    ,url:apiUrl+"system/UserFixedRoleCtrl-getUserFixedRoleList"
+    ,cols: [[ //标题栏
+      {checkbox: true, LAY_CHECKED: false} //默认全选
+      ,{field: 'roleName', title: '角色名', width: 186, sort: false}
+      ,{field: 'remark', title: '备注', width: 186}
+      ,{title: '操作',align:'center',width: 100, sort: false,toolbar: '#barDemo',fixed:"right"}
+    ]] 
+    //,skin: 'row' //表格风格
+    ,even: false
+    ,page: true //是否显示分页
+    ,limits: [20, 50, 100]
+    ,limit: 12 //每页默认显示的数量
+  });		
+		
+  var authorityIds=[]//选择的权限id
+		 //触发事件
+  var active = {
+  	
+    offset: function(othis){
+      var type = othis.data('type')
+      ,text = othis.text();
+      var openAdd=layer.open({
+        type: 1
+       	,title: '添加角色'
+       	,area: ['570px', '460px']
+        ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'layerDemo'+type //防止重复弹出
+        ,content: $("#addOrganization")
+        ,btn: ['保存',"取消"]
+        ,btnAlign: 'r' //按钮居中
+        ,shade: 0.3 //不显示遮罩
+        ,btn2: function(){
+          layer.closeAll();
+        }
+        ,yes: function(){
+        	$('.submitadd').click();
+        	return false
+         //	layer.msg('保存成功', {icon: 6});
+        }
+        ,success:function(){
+        	$("#addOrganization").find('input').val('');
+        }
+      });
+    }
+     ,offset_edit: function(othis,objData){
+      var type = othis.data('type')
+      ,text = othis.text();
+      var openAdd=layer.open({
+        type: 1
+       	,title: '分配权限'
+       	,area: ['570px', '460px']
+        ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'layerDemo'+type //防止重复弹出
+        ,content: $("#authority")
+        ,btn: ['保存',"取消"]
+        ,btnAlign: 'r' //按钮居中
+        ,shade: 0.3 //不显示遮罩
+        ,btn2: function(){
+          layer.closeAll();
+        }
+        ,yes: function(){
+        	var oCks = xtree.GetChecked(); //获取全部选中的末级节点checkbox对象
+        	authorityIds=[]
+            for (var i = 0; i < oCks.length; i++) {
+            	authorityIds.push(oCks[i].value)
+                console.log(oCks[i].value);
+            }
+            console.log(authorityIds)
+        	var authorityParams={
+        		"permissions":authorityIds,
+        		'id':objData.id
+        	}
+        	authorityParams=JSON.stringify(authorityParams)
+        	if(authorityIds.length){
+  			$.ajax({
+  				type:"post",
+  				contentType: "application/json",
+  				url:apiUrl+"system/UserFixedRoleCtrl-updateUserFixedRole",
+  				async:true,
+  				data:authorityParams,
+  				success:function(data){
+  					if(data.code=='0'){
+  						$('.layui-laypage-btn').click()
+  						layer.closeAll();
+  						layer.msg('权限分配成功！')
+  					}else{
+  						layer.msg('权限分配失败！')
+  					}
+  				}
+  			});	
+        	}else{
+        		layer.msg('请先选择要分配的权限！')
+        	}
+        	return false
+         //	layer.msg('保存成功', {icon: 6});
+        }
+        ,success:function(){
+        	console.log(objData)
+        	var hadRoleArr=[];
+        	if(objData.permission){
+        		hadRoleArr=objData.permission.split(',').slice(1,objData.permission.length)
+        		console.log(hadRoleArr)
+        	}
+        	$("#layui-xtree-demo1").html('')
+        	//权限选择树
+        	$.ajax({
+        		url:apiUrl+"system/UserFixedRoleCtrl-getTree",
+        		data:{},
+        		success:function(data){
+        			if(data.code=="0"){
+        				var nodeJson=JSON.parse(data.data)
+        				console.log(nodeJson)
+        				
+        				  xtree = new layuiXtree({
+				            elem: 'layui-xtree-demo1' //放xtree的容器（必填）
+				             , form: form              //layui form对象 （必填）
+				             , data: nodeJson              //数据，结构请参照下面 （必填）
+				             , isopen: true            //初次加载时全部展开，默认true （选填）
+				             , color: "#000"           //图标颜色 （选填）
+				             , icon: {                 //图标样式 （选填）
+				                 open: "&#xe7a0;"      //节点打开的图标
+				                 , close: "&#xe622;"   //节点关闭的图标
+				                 , end: "&#xe621;"     //末尾节点的图标
+				             }
+				             ,hadRole:hadRoleArr
+				        });
+	        			/*layui.tree({
+						  elem: '#authorityTree' //传入元素选择器
+						  ,check: 'checkbox'
+						   ,drag: true
+						  ,nodes:nodeJson
+						  ,click: function(node){
+						    console.log(node) //node即为当前点击的节点数据
+						      var that=event.target;
+						      console.log(that);
+								    if(that.tagName=='CITE'||that.tagName=='cite'){
+								    	if(!hasClass(that,'red')){
+											   	addClass(that, "red")
+											   	that.style.color='red';
+											   	//nodeParamObj=node;
+											   	authorityIds.push(node.id)
+											   	console.log(authorityIds);
+											   	var ss = $(that).parent().parent().index();
+											   	zswnnt.push(ss);
+											   	console.log(zswnnt);
+								    	}else{
+								    		   	removeClass(that, "red")
+											   	that.style.color='#333333';
+											   	console.log(authorityIds)
+											   	authorityIds.forEach(function(val,index){
+											   	
+											   		if(val==node.id){
+											   			console.log("val",val)
+											   			console.log('index',index)
+											   			console.log(val)
+											   			console.log(index)
+											   			authorityIds.splice(index,1)
+											   			console.log(authorityIds)
+											   			var aa = $(that).parent().parent().index();
+											   			
+											   			zswnnt.removeByValue(aa);
+											   		}
+											   	})
+								    	}
+									  
+									}
+						  }  
+						,skin:'shihuang'
+						});*/
+						//$('#treeBox').find('cite').removeClass('red')
+//						for(var i =0 ;i<zswnnt.length;i++){
+//							$('#authorityTree').find('cite').eq(zswnnt[i]).addClass('red')
+//						    $('#authorityTree').find('cite').eq(zswnnt[i]).css('color','red')
+//						}
+//						
+        			}else{
+        				layer.msg(data.msg)
+        			}
+        			
+        		}
+        	})
+        }
+      });
+    },
+    deleteRole:function(){
+    	 var checkStatus = table.checkStatus('roleData')
+     	,data = checkStatus.data;
+     	console.log(checkStatus)
+     	var idArr=[];
+		 for(var i=0;i<data.length;i++){
+		 	idArr.push(data[i].id)
+		 }
+		 var params={
+		 	"roleIdList":idArr
+		 }
+		 params=JSON.stringify(params);
+		 if(data.length){
+		 	layer.confirm('确定删除所选信息？', {icon: 3, title:'提示'}, function(index){
+		     	$.ajax({
+		     		type:"post",
+		     		url:apiUrl+"system/UserFixedRoleCtrl-deleteUserFixed",
+		     		contentType: "application/json",
+		     		data:params,
+		     		async:true,
+		     		success:function(data){
+		     			if(data.code=='0'){
+		     				if(data.status){
+			     				if(data.data.length==0){
+									layer.closeAll();
+					    			$('.layui-laypage-btn').click()
+					    			setTimeout(function(){
+					    				layer.msg("删除成功");
+					    			},1)
+				    			}else{
+					    			var prolist = "";
+					    			for(var i=0;i<data.data.length;i++){
+					    				prolist+="<p>"+data.data[i].roleName+"已被分配无法删除</p>"
+					    			}
+					    			$('.layui-laypage-btn').click()
+					    			setTimeout(function(){
+					    				layer.msg(prolist);	
+					    			},1)
+				    			}
+		     				}else{
+			     					if(data.data.length>0){
+						    			var prolist = "";
+						    			for(var i=0;i<data.data.length;i++){
+						    				prolist+="<p>"+data.data[i].roleName+"已被分配无法删除</p>"
+						    			}
+						    			layer.msg(prolist);	
+				     				}else{
+				     					layer.msg("删除失败！");
+				     				}
+			     				}
+		     			}else{
+		     					layer.msg(data.message);
+		     				
+		     			}
+		     		}
+		     	})
+	     	})
+     	}else{
+     		layer.msg("请先选择要删除的信息");
+     	}
+    }
+  };
+  
+    //按钮
+  $('.organizationBox .layui-btn').on('click', function(){
+    var othis = $(this), method = othis.data('method');
+    active[method] ? active[method].call(this, othis) : '';
+  });
+  
+  
+   form.on('submit(formEdit)', function(data){
+   // layer.msg(JSON.stringify(data.field));
+    var data1 = data;
+   // layer.closeAll();
+   $.ajax({
+   	type:"post",
+   	url:apiUrl+"system/UserFixedRoleCtrl-checkCodeRepeat",
+   	async:true,
+   	data:{
+   		"roleName":$('.addroleForm input[name="roleName"]').val()
+   	},
+   	success:function(data){
+   		var parmas = {
+   			"roleName":data1.field.roleName
+   			,"remark":data1.field.remark
+   		}
+   		 parmas=JSON.stringify(parmas);
+   		if(data.data){
+   			  $.ajax({
+		    	type:"post",
+		    	contentType: "application/json",
+		    	url:apiUrl+"system/UserFixedRoleCtrl-updateUserFixedRole",
+		    	data:parmas,//$('.addroleForm').serialize(),
+		    	async:true,
+		    	success:function(data){
+		    		console.log(data)
+		    		if(data.status){
+		    			table.reload('roleData', {
+							  url: apiUrl+'system/UserFixedRoleCtrl-getUserFixedRoleList'
+							});
+						layer.closeAll();
+		    			layer.msg("新增成功");
+		    		}else{
+		    			layer.msg("新增失败");
+		    		}
+		    	}
+		    });
+   		}else{
+   			layer.msg("角色名已存在！");
+   		}
+   	}
+   });
+  
+ 
+    return false;
+  });
+    //上传
+  //选完文件后不自动上传
+  upload.render({
+    elem: '#chooseFile'
+    ,url: '/upload/'
+    ,auto: false
+    //,multiple: true
+    ,bindAction: '#uploadBtn'
+    ,done: function(res){
+      console.log(res)
+    }
+  });
+  
+  
+ 
+});  
+	</script>
+</body>
+
+
+    
+
+
+</html>

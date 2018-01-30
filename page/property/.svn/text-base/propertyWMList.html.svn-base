@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>订单信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/form.css" media="all" />
+</head>
+<body>
+<div class="layui-form search-wrap" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">订单编码:</label>
+        <div class="layui-input-inline">
+            <input type="text" id="orderNo" lay-verify="title" autocomplete="off" placeholder="请输入订单编码" class="layui-input">
+        </div>
+        <label class="layui-form-label">下单日期:</label>
+        <div class="layui-input-inline">
+            <input type="text" id="orderDateStrat" class="layui-input" placeholder="yyyy-MM-dd">
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn btns" data-method="offset3" data-type="reload" id="search">查询</button>
+        </div>
+    </div>
+</div>
+<div style="height: 327px;overflow: hidden;overflow-y: auto;">
+    <table class="layui-table" id="propertyWM_table" >
+        <thead>
+        <tr>
+            <th width="60">商品编码</th>
+            <th>商品名称</th>
+            <th>品牌</th>
+            <th>规格</th>
+            <th>单位</th>
+            <th width="28">数量</th>
+            <th width="70">已入库数量</th>
+            <th width="60">金额</th>
+            <th width="28">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+<div id="listpage"></div>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['jquery','laypage','laydate'], function(){
+        var $ = layui.jquery
+            ,laypage = layui.laypage
+            ,layer = layui.layer;
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#orderDateStrat'
+            ,range: '~'
+            ,format: 'yyyy-MM-dd'
+        });
+        search();
+        $("#search").click(function () {
+            search();
+        })
+        //搜索
+        function search(page,limit,nowpage) {
+            $("#propertyWM_table tbody").html('');
+            var orderNo=$("#orderNo").val();
+            var seachtime = $("#orderDateStrat").val();
+            seachtime = seachtime.split(' ~ ');
+            var orderDateStrat = seachtime[0];
+            var orderDateEnd = seachtime[1];
+            if(typeof(page)=="undefined"){
+                page=1;
+            }
+            if(typeof(limit)=="undefined"){
+                limit=10;
+            }
+            if(typeof(nowpage)=="undefined"){
+                nowpage=10;
+            }
+            var parm={
+                cgrId:"200"
+                ,orderNo:$("#orderNo").val()
+                ,orderDateStrat:orderDateStrat
+                ,orderDateEnd:orderDateEnd
+                ,page:page
+                ,limit:limit
+            }
+            $.ajax({
+                url:ApiUrl+"zhOrder/getOrderPage",
+                async:true,
+                data:parm,
+                type:'GET',
+                success : function(result) {
+                    if(result.code==0){
+                        laypage.render({
+                            elem: 'listpage'
+                            ,count: result.count
+                            ,curr:nowpage
+                            ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                            ,jump: function(obj,first){
+                                if(!first){
+                                    search(obj.curr,obj.limit,obj.curr)
+                                }
+                            }
+                        });
+                        for(var i=0;i<result.data.length;i++){
+                            var trhtml='<tr><td colspan="9">' +
+                                '<span>订单编码: '+result.data[i].orderNo+'</span>' +
+                                '<span>下单日期: '+result.data[i].orderDate+'</span>' +
+                                '<span>订单总价:'+result.data[i].orderZj+'</span></td></tr>'
+                            for(var j=0;j<result.data[i].detailList.length;j++){
+                                var detailList =result.data[i].detailList[j]
+                                trhtml+='<tr><td>'+detailList.goodsId+'</td>' +
+                                    '<td>'+detailList.spMc+'</td>'+
+                                    '<td>'+detailList.ppMc+'</td>'+
+                                    '<td>'+detailList.modelMc+'</td>'+
+                                    '<td>'+detailList.spUnit+'</td>'+
+                                    '<td>'+detailList.spNum+'</td>'+
+                                    '<td>'+detailList.propertyGrnnum+'</td>'+
+                                    '<td>'+detailList.spZxsj+'</td>'+
+                                    '<td><a class="storagaae">入库</a></td></tr>'
+                            }
+                            $("#propertyWM_table tbody").append(trhtml);
+                        }
+                    }
+                }
+            });
+        }
+        //选择入库
+        $("body").on('click', '.storagaae', function(event) {
+            localStorage.propertyName=$(this).parents("tr").find("td:eq(1)").html();//资产名称
+            localStorage.unit=$(this).parents("tr").find("td:eq(4)").html();//资产单位
+            localStorage.specification=$(this).parents("tr").find("td:eq(3)").html();//规格型号
+            localStorage.price=$(this).parents("tr").find("td:eq(7)").html();//金额
+            localStorage.brand=$(this).parents("tr").find("td:eq(2)").html();//品牌
+            localStorage.num=$(this).parents("tr").find("td:eq(5)").html()-$(this).parents("tr").find("td:eq(6)").html();//数量
+            window.parent.wmadd()
+        });
+    })
+</script>
+</body>
+</html>

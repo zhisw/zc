@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>选择资产</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<style>
+			.search-bar{
+				margin-top: 20px;
+				margin-bottom: 10px;
+				padding-left: 20px;
+			}
+			.search-bar .distance{
+				margin-left: 5px;
+				margin-right: 10px;
+				width: 270px;
+			}
+			.search-bar .btns{
+				height: 30px;
+				line-height: 30px;
+				background: #6866E9;
+				opacity: 0.7;
+				filter: alpha(opacity=70);
+				border-radius: 15px;
+			}
+			.search-bar .btns:hover{
+				opacity: 1;
+				filter: alpha(opacity=100);
+			}
+			.layui-table {
+			    width: 90%;
+			    margin: 0 auto;
+			}
+			/*隐藏id列*/
+			td[data-field=id],th[data-field=id]{
+		        display: none;
+		    }
+		</style>
+	</head>
+	<body>
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]>
+		  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+		  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]--> 
+		<div class="search-bar layui-form">
+			<div class="layui-inline distance">
+		       <input type="text" placeholder="请输入资产条码或者资产名称关键字" class="layui-input keyword">
+		    </div> 
+		    <button class="layui-btn btns" id="search-btn">搜索</button>
+		    <button class="layui-btn btns" id="sure-btn" data-type="getCheckData">添加</button>
+		</div>
+		
+		<table class="layui-table" id="asset-table"></table>
+
+	</body>
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/peizhi.js"></script>
+	
+	<script>
+		layui.use(['jquery','form','table','layer'],function(){
+			var $ = layui.jquery;
+			var form = layui.form;			
+			var table = layui.table , layer = layui.layer;
+			var rr = $.cookie("organizationId");
+			//console.log(rr);
+			var params = {
+				groupCode : $.cookie("groupCode"),
+				statusArr: [0],
+				keyWordProperty: ""
+			}
+			//加载选择初始数据
+			searchData(params);
+			
+			//条件查询选择数据
+			$('.search-bar #search-btn').on('click',function(){
+				
+//				var organizationId = getCookie(organizationId);
+				//var organizationId = 1;  //当前登录人所在机构id,先写死，登陆cookie获取
+				var status = [0];  //闲置状态
+				var keyWordProperty = $(".search-bar .keyword").val(); 
+				var param = {
+			    	groupCode: $.cookie("groupCode"),
+			    	statusArr: [0],
+			    	keyWordProperty: keyWordProperty
+			   }
+				searchData(param);
+			});
+			
+			function searchData(param){
+				   $.ajax({
+					type:"get",
+					url:ApiUrl + "receive/qrypRropertyListByCondition",
+					traditional: true,
+					dataType:'json',
+				    data: param,
+				    success:function(data){
+				    	var myData = data.data;
+				    	if(data.code == 0){
+				    		table.render({
+						    	elem: '#asset-table'
+						    	,id:"asset-table"
+						    	,data: myData
+						    	,height: '320'
+							    ,cols: [[ //标题栏
+							       {checkbox: true}
+							      ,{field: 'id', title: 'ID', width: 20}
+							      ,{field: 'propertyCode', title: '资产条码', width: 170}
+							      ,{field: 'propertyName', title: '资产名称', width: 100}
+							      ,{field: 'categoryName', title: '资产类别', width: 120}
+							      ,{field: 'specification', title: '规格型号', width: 120}
+							      ,{field: 'brand', title: '品牌', width: 100}
+							      ,{field: 'unit', title: '单位', width: 100}
+							      ,{field: 'price', title: '金额', width: 100}
+							      ,{field: 'snno', title: '序列号', width: 120}
+							      ,{field: 'createat', title: '入库时间', width: 160}
+							      ,{field: 'serviceLife', title: '使用期限', width: 160}
+							      ,{field:'createOrganizationName',title:'所属公司', width:120}
+							    ]] 
+							    ,skin: 'row' //表格风格
+							    //,even: true
+							    ,page: true //是否显示分页
+							    ,limits: [20,50,100]
+							    ,limit: 20 //每页默认显示的数量
+							});
+				    	}else{
+				    		//console.log(data);
+				    	}
+				    	
+				    }
+				});
+			}
+		Array.prototype.remove=function(obj){ 
+			for(var i =0;i <this.length;i++){ 
+				var temp = this[i]; 
+				if(!isNaN(obj)){ 
+					temp=i; 
+				} 
+				if(temp == obj){ 
+					for(var j = i;j <this.length;j++){ 
+						this[j]=this[j+1]; 
+					} 
+					this.length = this.length-1; 
+				} 
+			} 
+		} 
+			$("#sure-btn").on('click',function(){  
+                    var checkStatus = table.checkStatus('asset-table');
+                    var datacode = JSON.stringify(checkStatus.data);
+                    if(datacode=='[]'){
+                    	layer.msg("未选中任何资产");
+                    	return false;
+                    }
+                    if(localStorage.choicdataa!="null"&&localStorage.choicdataa!=''){
+                    	var choicdatabArr=JSON.parse(localStorage.choicdataa)
+                    	var checkStatusDataArr=[]
+                    	 checkStatusDataArr=checkStatus.data
+                    		for(var c=0;c<checkStatusDataArr.length;c++){
+	                    		for(var i=0;i<choicdatabArr.length;i++){
+	                    			if(checkStatusDataArr.length){
+	                    				if(checkStatusDataArr[c].id==choicdatabArr[i].id){
+		                    				//checkStatusDataArr.splice(c,1)
+		                    				checkStatusDataArr.remove(c)
+	                    				}
+	                    			}
+	                    		}
+                    		}
+                    	datacode=choicdatabArr.concat(checkStatusDataArr)
+                    	datacode=JSON.stringify(datacode)
+                    }
+                    localStorage.setItem("choicdataa",datacode);
+                    //window.parent.document.getElementById("reloadtable").click();
+                    
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭   
+                    var indexiframe =  "layui-layer-iframe"+localStorage.getItem("indexztb");
+                    var body = $(window.parent.document.getElementById(indexiframe).contentWindow.document.body);
+                    //$("iframe[src='newaddlist.html']").find("#reloadtable").click();
+                    body.find("#reloadtable").click();
+			})
+		});
+	</script>
+</html>

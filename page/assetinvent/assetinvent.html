@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>资产盘点</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../assetallocation/css/allocation.css">
+	<link rel="stylesheet" href="../../css/public.css">
+	<style>
+	    .header form{float:left;}
+		
+	</style>
+	</head>
+	<body>
+		<div class="layui-form search-wrap">
+		    
+					
+						<div class="layui-inline">
+						    <label class="layui-form-label">盘点单号</label>
+						    <div class="layui-input-inline">
+						        <input type="text" name="pddh" lay-verify="title" autocomplete="off" placeholder="" class="layui-input">
+						      </div>
+				        </div>
+						<div class="layui-inline">
+						      <label class="layui-form-label">盘点日期 </label>
+						      <div class="layui-input-inline">
+						        <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input">
+						      </div>
+				        </div>
+				        <div class="layui-inline">
+						      <label class="layui-form-label" style="width:10px !important;padding:7px 5px !important;text-align:center !important;">至</label>
+						      <div class="layui-input-inline">
+						        <input type="text" name="date2" id="date1" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input">
+						      </div>
+				        </div>
+				        <div class="layui-inline" style="margin-top:-18px;">
+						      <label class="layui-form-label">盘点状态 </label>
+						      <div class="layui-input-block">
+							      <select name="interest" lay-filter="aihao">
+							       
+							        <option value="0" selected="">全部</option>
+							        <option value="1">已盘</option>
+							        <option value="2">未盘</option>
+							        
+							      </select>
+							      
+							    </div>
+				        </div>
+		            
+	            <div class="layui-inline btn-box" style="margin-top:-20px;">
+	            	    <button class="layui-btn btns-blue inventchaxun">查询</button>
+			            <button class="layui-btn btns-green inventadd">新增</button>
+			            
+	            </div>
+            </div>
+           
+            <table class="layui-table" id="idText"  lay-filter="demo" style="margin-top:-20px;">
+			  
+              </table>
+	</body>
+</html>
+<script type="text/html" id="barDemo">
+	{{#  if(d.state =="已盘点"){ }}
+	     <a class="layui-btn  layui-btn-mini" lay-event="detail">详情</a>
+	  
+	{{#  } }}
+   		 
+  	{{#  if(d.state =="未盘点"){ }}
+	     <a class="layui-btn  layui-btn-mini" lay-event="detail">操作</a>
+	  
+	{{#  } }}
+
+ 
+</script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/jscript" src="../../js/peizhi.js"></script>
+<script>
+layui.use(['form', 'layedit', 'laydate'], function(){
+  var form = layui.form
+  ,layer = layui.layer
+  ,layedit = layui.layedit
+  ,laydate = layui.laydate;
+  
+  
+  dateFunc('#date','#date1');
+  //日期
+  laydate.render({
+    elem: '#date'
+  });
+  laydate.render({
+    elem: '#date1'
+  });
+  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+ 
+  //自定义验证规则
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '标题至少得5个字符啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+ });
+layui.use(['layer', 'table'], function(){
+	var layer = layui.layer , table = layui.table , $ = layui.$;
+	table.on('checkbox(demo)', function(obj){
+   
+  });
+ $.ajax({
+	    type:"get",
+	    url:ApiUrl+"inventory/getinventorylist?inventoryCode=&startTime=&endTime=",
+		success:function(result){
+			table.render({
+			    elem: '#idText'
+			    ,id:'idText'
+			   	,data:result.data
+			    ,height: 'full-80'
+			    ,cols: [[ //标题栏
+			   
+					    {field:'inventoryCode',title: '盘点单号', width:200}
+					    ,{field:'createUserName',title: '创建人', width:200}
+					    ,{field:'createAt', title:'创建时间',width:200}
+					    ,{field:'inventoryUserName', title:'盘点人',width:200}
+					    ,{field:'state', title:'盘点状态',width:150}
+				
+					    ,{fixed: 'right', title:'操作', width:140, align:'left', toolbar: '#barDemo'}
+			     
+			    ]] 
+			    //,skin: 'row' //表格风格
+			    //,even: true
+			    ,page: true //是否显示分页
+			    ,limits: [20, 50, 100]
+			    ,limit: 20 //每页默认显示的数量
+			});
+		}
+})
+
+$(".inventadd").on('click',function(){
+		 layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '新增盘点'
+        ,area: ['900px', '430px']
+        ,shade: 0.3
+        ,maxmin: true
+        ,btnAlign: 'r'
+        ,content: 'newaddinvent.html'
+        ,btn: ['确定', '取消'] //只是为了演示
+        ,yes: function(){
+        var indexiframe =  "layui-layer-iframe"+layer.index;
+        var body = $(document.getElementById(indexiframe).contentWindow.document.body)
+        body.find("#pandiantijiao").click();
+       
+         //layer.close(layer.index);
+        }
+        ,btn2: function(){
+         layer.close(layer.index);
+        }
+        ,cancel: function(){ 
+    //右上角关闭回调
+         layer.close(layer.index);
+         //return false //开启该代码可禁止点击该按钮关闭
+        }
+        
+        ,zIndex: layer.zIndex //重点1
+        ,success: function(layero){
+          layer.setTop(layero); //重点2
+        }
+     });
+	})
+$(".inventchaxun").on('click',function(){
+	var inventoryCode = $("input[name=pddh]").val();
+	var startTime = $("input[name=date]").val();
+	var endTime = $("input[name=date2]").val();
+	var inventoryState = $("select[name=interest]").val();
+			table.render({
+			     elem: '#idText'
+			    ,id:'idText'
+			   	,url:ApiUrl+"/inventory/getinventorylist"
+			   	,where:{'inventoryCode':inventoryCode,'startTime':startTime,'endTime':endTime,'inventoryState':inventoryState}
+			    ,height: 'full-80'
+			    ,cols: [[ //标题栏
+			   
+					    {field:'inventoryCode',title: '盘点单号', width:200}
+					    ,{field:'createUserName',title: '创建人', width:200}
+					    ,{field:'createAt', title:'创建时间',width:200}
+					    ,{field:'inventoryUserName', title:'盘点人',width:200}
+					    ,{field:'state', title:'盘点状态',width:150}
+					   
+					    ,{fixed: 'right', title:'操作', width:140, align:'left', toolbar: '#barDemo'}
+					    
+			     
+			    ]] 
+			    ,skin: 'row' //表格风格
+			    //,even: true
+			    ,page: true //是否显示分页
+			    ,limits: [20, 50, 100]
+			    ,limit: 20 //每页默认显示的数量
+			});
+		
+})
+table.on('tool(demo)', function(obj){
+    var data = obj.data;
+        data = JSON.stringify(data);
+    localStorage.setItem("detalisdata",data);
+    localStorage.setItem("fx",111);
+    if(obj.event === 'detail'){
+    	if(obj.data.inventoryState==2){
+    		    layer.open({
+			        type: 2 //此处以iframe举例
+			        ,title: '资产盘点详情'
+			        ,area: ['900px', '500px']
+			        ,shade: 0.3
+			        ,maxmin: true
+			        ,btnAlign: 'r'
+			        ,content: 'detalis.html  '
+			        ,btn: [] //只是为了演示
+			        ,yes: function(){
+			          //window.location.href="printborrow.html";
+			        }
+			        ,btn2: function(){
+			         //layer.close(layer.index);
+			        }
+			        ,cancel: function(){ 
+			    //右上角关闭回调
+			         layer.close(layer.index);
+			         parent.location.reload();
+			         //return false //开启该代码可禁止点击该按钮关闭
+			        }
+			        
+			        ,zIndex: layer.zIndex //重点1
+			        ,success: function(layero){
+			          layer.setTop(layero); //重点2
+			        }
+			      });
+    	}else if(obj.data.inventoryState==1){
+    		    layer.open({
+			        type: 2 //此处以iframe举例
+			        ,title: '资产盘点详情'
+			        ,area: ['900px', '500px']
+			        ,shade: 0.3
+			        ,maxmin: true
+			        ,btnAlign: 'r'
+			        ,content: 'detalis2.html  '
+			        ,btn: [] //只是为了演示
+			        ,yes: function(){
+			          //window.location.href="printborrow.html";
+			        }
+			        ,btn2: function(){
+			         //layer.close(layer.index);
+			        }
+			        ,cancel: function(){ 
+			    //右上角关闭回调
+			         layer.close(layer.index);
+			         // parent.location.reload();
+			         //return false //开启该代码可禁止点击该按钮关闭
+			        }
+			        
+			        ,zIndex: layer.zIndex //重点1
+			        ,success: function(layero){
+			          layer.setTop(layero); //重点2
+			        }
+			      });
+    	}
+
+    }
+});
+})
+</script>

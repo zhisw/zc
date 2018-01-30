@@ -1,0 +1,32 @@
+.header{
+	padding-top:10px;
+}
+.layui-form-item{width:220px !important;float:left;}
+.layui-form-label{width:70px !important;padding:7px 5px !important;}
+.layui-input-inline{width:135px;margin-bottom:20px;}
+.layui-input-inline input{height:32px !important;}
+.layui-select-title input{height:32px !important;}
+.layui-input-block{margin-left:90px !important;}
+.anniu{float:left;margin-left:20px;}
+.anniu button{
+	display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    width:85px;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 14px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-right:10px;
+}
+
+.layui-form-checkbox {
+	height: 15px !important;
+    line-height: 15px !important;
+    padding-right: 15px !important;
+}
+
+.foot{clear:both;margin-top:0px;}

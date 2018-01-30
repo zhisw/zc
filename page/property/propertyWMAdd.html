@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>订单入库</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/form.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">资产名称:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="propertyName"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>资产类别:</label>
+            <div class="layui-col-xs6 treeWrap">
+                <input type="text" id="categoryId" name="categoryId" placeholder="请选择资产分类" class="layui-input" readonly>
+                <div class="categoryTree" id="categoryTree"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">单位:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="unit"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">规格型号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="specification"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">金额:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="price"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">数量:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="num"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">SN码:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="snno" placeholder="请输入SN码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">品牌:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="brand"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>入库时间:</label>
+            <div class="layui-col-xs6">
+                <input type="text" class="layui-input" id="storageinDate" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+    </div>
+
+<table class="layui-table" id="zhpropertyList">
+    <thead>
+    <tr>
+        <th></th>
+        <th>使用公司</th>
+        <th>使用部门</th>
+        <th>使用人</th>
+        <th>使用期限</th>
+        <th>存放地</th>
+        <th>备注</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+</form>
+<button class="sumbit layui-hide"></button>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['jquery','laydate','form','tree'], function(){
+        var $ = layui.$;
+        var laydate = layui.laydate;
+        var layer = layui.layer;
+        var tree = layui.tree
+        var form = layui.form;//只有执行了这一步，部分表单元素才会自动修饰成功
+        //但是，如果你的HTML是动态生成的，自动渲染就会失效
+        //因此你需要在相应的地方，执行下述方法来手动渲染，跟这类似的还有 element.init();
+
+        //日期
+        laydate.render({
+            elem: '#storageinDate'
+            ,position: 'fixed'
+            ,type:'datetime'
+        });
+        //获取数据
+        $("#propertyName").html(localStorage.propertyName);//资产名称
+        $("#unit").html(localStorage.unit);//资产单位
+        $("#specification").html(localStorage.specification);//规格型号
+        $("#price").html(localStorage.price);//金额
+        $("#brand").html(localStorage.propertyName);//brand
+        var num=parseInt(localStorage.num)//数量
+        $("#num").html(num);
+        //类别树
+        $.ajax({
+            type:"get",
+            url:ApiUrl+"category/getCategoryInfoByTree",
+            async:true,
+            success:function(res){
+                datatree = res;
+                console.log(datatree);
+                layui.tree({
+                    elem: '#categoryTree' //传入元素选择器
+                    ,nodes: datatree
+                    ,skin:'shihuang'
+                    ,click: function(node){
+                        if(node.children==null){
+                            $("#categoryTree").hide();
+                            $("#categoryId").val(node.title);
+                            $("#categoryId").attr('categoryId',node.id);
+                            $("#categoryId").attr('parentIdPath',node.parentIdPath);
+                        }
+                    }
+                });
+            }
+        });
+        //分类选择
+        $("#categoryId").on('click', function(){
+            $("#categoryTree").show();
+        })
+        //拼接表格
+        var trhtml=''
+        for(var i=0;i<num;i++){
+                trhtml+='<tr><td><div class="layui-form"><input type="checkbox" name="choose" lay-skin="primary" checked></div></td>'+
+                '<td><select class="organizationId" lay-filter="organizationId"><option value="">请选择</option></select></td>'+
+                '<td><select class="deptId" lay-filter="deptId"><option value="">请选择</option></select></td>'+
+                '<td><select class="personnelId" lay-filter="personnelId"><option value="">请选择</option></select></td>'+
+                '<td><input type="text" class="serviceLife"></td>'+
+                '<td><input type="text" class="depositAdress"></td>'+
+                '<td><input type="text" class="remark"></td></tr>'
+        }
+        $("#zhpropertyList tbody").append(trhtml);
+        //获取公司
+        $.ajax({
+            type:"get",
+            url:ApiUrl + "org/getOrgInfoByCondition",
+            async:true,
+            success:function(res){
+                console.log(res)
+                var departmentlist = "";
+                for(var i=0;i<res.length;i++){
+                    departmentlist+="<option organizationIdPath='"+res[i].parentIdPath+"' value='"+res[i].id+"'>"+res[i].name+"</option>"
+                }
+                $(".organizationId").each(function () {
+                    $(".organizationId").append(departmentlist);
+                    form.render('select');
+                })
+            }
+        });
+        var organizationId;//公司ID
+        var deptId//部门ID
+        //监听获取部门
+        form.on('select(organizationId)', function(data){
+            debugger
+            organizationId = data.value;
+            $(this).parents('tr').find("td").eq(2).find('.deptId').html('<option value="">请选111择</option>')
+            $(this).parents('tr').find("td").eq(3).find('.personnelId').html('<option value="">请选择</option>')
+            var aaa =$(this)
+            form.render('select');
+            if(organizationId==''){
+                return false
+            }
+            $.ajax({
+                type:"get",
+                url:ApiUrl + "depart/getDepartmentByCondition?organizationId="+organizationId,
+                async:true,
+                success:function(res){
+                    var res = res.data;
+                    var departmentlist = "";
+                    for(var i=0;i<res.length;i++){
+                        departmentlist+="<option value='"+res[i].id+"'>"+res[i].departName+"</option>"
+                    }
+                    aaa.parents('tr').find("td").eq(2).find('.deptId').append(departmentlist)
+                    form.render('select');
+                }
+            });
+        });
+        //监听获取人员
+        form.on('select(deptId)',function(data){
+            deptId = data.value;
+            data.parents('tr').find("td").eq(3).find('.personnelId').html('<option value="">请选择</option>')
+            if(deptId==''){
+                return false
+            }
+            $.ajax({
+                type:"get",
+                url: ApiUrl+"system/UserFixedCtrl-getUserFixedList?deptId="+deptId,
+                async:true,
+                success:function(res){
+                    var userlist = "";
+                    var res = res.data;
+                    for(var i=0;i<res.length;i++){
+                        userlist+="<option value='"+res[i].id+"'>"+res[i].realName+"</option>"
+                    }
+                    data.parents('tr').find("td").eq(3).find('.personnelId').append(userlist)
+                }
+            });
+        })
+        //表单提交
+        $('.sumbit').on('click', function(){
+            //表单验证
+            var categoryId = $("#categoryId").val()
+            if(categoryId==''){
+                layer.msg('请填写资产类别')
+                return false
+            }
+            var storageinDate = $("#storageinDate").val()
+            if(storageinDate==''){
+                layer.msg('请填写入库时间')
+                return false
+            }
+            var bool=false;
+            var parm={};
+            $("input[name='choose']:checked").each(function (index) {
+                parm['zhpropertyList['+index+'].propertyName']=$("#propertyName").html();//资产名称
+                parm['zhpropertyList['+index+'].unit']=$("#unit").html();//单位
+                parm['zhpropertyList['+index+'].price']=$("#price").html();//金额
+                parm['zhpropertyList['+index+'].specification']=$("#specification").html()//规格型号
+                parm['zhpropertyList['+index+'].snno']=$("#snno").val()//sn号码
+                parm['zhpropertyList['+index+'].brand']=$("#brand").html()//品牌
+                parm['zhpropertyList['+index+'].storageinDate']=$("#storageinDate").val()//入库时间
+                parm['zhpropertyList['+index+'].sourceType']=2//资产来源
+                parm['zhpropertyList['+index+'].groupCode']=$.cookie("groupCode")//管理员ID
+                parm['zhpropertyList['+index+'].categoryId']=$("#categoryId").attr('categoryId')//资产类别id
+                parm['zhpropertyList['+index+'].categoryName']=$("#categoryId").val()//资产类别名称
+                parm['zhpropertyList['+index+'].categoryidPath']=$("#categoryId").attr('categoryidPath')//资产类别路径
+                var organizationId = $(this).parents('tr').find("td").eq(1).find('.organizationId')
+                if(organizationId.val()==''){
+                    layer.msg('请选择公司')
+                    bool=true
+                    return;
+                }
+                parm['zhpropertyList['+index+'].organizationId']=organizationId.val()//公司id
+                parm['zhpropertyList['+index+'].organizationName']=organizationId.find("option:selected").text();//公司名称
+                parm['zhpropertyList['+index+'].organizationIdPath']=organizationId.find("option:selected").attr('organizationIdPath');//公司路径
+                var deptId = $(this).parents('tr').find("td").eq(2).find('.deptId')
+                if(deptId.val()!=''){
+                    parm['zhpropertyList['+index+'].deptId']=deptId.val()//部门id
+                    parm['zhpropertyList['+index+'].deptName']=deptId.find("option:selected").text();//部门名称
+                }
+                var personnelId = $(this).parents('tr').find("td").eq(3).find('.personnelId')
+                if(personnelId.val()!=''){
+                    parm['zhpropertyList['+index+'].personnelId']=personnelId.val()//人员id
+                    parm['zhpropertyList['+index+'].personnelName']=personnelId.find("option:selected").text();//人员名称
+                }
+                parm['zhpropertyList['+index+'].disposePersonid']=$.cookie("userCode")//处理人id
+                parm['zhpropertyList['+index+'].disposePersonname']=$.cookie("realName")//处理人
+                var serviceLife = $(this).parents('tr').find("td").eq(4).find('.serviceLife').val()//使用期限
+                var reg = /^[0-9]*$/;
+                if(!reg.test(serviceLife)){
+                    layer.msg('使用期限输入数字月份')
+                    bool=true
+                    return;
+                }
+                parm['zhpropertyList['+index+'].serviceLife']=serviceLife
+                parm['zhpropertyList['+index+'].depositAdress']=$(this).parents('tr').find("td").eq(5).find('.depositAdress').val()//存放地址
+                parm['zhpropertyList['+index+'].remark']=$(this).parents('tr').find("td").eq(6).find('.depositAdress').val()//备注
+            })
+            if(bool){
+                return
+            }
+            $.ajax({
+                url:ApiUrl+"zhProperty/insertPropertyGrnList",
+                async:false,
+                data:parm,
+                type:'POST',
+                dataType: 'json',
+                success : function(result) {//返回数据根据结果进行相应的处理
+                    if(result.code==0){
+                        layer.msg("新增成功",{time:2000},function () {
+                            parent.location.reload()
+                        });
+                    }else{
+                        layer.msg(result.message)
+                    }
+                }
+            });
+        })
+        form.render();
+    })
+
+</script>
+</body>
+</html>

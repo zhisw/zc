@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>盘点差异报告</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/allocation.css">
+	<style>
+		.header button{
+					display: inline-block;
+				    height: 30px;
+				    line-height: 30px;
+				    padding:0 15px;
+				    color: #fff;
+				    white-space: nowrap;
+				    text-align: center;
+				    font-size: 14px;
+				    border: none;
+				    border-radius: 15px;
+				    cursor: pointer;
+				    margin-right:10px;
+				    float:left;
+		    }
+		.yipan{background:#6866E9;margin-left:10px;}
+		.yipan:hover{opacity: 0.7;}
+		.complete{background:#6866E9;margin-left:10px;}
+		.complete:hover{opacity: 0.7;}
+		.presentation{background:#6866E9;margin-left:10px;}
+		.presentation:hover{opacity: 0.7;}
+		.btn-box{
+				margin-top: 50px;
+				text-align: left;
+			}
+	</style>
+	<style type="text/css" media="print"> 
+			.noprint{
+				display:none;
+			} 
+	</style>
+	</head>
+	<body>
+		<div class="header">
+			<h6 style="padding: 10px 0;text-align:center;font-size:22px">盘点差异报告</h6>
+			<div class="layui-inline">
+				      <label class="layui-form-label">盘点单号</label>
+				      <div class="layui-input-inline" style="width:145px;">
+				        <input type="text" name="pddh" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+            </div>
+            <div class="layui-inline">
+				      <label class="layui-form-label">盘点人 </label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="pdr" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+          </div><br><br><br><br>
+			<p style="padding-left:20px;color:blue;">盘点范围</p>
+			<form class="layui-form">
+				 <div class="layui-inline">
+				      <label class="layui-form-label"><font color="red";>*</font>入库时间 </label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="date" id="date" lay-verify="date" disabled="disabled" autocomplete="off" class="layui-input">
+				      </div>
+                 </div>
+		         <div class="layui-inline">
+				      <label class="layui-form-label" style="width:10px !important;padding:7px 5px !important;text-align:center !important;">至</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="date2" id="date1" lay-verify="date" disabled="disabled" autocomplete="off" class="layui-input">
+				      </div>
+		         </div>
+		        <div class="layui-inline">
+				      <label class="layui-form-label">公司</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="company" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+                </div>
+                <div class="layui-inline">
+				      <label class="layui-form-label">部门</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="department" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+                </div>
+				<div class="layui-inline">
+				      <label class="layui-form-label">资产类别</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="category" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+                </div>
+			   
+			     <!--<div class="layui-inline">
+				      <label class="layui-form-label">资产条码 </label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="tiaocode" lay-verify="title" disabled="disabled"  class="layui-input" >
+				      </div>
+                 </div>-->
+                 
+			</form>
+			<div style="width:98%;overflow-x: hidden;margin-left:1%">
+			<table class="layui-table">
+				<thead><tr><td>是否已盘</td><td>资产条码</td><td>资产名称</td><td>资产类别</td><td>规格型号</td><td>品牌</td><td>单位</td><td>序列号</td><td>所在部门</td><td>使用人</td><td>入库时间</td><td>使用期限</td><td>所属公司</td></tr></thead>
+				<tbody class="printbody"></tbody>
+			</table>
+			</div>
+			<div class="btn-box">
+			<button class="print noprint">打印</button>
+			
+			<button class="goback noprint">返回</button>
+			</div>
+		</div>
+	</body>
+</html>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+layui.use('table', function(){
+	var table = layui.table,$ = layui.$;
+	var data = JSON.parse(localStorage.getItem('presen'));
+	          $("input[name=pddh]").val(data.inventoryCode);//盘点单号
+		      $("input[name=pdr]").val(data.createUserName);//盘点人
+		      $("input[name=date]").val(data.beginTime);
+		      $("input[name=date2]").val(data.finishTime);
+		      $("input[name=company]").val(data.organizationName);
+		      if(data.deptName=="请选择"){
+		      	$("input[name=department]").parent().parent().hide();
+		      }else{
+		        $("input[name=department]").val(data.deptName);
+		      }
+		      if(data.propertyCatagory!=''){
+		      	$("input[name=category]").val(data.propertyCatagory);
+		      }else{
+		      	$("input[name=category]").val("全部");
+		      }
+		      
+		      //$("input[name=tiaocode]").val(data.propertyCode);
+		      var prolist = "";
+		     for(var i=0;i<data.propertyList.length;i++){
+		      	prolist+="<tr>"
+		      	        +"<td>"+data.propertyList[i].tempStatusName+"</td>"
+		      	        +"<td>"+data.propertyList[i].propertyCode+"</td>"
+		      	        +"<td>"+data.propertyList[i].propertyName+"</td>"
+		      	        +"<td>"+data.propertyList[i].categoryName+"</td>"
+		      	        +"<td>"+data.propertyList[i].specification+"</td>"
+		      	        +"<td>"+data.propertyList[i].brand+"</td>"
+		      	        +"<td>"+data.propertyList[i].unit+"</td>"
+		      	        +"<td>"+data.propertyList[i].snNo+"</td>"
+		      	        +"<td>"+data.propertyList[i].deptName+"</td>"
+		      	        +"<td>"+data.propertyList[i].personnelName+"</td>"
+		      	        +"<td>"+data.propertyList[i].storageinDate+"</td>"
+		      	        +"<td>"+data.propertyList[i].serviceLife+"</td>"
+		      	        +"<td>"+data.propertyList[i].createOrganizationName+"</td>"
+		      	        +"</tr>"
+		      }
+		      $(".printbody").html(prolist);
+//	          table.render({
+//					    elem: '#idText'
+//					    ,id:'idText'
+//					   	,data:data.propertyList
+//					    
+//					    ,cols: [[ //标题栏  
+//					     
+//							    {field:'tempStatusName',title: '是否已盘', width:90}
+//							    ,{field:'propertyCode',title: '资产条码', width:90}
+//							    ,{field:'propertyName', title:'资产名称',width:90}
+//							    ,{field:'categoryName', title:'资产类别',width:90}
+//							    ,{field:'inventoryState', title:'规格型号',width:90}
+//							    ,{field: 'brand', title:'品牌', width:80}
+//							    ,{field: 'unit', title:'单位', width:60}
+//							    ,{field: 'snNo', title:'序列号', width:80}
+//							    ,{field: 'deptName', title:'所在部门', width:90}
+//							    ,{field: 'personnelName', title:'使用人', width:80}
+//							    ,{field: 'storageinDate', title:'入库时间', width:90}
+//							    ,{field: 'serviceLife', title:'使用期限', width:80}
+//					     
+//					    ]] 
+//					    ,skin: 'row' //表格风格
+//					    ,even: true
+//					    ,page: false //是否显示分页
+//					    ,limits: [5, 7, 10]
+//					    ,limit: 7 //每页默认显示的数量
+//					});
+		$(".print").on('click',function(){
+			$(this).hide();
+			$(".goback").hide();
+			window.print();
+			$(this).show();
+			$(".goback").show();
+		});
+		$(".goback").on('click',function(){
+			window.history.go(-1);
+		})
+					
+})
+</script>

@@ -1,0 +1,173 @@
+{
+  "code": 0
+  ,"msg": ""
+  ,"count": 3000000
+  ,"data": [{
+    allocationCode
+:
+3
+allocationState
+:
+"ww"
+allotMoney
+:
+236.23
+allotRemark
+:
+"ww"
+brand
+:
+"个"
+callinAddress
+:
+"ww"
+callinAdmin
+:
+"admin"
+callinDate
+:
+null
+callinDeptId
+:
+"22"
+callinDeptName
+:
+"ww"
+callinOrganization
+:
+"ww"
+callinUserId
+:
+"2"
+callinUserName
+:
+"ss"
+calloutAdmin
+:
+"aa"
+calloutDate
+:
+1505192340000
+calloutDeptId
+:
+"22"
+calloutDeptName
+:
+"sd"
+calloutOrganization
+:
+"ww"
+createAt
+:
+1505192340000
+id
+:
+1
+limit
+:
+10
+originalAddress
+:
+"dd"
+originalUserId
+:
+"1"
+originalUserName
+:
+"fhb"
+page
+:
+null
+pageStart
+:
+0
+propertyCatagory
+:
+"电子"
+"propertyCode"
+:
+"4"
+,
+propertyCodes
+:
+null
+propertyName
+:
+"王者荣耀"
+skuSpecs
+:
+"红色"
+unit
+:
+"2"
+updateAt
+:
+1505192340000
+  }, {
+    "state": "已调出"
+    ,"allocationdate": "2016-10-14"
+    ,"allocationname": "李四"
+    ,"assetcode": "1051"
+    ,"assetname": "玛丽梦露-洗发露"
+    ,"assetcategory": "洗发露"
+    ,"brand": "玛丽梦露"
+    ,"model": "高60毫米，宽24毫米"
+    ,"company": "瓶"
+    ,"money": "￥45.50"
+    ,"allocationcompany": "网易"
+    ,"LAY_CHECKED": true
+    ,"wealth": "<a href='javascript:void(0)' data-method='setTop' class='godetalis'>详情</a>"
+  }, {
+    "state": "已归还"
+    ,"allocationdate": "2016-10-14"
+    ,"allocationname": "二逼蛋"
+    ,"assetcode": "1031"
+    ,"assetname": "霸王洗发露"
+    ,"assetcategory": "洗发露"
+    ,"brand": "霸王"
+    ,"model": "高45毫米，宽34毫米"
+    ,"company": "瓶"
+    ,"money": "￥22.00"
+    ,"allocationcompany": "腾旭"
+    ,"wealth": "<a href='javascript:void(0)' data-method='setTop' class='godetalis'>详情</a>"
+  }, {
+    "state": "已调出"
+    ,"allocationdate": "2016-10-14"
+    ,"allocationname": "万二麻子"
+    ,"assetcode": "1007"
+    ,"assetname": "哇哈哈-牛乳"
+    ,"assetcategory": "饮料"
+    ,"brand": "哇哈哈"
+    ,"model": "高34毫米，宽3毫米"
+    ,"company": "瓶"
+    ,"money": "￥2.50"
+    ,"allocationcompany": "华为"
+    ,"wealth": "<a href='javascript:void(0)' data-method='setTop' class='godetalis'>详情</a>"
+  }, {
+    "state": "已归还"
+    ,"allocationdate": "2016-10-14"
+    ,"allocationname": "猛男茶饭"
+    ,"assetcode": "1003"
+    ,"assetname": "百事可乐"
+    ,"assetcategory": "饮料"
+    ,"brand": "百事"
+    ,"model": "高57毫米，宽3毫米"
+    ,"company": "瓶"
+    ,"money": "￥3.50"
+    ,"allocationcompany": "支付宝"
+    ,"wealth": "<a href='javascript:void(0)' data-method='setTop' class='godetalis'>详情</a>"
+  }, {
+    "state": "已调出"
+    ,"allocationdate": "2016-10-14"
+    ,"allocationname": "下痘痘"
+    ,"assetcode": "1001"
+    ,"assetname": "康师傅红烧牛肉面"
+    ,"assetcategory": "方便面"
+    ,"brand": "康师傅"
+    ,"model": "高45毫米，宽34毫米"
+    ,"company": "桶"
+    ,"money": "￥4.50"
+    ,"allocationcompany": "联想"
+    ,"wealth": "<a href='javascript:void(0)' data-method='setTop' class='godetalis'>详情</a>"
+  }]
+}  

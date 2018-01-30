@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>维修单</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" action="">
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>入库日期:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="grnDate" name="grnDate" class="layui-input" lay-verify="required" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">备注:</label>
+        <div class="nine-xs8">
+            <input type="text" id="remark" lay-verify="remark" placeholder="请输入备注" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="btn-box">
+        <button class="layui-btn btns-blue" type="button" id="select-asset">选择物品</button>
+        <button class="layui-btn btns-blue" type="button" id="del-btn" data-type="getCheckData">删除</button>
+    </div>
+    <button class="layui-btn submitLY layui-hide" lay-submit="" lay-filter="form-submit" type="button" >立即提交</button>
+</form>
+<table id="sure-table" lay-filter="table-checkbox"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['form','laydate','table'], function() { //独立版的layer无需执行这一句
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var table = layui.table;
+        var $=layui.$;
+        laydate.render({
+            elem: '#grnDate'
+            ,position: 'fixed'
+            ,value:new Date()
+            ,type: 'datetime'
+        });
+        //监听表单提交
+        form.verify({
+            moneyRepairs: [/(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/, '输入正确的金额'],
+        });
+        form.on('submit(form-submit)', function(data){
+            var parms = {};
+            var bool=false
+            var tableselect = table.cache['idTest']
+            if(tableselect.length<1) {
+                layer.msg('请选择物品');
+                return
+            }
+            for(var i = 0;i<tableselect.length;i++){
+                parms.orderType=1
+                parms.grnDate=$("#grnDate").val()
+                parms['detailList['+i+'].orderType']=1//入库单
+                parms['detailList['+i+'].remark']=$("#remark").val()//备注
+                parms['detailList['+i+'].propertyId']=tableselect[i].id//ID
+                parms['detailList['+i+'].propertyCode']=tableselect[i].consumableCode//耗材编码
+                parms['detailList['+i+'].propertyName']=tableselect[i].consumableName//耗材名称
+                parms['detailList['+i+'].categoryId']=tableselect[i].categoryId//分类ID
+                parms['detailList['+i+'].categoryName']=tableselect[i].categoryName//分类名称
+                parms['detailList['+i+'].specification']=tableselect[i].specification//规格型号
+                parms['detailList['+i+'].brand']=tableselect[i].brand//品牌
+                parms['detailList['+i+'].unit']=tableselect[i].unit//单位
+                parms['detailList['+i+'].grnnum']=tableselect[i].num_edit//数量
+                parms['detailList['+i+'].grnprice']=tableselect[i].price_edit//单价
+                parms['detailList['+i+'].grnsum']=tableselect[i].sumprice//金额
+                if(tableselect[i].num_edit==undefined||tableselect[i].num_edit==''||tableselect[i].price_edit==''||tableselect[i].price_edit==undefined){
+                    bool=true
+                    break;
+                }
+            }
+            if(bool){
+                layer.msg('请输入入库数量，入库单价');
+                return
+            }
+            $(this).attr("disabled","disabled");
+            $.ajax({
+                url:ApiUrl+"zhConsumable/insertconsumablegrn",
+                async:false,
+                data:parms,
+                type:'POST',
+                success : function(result) {//返回数据根据结果进行相应的处理
+                    if(result.code==0){
+                        layer.msg("新增成功",{time:2000},function () {
+                            parent.location.reload()
+                        });
+                    }else{
+                        layer.msg('错误信息'+result.message)
+                    }
+                }
+            });
+        });
+        //判断数量
+        table.on('edit(table-checkbox)', function(obj){
+            if(obj.field=='num_edit'){
+                var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+                if(!reg.test(obj.value)){
+                    obj.data.num_edit=''
+                    layer.msg('请输入正确的数量');
+                    table.reload('idTest')
+                    return;
+                }
+                if(obj.data.price_edit!=''&&obj.data.price_edit!=undefined){
+                    obj.data.sumprice=obj.data.price_edit*obj.value
+                    table.reload('idTest')
+                }
+            }
+            if(obj.field=='price_edit'){
+                var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+                if(!reg.test(obj.value)){
+                    obj.data.price_edit=''
+                    layer.msg('请输入正确的金额');
+                    return;
+                }
+                if(obj.data.num_edit!=''&&obj.data.num_edit!=undefined){
+                    obj.data.sumprice=obj.data.num_edit*obj.value
+                    table.reload('idTest')
+                }
+            }
+        });
+    })
+    //渲染已选择资产表格
+    function renderTable(obj){
+        layui.use(['jquery','form','layer','table'], function(){
+            var $ = layui.jquery;
+            var table = layui.table;
+            var layer = layui.layer;
+            table.render({
+                elem: '#sure-table'
+                ,id:'idTest'
+                ,data: JSON.parse(obj)
+                ,cols: [[ //标题栏
+                    {checkbox: true}
+                    ,{field: 'consumableCode', title: '资产条码', width: 170}
+                    ,{field: 'consumableName', title: '资产名称', width: 100}
+                    ,{field: 'categoryName', title: '资产类别', width: 120}
+                    ,{field: 'num_edit', title: '入库数量', edit: 'text',width: 90}
+                    ,{field: 'price_edit', title: '入库单价', edit: 'text',width: 90}
+                    ,{field: 'sumprice', title: '入库金额', width: 90}
+                    ,{field: 'specification', title: '规格型号', width: 120}
+                    ,{field: 'brand', title: '品牌', width: 100}
+                    ,{field: 'unit', title: '单位', width: 100}
+                ]]
+                ,skin: 'row' //表格风格
+                ,even: true
+                ,height:210
+            });
+        })
+    }
+    //多次选择资产
+    function selectData(i,data){
+        if(i==1){
+            var data1 = localStorage.setItem("data1",data);
+        }else if(i>1){
+            var data1 = localStorage.getItem("data1");
+            var oldArr = JSON.parse(data1);
+            var newArr = JSON.parse(data);
+            var oldArrId = [];
+            //去重
+            for(var j = 0;j<oldArr.length;j++){
+                oldArrId.push(oldArr[j].id);
+            }
+            for(var k = 0;k<newArr.length;k++){
+                if(oldArrId.indexOf(newArr[k].id) == -1){
+                    oldArr.push(newArr[k]);
+                }
+            }
+            var data1 = localStorage.setItem("data1",JSON.stringify(oldArr));
+        }
+    }
+    //多次选择资产删除
+    function selectDataDel(dataDel){
+        var data1 = localStorage.getItem("data1");
+        var oldArr = JSON.parse(data1);
+        var newArr = JSON.parse(dataDel);
+        var numArr = [];
+        //删除
+        for(var m = 0;m<oldArr.length;m++){
+            for(var n = 0;n<newArr.length;n++){
+                if(oldArr[m].id == newArr[n].id){
+                    oldArr.remove(m); //m为选择数据删除的第几条
+                }
+            }
+        }
+        localStorage.setItem("dataDel",JSON.stringify(oldArr));
+    }
+    /*删除数组指定下标或指定对象 */
+    Array.prototype.remove=function(obj){
+        for(var i =0;i <this.length;i++){
+            var temp = this[i];
+            if(!isNaN(obj)){
+                temp=i;
+            }
+            if(temp == obj){
+                for(var j = i;j <this.length;j++){
+                    this[j]=this[j+1];
+                }
+                this.length = this.length-1;
+            }
+        }
+    }
+</script>
+</body>
+</html>

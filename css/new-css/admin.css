@@ -1,0 +1,64 @@
+.header-name{
+	float:left;
+	margin-left:35px;
+	margin-top:20px;
+	width:320px;
+	height:25px;
+	background:url(../../images/new-images/logoname.png) no-repeat;
+	background-size:100% 100%;
+}
+.logoname{
+	width:320px;
+}
+.layui-this{
+	background:#fff !important;
+	color:#999999 !important;
+}
+.layui-this>a{
+	background:url(../../images/new-images/lijianbian.png) no-repeat;
+	background-size:100% 100%;
+}
+.layui-this>a:hover{
+	background:#2B2E37!important;
+}
+.layui-layout-admin .layui-header{
+	background:url(../../images/new-images/logo.png) no-repeat;
+	background-size:100% 100%;
+}
+.layui-nav-tree .layui-nav-bar{
+	background:#7978E9 !important;
+}
+.layui-nav-bar{height:0 !important;}
+.layui-body{border-top:0 !important;}
+#top_tabs_box{background:#E2E1EB;}
+.add-danwei{
+	background:url(../../images/new-images/workicon.png) no-repeat;
+	float: left;
+    margin-top: 22px;
+    width: 15px;
+    height: 15px;
+}
+.add-user{
+	background:url(../../images/new-images/usericon.png) no-repeat;
+	float: left;
+    margin-top: 22px;
+    width: 15px;
+    height: 15px;
+}
+.add-help{
+	background:url(../../images/new-images/helpicon.png) no-repeat;
+	float: left;
+    margin-top: 22px;
+    width: 15px;
+    height: 15px;
+}.add-sign{
+	background:url(../../images/new-images/signicon.png) no-repeat;
+	float: left;
+    margin-top: 22px;
+    width: 15px;
+    height: 15px;
+}
+.layui-bg-black{background:#0B142A;}
+.layui-nav-itemed .layui-nav-child{background:#000;}
+
+

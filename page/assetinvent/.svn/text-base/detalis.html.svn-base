@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>盘点单明细</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/allocation.css">
+	<style>
+		.header button{
+					display: inline-block;
+				    height: 30px;
+				    line-height: 30px;
+				    padding:0 15px;
+				    color: #fff;
+				    white-space: nowrap;
+				    text-align: center;
+				    font-size: 14px;
+				    border: none;
+				    border-radius: 15px;
+				    cursor: pointer;
+				    margin-right:10px;
+				    float:left;
+		    }
+		.yipan{background:#6866E9;margin-left:10px;}
+		.yipan:hover{opacity: 0.7;}
+		.complete{background:#6866E9;margin-left:10px;}
+		.complete:hover{opacity: 0.7;}
+		.presentation{background:#6866E9;margin-left:10px;}
+		.presentation:hover{opacity: 0.7;}
+	</style>
+	</head>
+	<body>
+		<div class="header">
+			<div class="layui-inline">
+				      <label class="layui-form-label">盘点单号:</label>
+				      <div class="layui-input-inline" style="width:145px;">
+				        <input type="text" name="pddh" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+            </div>
+            <div class="layui-inline">
+				      <label class="layui-form-label">盘点人:</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="pdr" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+          </div>
+			<p style="padding-left:20px;color:blue;clear:both">盘点范围:</p>
+			<form class="layui-form">
+				 <div class="layui-inline">
+				      <label class="layui-form-label"><font color="red";>*</font>入库时间:</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="date" id="date" lay-verify="date" disabled="disabled" autocomplete="off" class="layui-input">
+				      </div>
+                 </div>
+		         <div class="layui-inline">
+				      <label class="layui-form-label" style="width:10px !important;padding:7px 5px !important;text-align:center !important;">至</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="date2" id="date1" lay-verify="date" disabled="disabled" autocomplete="off" class="layui-input">
+				      </div>
+		         </div>
+		        <div class="layui-inline">
+				      <label class="layui-form-label">公司:</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="company" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+                </div>
+                <div class="layui-inline">
+				      <label class="layui-form-label">部门:</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="department" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+                </div>
+				<div class="layui-inline">
+				      <label class="layui-form-label">资产类别:</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="category" lay-verify="title" disabled="disabled"  class="layui-input">
+				      </div>
+                </div>
+			   
+			     <div class="layui-inline">
+				      <label class="layui-form-label">资产条码:</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="tiaocode" lay-verify="title" autocomplete="off"  class="layui-input" placeholder="输入资产条码查询">
+				      </div>
+                 </div>
+                 
+			</form>
+			<button class="chaxun" style="margin-left:20px;">查询</button>
+			<button class="yipan" data-type="getCheckData">已盘</button>
+			<table class="layui-table" id="idText"  lay-filter="fhbtable"></table>
+			<button class="complete">完成盘点</button>
+			<button class="presentation" style="background:#737383">生成差异报告</button>
+			<button class="goback">返回</button>
+		</div>
+	</body>
+</html>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+	layui.use(['form', 'layedit', 'laydate'], function(){
+  var form = layui.form
+  ,layer = layui.layer
+  ,layedit = layui.layedit
+  ,laydate = layui.laydate;
+  
+  //日期
+  laydate.render({
+    elem: '#date'
+  });
+  laydate.render({
+    elem: '#date1'
+  });
+  
+  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+ 
+  //自定义验证规则
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '标题至少得5个字符啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+  
+  //监听提交
+  form.on('submit(demo1)', function(data){
+    layer.alert(JSON.stringify(data.field), {
+      title: '最终的提交信息'
+    })
+    return false;
+  });
+  
+  
+});
+</script>
+<script>
+	layui.use('table',function(){
+		var table = layui.table , $ = layui.$,layer = layui.layer;
+		var detalisdata = JSON.parse(localStorage.getItem("detalisdata"));
+		table.on('checkbox(demo)', function(obj){
+   
+  });
+//		var inventoryCode = {
+//			'inventoryCode' : detalisdata.inventoryCode
+//		}
+//		var inventoryCodes = JSON.stringify(inventoryCode);
+		$.ajax({
+			type:"get",
+			url: ApiUrl+"inventory/inventory-detail?inventoryCode="+detalisdata.inventoryCode,
+			async:true,
+			contentType:'application/json',
+			xhrFields: {
+			 withCredentials: true,
+		    },
+		    crossDomain: true,
+		    complete: function (XMLHttpRequest, textStatus) {
+            if (XMLHttpRequest.responseJSON == -2) {
+               layer.msg('登录失效,请重新登录')
+                window.top.location.replace("http://192.168.1.216:21000/");
+            }
+            },
+		   // data:inventoryCodes,
+		    success:function(res){
+		    	if(res.status==true){
+		    		$("input[name=pddh]").val(res.data.inventoryCode);//盘点单号
+		    		$("input[name=pdr]").val(res.data.createUserName);//盘点人
+		    		$("input[name=date]").val(res.data.beginTime);
+		    		$("input[name=date2]").val(res.data.finishTime);
+		    		$("input[name=company]").val(res.data.organizationName);
+		    		if(res.data.deptName=='请选择'){
+		    			$("input[name=department]").parent().parent().hide();
+		    		}else{
+		    			$("input[name=department]").val(res.data.deptName);
+		    		}
+		    		
+		    		if(res.data.propertyCatagory!=''){
+		    			$("input[name=category]").val(res.data.propertyCatagory);
+		    		}else{
+		    			$("input[name=category]").val("全部");
+		    		}
+		    		table.render({
+					    elem: '#idText'
+					    ,id:'idText'
+					   	,data:res.data.propertyList
+					    ,height: 180
+					    ,cols: [[ //标题栏  
+					     {checkbox:true, fixed: true}
+							    ,{field:'tempStatusName',title: '是否已盘', width:100}
+							    ,{field:'propertyCode',title: '资产条码', width:110}
+							    ,{field:'propertyName', title:'资产名称',width:110}
+							    ,{field:'categoryName', title:'资产类别',width:100}
+							    ,{field:'specification', title:'规格型号',width:110}
+							    ,{field: 'brand', title:'品牌', width:80}
+							    ,{field: 'unit', title:'单位', width:80}
+							    ,{field: 'snNo', title:'序列号', width:80}
+							    ,{field: 'deptName', title:'所在部门', width:120}
+							    ,{field: 'personnelName', title:'使用人', width:80}
+							    ,{field: 'storageinDate', title:'入库时间', width:100}
+							    ,{field: 'serviceLife', title:'使用期限', width:100}
+							    ,{field:'createOrganizationName',title:'所属公司',width:120}
+					     
+					    ]] 
+					    ,skin: 'row' //表格风格
+					    //,even: true
+					    ,page: true //是否显示分页
+					    ,limits: [20, 50, 100]
+					    ,limit: 20 //每页默认显示的数量
+					});
+					
+					
+		    	}
+		    }
+		});
+		$(".chaxun").on('click',function(){
+			var code = $("input[name=tiaocode]").val();
+			var pddh = $("input[name=pddh]").val();
+			$.ajax({
+				type:"get",
+				url: ApiUrl+"inventory/getinventory-detaillist?propertyCode="+code+"&inventoryCode="+pddh,
+				async:true,
+				contentType:'application/json',
+				xhrFields: {
+					 withCredentials: true,
+				},
+				crossDomain: true,
+				success:function(res){
+					if(res.code==0){
+							table.render({
+									    elem: '#idText'
+									    ,id:'idText'
+										,data:res.data
+										,height: 180
+										,cols: [[ //标题栏  
+											{checkbox:true, fixed: true}
+										   ,{field:'tempStatusName',title: '是否已盘', width:100}
+													    ,{field:'propertyCode',title: '资产条码', width:110}
+													    ,{field:'propertyName', title:'资产名称',width:110}
+													    ,{field:'categoryName', title:'资产类别',width:100}
+													    ,{field:'specification', title:'规格型号',width:110}
+													  ,{field: 'brand', title:'品牌', width:80}
+										    ,{field: 'unit', title:'单位', width:80}
+										    ,{field: 'snNo', title:'序列号', width:80}
+										    ,{field: 'deptName', title:'所在部门', width:120}
+										    ,{field: 'personnelName', title:'使用人', width:80}
+										    ,{field: 'storageinDate', title:'入库时间', width:100}
+										    ,{field: 'serviceLife', title:'使用期限', width:100}
+											     
+											 ]] 
+											  ,skin: 'row' //表格风格
+											  ,even: true
+											  ,page: true //是否显示分页
+											  ,limits: [20, 50, 100]
+											  ,limit: 20 //每页默认显示的数量
+									});
+					}else{
+						layer.msg("GG");
+					}
+				}
+			});
+		})
+		
+		$(".yipan").on('click',function(){
+		  var checkStatus = table.checkStatus('idText');
+		  var datacode = JSON.stringify(checkStatus.data);
+		  var proper = new Array();
+		  console.log(checkStatus.data);
+                    if(datacode=='[]'){
+                    	layer.msg("未选中任何资产");
+                    	return false;
+                    }else{
+                    	
+                    	for(var i = 0 ; i<checkStatus.data.length; i ++){
+                    		proper.push(checkStatus.data[i].propertyCode)
+                    	}
+                    	propertyCodes = {
+                    		'propertyCodes':proper,
+                    		'inventoryCode':$("input[name=pddh]").val()
+                    	}
+                    	property = JSON.stringify(propertyCodes);
+                    	$.ajax({
+                    		type:"post",
+							url: ApiUrl+"inventory/inventory-properties",
+							traditional: true,
+							contentType:'application/json',
+							data:property,
+							xhrFields: {
+							 withCredentials: true,
+						    },
+						    crossDomain: true,
+						    complete: function (XMLHttpRequest, textStatus) {
+				            if (XMLHttpRequest.responseJSON == -2) {
+				               layer.msg('登录失效,请重新登录')
+				                window.top.location.replace("http://192.168.1.216:21000/");
+				            }
+				            },
+						   // data:inventoryCodes,
+						    success:function(res){
+						    	if(res.status==true){
+						    		var loadre = $("input[name=pddh]").val();
+						    		$.ajax({
+										type:"get",
+										url: ApiUrl+"inventory/inventory-detail?inventoryCode="+loadre,
+										async:true,
+										contentType:'application/json',
+										xhrFields: {
+										 withCredentials: true,
+									    },
+									    crossDomain: true,
+									    complete: function (XMLHttpRequest, textStatus) {
+							            if (XMLHttpRequest.responseJSON == -2) {
+							               layer.msg('登录失效,请重新登录')
+							                window.top.location.replace("http://192.168.1.216:21000/");
+							            }
+							            },
+									   // data:inventoryCodes,
+									    success:function(res){
+									    	table.render({
+											    elem: '#idText'
+											    ,id:'idText'
+											   	,data:res.data.propertyList
+											    ,height: 180
+											    ,cols: [[ //标题栏  
+											     {checkbox:true, fixed: true}
+													    ,{field:'tempStatusName',title: '是否已盘', width:100}
+													    ,{field:'propertyCode',title: '资产条码', width:110}
+													    ,{field:'propertyName', title:'资产名称',width:110}
+													    ,{field:'categoryName', title:'资产类别',width:100}
+													    ,{field:'inventoryState', title:'规格型号',width:110}
+													  ,{field: 'brand', title:'品牌', width:80}
+										    ,{field: 'unit', title:'单位', width:80}
+										    ,{field: 'snNo', title:'序列号', width:80}
+										    ,{field: 'deptName', title:'所在部门', width:120}
+										    ,{field: 'personnelName', title:'使用人', width:80}
+										    ,{field: 'storageinDate', title:'入库时间', width:100}
+										    ,{field: 'serviceLife', title:'使用期限', width:100}
+											     
+											    ]] 
+											    ,skin: 'row' //表格风格
+											    ,even: true
+											    ,page: true //是否显示分页
+											    ,limits: [20, 50, 100]
+											    ,limit: 20 //每页默认显示的数量
+											});
+									    }
+									   })
+						    		
+						    	}
+						    }
+                    		
+                    	})
+                    }
+		});
+		$(".complete").on('click',function(){
+			var pddh = $("input[name=pddh]").val();
+			var param = {'inventoryCode':pddh};
+			var params = JSON.stringify(param);
+			$.ajax({
+				type:"post",
+				url: ApiUrl+"inventory/inventory-status",
+				data:params,
+				async:true,
+				contentType:'application/json',
+	            xhrFields: {
+                    withCredentials: true,
+				},
+				crossDomain: true,
+				complete: function (XMLHttpRequest, textStatus) {
+				if (XMLHttpRequest.responseJSON == -2) {
+					layer.msg('登录失效,请重新登录')
+					window.top.location.replace("http://192.168.1.216:21000/");
+		          }
+				},
+				success:function(res){
+					if(res.status==true){
+						layer.msg("此盘点单已完成盘点！");
+						$(".yipan").unbind('click');
+						$(".yipan").css("background","#737383");
+						$(".complete").unbind('click');
+						$(".complete").css("background","#737383");
+						$(".presentation").css("background","#6866E9");
+						$(".presentation").bind('click',function(){
+							$.ajax({
+								type:"get",
+								url: ApiUrl+"inventory/inventory-difference?inventoryCode="+pddh,
+								async:true,
+								//data:params,
+								contentType:'application/json',
+	                            xhrFields: {
+                                  withCredentials: true,
+				                  },
+				                crossDomain: true,
+				                success:function(result){
+				                	if(result.status==true){
+				                		var presen = JSON.stringify(result.data);
+				                		localStorage.setItem("presen",presen);
+				                		var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                        parent.layer.close(index); //再执行关闭   
+				                		parent.location.href = 'detalispresen.html';
+				                	}
+				                }
+							});
+							
+						})
+					}
+				}
+			});
+		});
+		$(".goback").on('click',function(){
+			 var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+             parent.layer.close(index); //再执行关闭   
+             parent.location.reload();
+		});
+		
+	})
+</script>

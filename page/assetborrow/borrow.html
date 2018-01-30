@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>资产借用</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/borrow.css">
+	<link rel="stylesheet" href="../../css/public.css">
+	<style>
+		.layui-laypage-prev{
+			
+			border:0 !important;
+		}
+		.layui-laypage-next{
+			
+			border:0 !important;
+		}
+		.layui-box a{
+			background:#f2f2f2 !important;
+			border:0 !important;
+		}
+		.layui-laypage-skip{
+			background:#f2f2f2 !important;
+		}
+		.layui-laypage-skip input,button{
+			height:26px !important;
+			line-height:26px !important;
+		}
+		.layui-laypage-count{
+			background:#f2f2f2 !important;
+		}
+		.layui-laypage-limits select{
+			height:18px !important;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="header">
+		<div class="layui-inline">
+		      <label class="layui-form-label">借用单号 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="borrowlist" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+		      </div>
+        </div>
+        <div class="layui-inline">
+		      <label class="layui-form-label">借用人 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="borrowname" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+		      </div>
+        </div>
+		<div class="layui-inline">
+		      <label class="layui-form-label">借用日期 </label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+		      </div>
+        </div>
+        <div class="layui-inline">
+		      <label class="layui-form-label" style="width:10px !important;padding:7px 5px !important;text-align:center !important;">至</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="date" id="date1" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+		      </div>
+        </div>
+        <div class="layui-inline btn-box">
+        	<button class="layui-btn btns-blue chaxun">查询</button>
+        	<button class="layui-btn btns-green newadd" data-method="setTop">新增</button>
+        	<button class="layui-btn btns-blue return" data-method="setTop3" data-type="getCheckData">归还</button>
+        	
+        </div>
+	</div>
+	<div class="foot">
+		<table class="layui-table"  id='idText' lay-filter="demo">
+			  
+       </table>
+        <div id="demo0" style="background:#f2f2f2;"></div>
+	</div>
+</body>
+</html>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-mini" lay-event="detail">详情</a>
+</script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+
+<script>
+layui.use(['form', 'layedit', 'laydate'], function(){
+  var form = layui.form
+  ,layer = layui.layer
+  ,layedit = layui.layedit
+  ,laydate = layui.laydate
+  ,laypage = layui.laypage;
+  dateFunc('#date','#date1');
+  //日期
+  laydate.render({
+    elem: '#date'
+  });
+  laydate.render({
+    elem: '#date1'
+  });
+  
+  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+ 
+  //自定义验证规则
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '标题至少得5个字符啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+  
+  //监听提交
+  form.on('submit(demo1)', function(data){
+    layer.alert(JSON.stringify(data.field), {
+      title: '最终的提交信息'
+    })
+    return false;
+  });
+
+});
+layui.use(['layer','table','form','laypage'],function(){
+var arr = new Array();
+var $ = layui.jquery, layer = layui.layer, table = layui.table , form = layui.form , laypage = layui.laypage; 
+table.on('checkbox(demo)', function(obj){
+  });
+$.ajax({
+	type:"get",
+    url:ApiUrl+"borrow/qryBorrowListByCondition?groupCode="+$.cookie('groupCode'),
+    traditional: true,
+    contentType:'application/json',
+    success:function(res){
+    	//console.log(res.total);
+    	laypage.render({
+             elem: 'demo0'
+            ,layout: [ 'prev', 'page', 'next','skip', 'count','limit', ]
+            ,prev: '<i class="layui-icon"></i>'
+            ,next: '<i class="layui-icon"></i>'
+            ,count: res.total//数据总数
+            ,limits: [20,50,100]
+            //,theme: '#f2f2f2'
+            ,jump: function(obj, first){
+              loadtable(obj.curr,obj.limit); //obj包含了当前分页的所有参数，比如：
+            
+             //console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+             //console.log(obj.limit); //得到每页显示的条数
+    
+    //首次不执行
+    if(!first){
+      //do something
+    }
+  }
+       });
+   
+    }
+})
+
+loadtable(1,1000);
+function loadtable(page,limit){
+table.render({
+	    elem: '#idText'
+	    ,id:'idText'
+	   	,url:ApiUrl+"borrow/qryBorrowListByCondition"
+	   	,where:{'groupCode': $.cookie('groupCode'),'page' : page,'limit':limit}
+	    ,height: 'full-130'
+	    ,cols: [[ //标题栏
+	    {checkbox:true, fixed: true}
+	            ,{field:'num' , title: '序号' ,width:60,align:'center',}
+			    ,{field:'statusBorrow1',title: '状态', width:80}
+			    ,{field:'idBorrow',title: '借用单号', width:130}
+			    ,{field:'dateBorrow', title:'借用日期',width:120}
+			    ,{field:'organizationName', title:'借用公司',width:100}
+			    ,{field:'nameDept', title:'借用部门',width:100}
+			    ,{field:'userBorrow', title:'借用人',width:80}
+			    ,{field:'datePredictGiveback', title:'预计归还日期',width:120}
+			    ,{field:'dateFinalGiveback',title:'归还日期', width:120}
+			    
+			    ,{field:'digest',title:'摘要', width:80}
+			    ,{fixed: 'right', title:'操作', width:80, align:'left', toolbar: '#barDemo'}
+	    ]] 
+	   
+	  });
+}
+table.on('tool(demo)', function(obj){
+    var data = obj.data;
+        data = JSON.stringify(data);
+    localStorage.setItem("detalisdata",data);
+    localStorage.setItem("fx",111);
+    if(obj.event === 'detail'){
+        layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '借用单'
+        ,area: ['900px', '500px']
+        ,shade: 0
+        ,maxmin: true
+        ,btnAlign: 'r'
+        ,content: 'detalis.html  '
+        ,btn: ['打印', '确定'] //只是为了演示
+        ,yes: function(){
+          window.location.href="printborrow.html";
+        }
+        ,btn2: function(){
+         layer.close(layer.index);
+        }
+        ,cancel: function(){ 
+    //右上角关闭回调
+         layer.close(layer.index);
+         //return false //开启该代码可禁止点击该按钮关闭
+        }
+        
+        ,zIndex: layer.zIndex //重点1
+        ,success: function(layero){
+          layer.setTop(layero); //重点2
+        }
+      });
+    }
+});
+var count=0;
+var active = {
+  setTop: function(){
+      var that = this; 
+      //多窗口模式，层叠置顶
+      layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '借用单'
+        ,area: ['900px', '500px']
+        ,shade: 0.3
+        ,maxmin: true
+        ,btnAlign: 'r'
+        ,content: 'newaddlist.html  '
+        ,btn: ['确定', '取消'] //只是为了演示
+        ,yes: function(){
+        var indexiframetj ="layui-layer-iframe"+localStorage.getItem("indexzc");
+        var body = $(document.getElementById(indexiframetj).contentWindow.document.body);
+        body.find("#borrowtijiao").click();
+        }
+        ,btn2: function(){
+        	//debugger;
+         layer.close(layer.index);
+        }
+        ,cancel: function(){ 
+    //右上角关闭回调
+         layer.close(layer.index);
+         //return false //开启该代码可禁止点击该按钮关闭
+        }
+        
+        ,zIndex: layer.zIndex //重点1
+        ,success: function(layero,index){
+        	var body = layer.getChildFrame('body', index);
+        	//debugger;
+        	localStorage.setItem("indexzc",layer.index);
+			var iframeWin = window[layero.find('iframe')[0]['name']]; 
+			        		//选择资产
+			body.find('.xuanzezichan').on('click', function(){
+					active.selectAsset();
+					count = 0;
+						    	//多次选择资产
+//					selectData = {
+//				        	selectDataFunc:function(i,data){
+//				        	iframeWin.selectData(i,data);
+//				        		}
+//				        }
+        })
+          layer.setTop(layero); //重点2
+        }
+      });
+   },
+   selectAsset: function(){
+		var that = this; 
+			count++;
+			      	//多窗口模式，层叠置顶
+		layer.open({
+				type: 2 //此处以iframe举例
+				,title: '选择资产'
+				,area: ['700px', '460px']
+				,offset: '50px'
+				,shade: 0.3
+				,content: 'choice.html'
+			    ,resize:false
+			    ,maxmin: true
+			    ,zIndex: layer.zIndex
+			    ,success: function(layero, index){
+			        		
+				}
+			    ,cancel: function(index, layero){  //右上角关闭回调
+					localStorage.setItem("data1","[]");
+				}
+			});
+	    }
+}
+$('.newadd').on('click', function(){
+	localStorage.setItem("choicdatab",null);
+    var othis = $(this), method = othis.data('method');
+    active[method] ? active[method].call(this, othis) : '';
+  });
+var active2 = {
+  setTop: function(){
+      var that = this; 
+      //多窗口模式，层叠置顶
+      layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '借用单'
+        ,area: ['900px', '500px']
+        ,shade: 0
+        ,maxmin: true
+        ,btnAlign: 'r'
+        ,content: 'detalis.html  '
+        ,btn: ['取消', '确定'] //只是为了演示
+        ,yes: function(){
+          layer.close(layer.index);
+        }
+        ,btn2: function(){
+         layer.close(layer.index);
+        }
+        ,cancel: function(){ 
+    //右上角关闭回调
+         layer.close(layer.index);
+         //return false //开启该代码可禁止点击该按钮关闭
+        }
+        
+        ,zIndex: layer.zIndex //重点1
+        ,success: function(layero){
+          layer.setTop(layero); //重点2
+        }
+      });
+   }
+}
+var active3 = {
+    getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('idText')
+      ,data = checkStatus.data
+      ,fxcheck = "";
+      for(i in data){
+         if(data[i].statusBorrow1=="已归还"){
+      		fxcheck = 'mmp';
+      	}
+      }
+      if(JSON.stringify(data)=="[]"){
+      	str = false;
+      	layer.msg("未选中任何项");
+      }else if(fxcheck=='mmp'){
+      	str = false;
+      	layer.msg("选中资产，已经有归还的了");
+      }else{
+      	str = true;
+      	//console.log(checkStatus);
+      	for(var i=0;i<data.length;i++){
+      	arr.push(data[i].idBorrow);
+      	};
+      //layer.alert(JSON.stringify(data));
+      }
+    }
+  };
+var active4 = {
+	setTop3: function(){
+      var that = this;
+      //多窗口模式，层叠置顶
+            layer.confirm('是否确定归还此资产', {icon: 3, title:'提示'}, function(index){
+      //do something
+      	var borrowArr = {
+        		'borrowArr' : arr,
+        		'userHanddleGiveback' : $.cookie('realName')
+        	};
+        	borrowArr = JSON.stringify(borrowArr);
+        	var list = $("input[name=borrowlist]").val();
+	        var name = $("input[name=borrowname]").val();
+	        var timestr = $("#date").val();
+	        var timend = $("#date1").val();
+         $.ajax({
+         	type:"post",
+         	url:ApiUrl+"borrow/giveBackProperty",
+         	traditional: true,
+         	data:borrowArr,
+         	contentType:'application/json',
+         	success:function(res){
+         		if(res.code==0){
+         			layer.msg("归还成功");
+         			setInterval(function(){location.reload();},2000)
+         		}else if(res.code==1){
+         			layer.msg("归还失败");
+         		}
+         		
+         	},
+         	error:function(XMLHttpRequest, textStatus, errorThrown){
+         		
+               alert(XMLHttpRequest.readyState);
+              
+         	}
+         });
+         layer.close(layer.index);
+      });
+
+   }
+}
+
+window.onload = function(){
+  $('.godetalis').bind('click', function(){
+    var othis = $(this), method = othis.data('method');
+    active2[method] ? active2[method].call(this, othis) : '';
+  });
+}
+$(".return").on('click',function(){
+	var type = $(this).data('type');
+    active3[type] ? active3[type].call(this) : '';
+    if(str==true){
+	var othis = $(this), method = othis.data('method');
+    active4[method] ? active4[method].call(this, othis) : '';	
+	}  
+});
+$(".chaxun").on('click',function(){
+	var list = $("input[name=borrowlist]").val();
+	var name = $("input[name=borrowname]").val();
+	var timestr = $("#date").val();
+	var timend = $("#date1").val();
+	var gound = $.cookie("groupCode");
+	
+$.ajax({
+	type:"get",
+    url:ApiUrl+"borrow/qryBorrowListByCondition?idBorrow="+list+"&userBorrow="+name+"&startDate="+timestr+"&endDate="+timend+"&groupCode="+gound,
+    traditional: true,
+     xhrFields: {
+            withCredentials: true,
+        },
+        crossDomain: true,
+    //data:{'groupCode': $.cookie('groupCode'), 'page' : 1 ,'limit' : 10000},
+    contentType:'application/json',
+    success:function(res){
+    	//console.log(res.total);
+    	laypage.render({
+             elem: 'demo0'
+             ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+            ,count: res.total//数据总数
+            ,jump: function(obj, first){
+              reloadtable(obj.curr,obj.limit);                             //obj包含了当前分页的所有参数，比如：
+             //console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+             //console.log(obj.limit); //得到每页显示的条数
+    
+    //首次不执行
+    if(!first){
+      //do something
+    }
+  }
+        });
+    }
+});
+function reloadtable(page,limit){
+		table.render({
+	    elem: '#idText'
+	    ,id:'idText'
+	   	,url:ApiUrl+"borrow/qryBorrowListByCondition"
+	   	,where:{'idBorrow':list,'userBorrow':name,'startDate':timestr,'endDate':timend,'groupCode': gound,'page':page,'limit':limit}
+	    ,height: 'full-130'
+	    ,cols: [[ //标题栏
+	    {checkbox:true, fixed: true}
+	            ,{field:'num' , title: '序号' ,width:60,align:'center',}
+			    ,{field:'statusBorrow1',title: '状态', width:80}
+			    ,{field:'idBorrow',title: '借用单号', width:150}
+			    ,{field:'dateBorrow', title:'借用日期',width:120}
+			     ,{field:'organizationName', title:'借用公司',width:100}
+			    ,{field:'nameDept', title:'借用部门',width:100}
+			    ,{field:'userBorrow', title:'借用人',width:90}
+			    ,{field:'datePredictGiveback', title:'预计归还日期',width:120}
+			    ,{field:'dateFinalGiveback',title:'归还日期', width:120}
+			    
+			    ,{field:'digest',title:'摘要', width:100}
+			    ,{fixed: 'right', title:'操作', width:80, align:'left', toolbar: '#barDemo'}
+	    ]] 
+	  });
+	}
+	
+	
+})
+})
+</script>
+
+</html>

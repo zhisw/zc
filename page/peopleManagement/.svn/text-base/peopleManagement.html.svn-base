@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>人员管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<style>
+		html,body{
+			width: 100%;
+			height: 100%;
+		}
+		body .layui-tree-skin-shihuang .layui-tree-branch{color: #EDCA50;}    
+		.childrenBody{
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			padding-top: 15px;
+		}
+		.addPeople,#chooseAuthority,#editPeople{
+			padding: 15px 0;
+		} 
+		
+		.addPeople .layui-input-block,.editPeople .layui-input-block{
+			margin-right: 20px;
+		}
+		#chooseAuthority .layui-input-block,.editPeople .layui-input-block{
+			margin-right: 20px;
+		}
+		.peopleTable{
+			margin-left:-60px;
+		}
+		.red{
+			color: red;
+		}
+		.uploadExcelTitle{
+			line-height:50px;
+			font-weight: 600;
+		}
+		#uploadExcel{
+			padding: 20px;
+		}
+		#chooseFile{
+			height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#chooseFile:hover{
+			opacity: 1;
+		}
+		#uploadBtn{
+			height: 30px;
+			background: #46CE4E;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+			margin-left: 10px;
+		}
+		#uploadBtn:hover{
+			opacity: 1;
+		}
+		.startUpload{
+			margin-top: 10px;
+		}
+		.startUpload a:-webkit-any-link {
+	    color: -webkit-link;
+	    cursor: auto;
+	    text-decoration: underline;
+		}
+			#btns{
+			height: 30px;
+			background: #6866E9;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#btns:hover{
+			opacity: 1;
+		}
+		#delBtn{
+			height: 30px;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;
+		}
+		#delBtn:hover{
+			opacity: 1;
+		}
+		#btns2{
+			height: 30px;
+			background: #46CE4E ;
+			opacity: 0.7;
+			line-height: 30px;
+			border-radius: 15px ;
+			font-size: 14px;
+			text-align: center;	
+		}
+			#btns2:hover{
+			opacity: 1;
+		}
+		.searchBox{
+			line-height: 36px;
+			cursor: pointer;
+		}
+		input:-webkit-autofill {
+			  -webkit-box-shadow: 0 0 0px 1000px white inset;
+			  -webkit-text-fill-color: #333;
+			}
+			#treeBox{
+				width: 80%;
+				border: 1px solid #e2e1eb;
+				margin-right: -20px;
+			}
+		#nBtns{
+			opacity: 0.7;
+			border-radius: 15px ;
+			text-align: center;
+			color: #9594f0;
+			border: 1px solid #9594f0;
+			background: #FFFFFF;
+			width: 45px;
+			height: 22px;
+			line-height: 22px;
+		}
+		#nBtns:hover{
+			opacity: 1;
+			color: #6c6aeb;
+			border: 1px solid #6c6aeb;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+    <div class="layui-col-md3">
+      <ul id="treeBox"></ul>
+    </div>
+    <div class="layui-col-md9">
+    <div class="peopleTable">
+     	<div class="layui-row">
+	    	<div class="layui-row layui-col-md4">
+	     	 <button class="layui-btn " data-method="offset" data-type="auto" id="btns">添加</button>
+	     	 <button class="layui-btn layui-btn-primary" data-method="deletPeople" id="delBtn">删除</button>
+	     	 <button class="layui-btn " data-method="offset_authority" id="btns">角色</button>
+	     	</div>
+	     	<div class="layui-row layui-col-md5  layui-col-md-offset3">
+	     		<div class="layui-row">
+		     			 <button class="layui-btn" data-method="offset_uploadExcel" id="btns2">导入</button>
+		     			 <button class="layui-btn" id="btns2" data-method="loadExcel" data-type='1'>导出</button>
+				     	 	<div class="layui-input-inline" style="margin-left: 10px;">	
+				     	 		 <input type="text" name="title"  placeholder="姓名或工号" autocomplete="off" class="layui-input " style="height:33px;width: 160px;">   
+				     	 	</div>
+			     	 	<div class="layui-inline searchBox">
+			     	 	 	<i class="layui-icon" style="font-size: 23px;padding: 0 5px;">&#xe615;</i>  
+			     	 	</div>
+			     	 
+	     		</div>
+	     	</div>	
+     	</div>
+     	<div class="layui-row">
+     		<table id="peopleData" lay-filter="peopleDataFilter"></table>
+     	</div>
+     	
+    </div>
+    </div>
+  </div>
+  	<!--新增员工-->
+  	<div class="layui-row addPeople" id="addPeople" style="display: none;"> 
+     		<form class="layui-form addForm" autocomplete="off">
+     			<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>员工编号:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="userCode" required lay-verify="required"  placeholder="请输入员工编号" autocomplete="off" class="layui-input relInput">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>员工姓名:</label>
+				    <div class="layui-input-block">
+				    	
+				      <input type="text" name="realName" required  lay-verify="required" placeholder="请输入员工姓名" autocomplete="off"  class="layui-input relInput">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">是否管理员:</label>
+				     <div class="layui-input-block">
+				      <select name="isadmin" lay-verify="required" lay-filter="isadmin">
+				        <option value="1">是</option>
+				        <option value="-1">否</option>
+				      </select>
+				    </div>
+				</div>	
+				<div class="layui-form-item" id="isadminpasd">
+				    <label class="layui-form-label"><span class="red">*</span>登录密码:</label>
+				    <div class="layui-input-block">
+				    	
+				       <input type="password" name="userPassword" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input relInput">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>所属机构:</label>
+				     <div class="layui-input-block">
+				      <select name="organizationId" lay-verify="required" class="organizationId" lay-filter="organization">
+				      
+				      </select>
+				      <input type="hidden" name="organizationTitle" id="" value="" />
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>所属部门:</label>
+				     <div class="layui-input-block">
+				      <select name="deptId"  lay-verify="required"  lay-filter="dept" class="deptId">
+				      	<option value=""></option>
+				      </select>
+				      <input type="hidden" name="deptName" id="" value=""  class="relInput"/>
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">手机号码:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="phone"   lay-verify="ifcheck" placeholder="请输入手机号码" autocomplete="off" class="layui-input relInput">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">电子邮箱:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="email"   lay-verify="ifrequired" placeholder="请输入电子邮箱" autocomplete="off" class="layui-input relInput">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">在职状态:</label>
+				     <div class="layui-input-block">
+				      <select name="jobState" lay-verify="required">
+				        <option value="1">在职</option>
+				        <option value="-1">离职</option>
+				      </select>
+				    </div>
+				</div>
+				<!--<div class="layui-form-item">
+				    <label class="layui-form-label">是否保管员</label>
+				     <div class="layui-input-block">
+				      <select name="isStoreman" lay-verify="required">
+				        <option value="1">是</option>
+				        <option value="-1">否</option>
+				      </select>
+				    </div>
+				</div>	-->
+				<input type="hidden" value="" class="id" name="nodeId"/>
+				<div class="layui-form-item" style="display: none;">
+				    <div class="layui-input-block">
+				      <button class="layui-btn submitAdd" lay-submit lay-filter="formDemo">立即提交</button>
+				      <input type="button"  value="取消" class="layui-btn layui-btn-primary cancleOpen">
+				    </div>
+				</div>
+     	</form>
+    </div>
+    <!--修改员工-->
+    <div class="layui-row editPeople" id="editPeople" style="display: none;"> 
+     		<form class="layui-form editForm">
+     			<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>员工编号:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="userCode"  required  lay-verify="required" placeholder="请输入员工编号" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>员工姓名:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="realName" required  lay-verify="required" placeholder="请输入员工姓名" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">是否管理员:</label>
+				     <div class="layui-input-block">
+				      <select name="isadmin" lay-verify="required" lay-filter="isadmin">
+				        <option value="1">是</option>
+				        <option value="-1">否</option>
+				      </select>
+				    </div>
+				</div>	
+				<div class="layui-form-item userpassword">
+				    <label class="layui-form-label"><span class="red">*</span>登录密码:</label>
+				    <div class="layui-input-block">
+				       <input type="password" name="userPassword1" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+				        <input type="hidden" name="userPassword"   placeholder="请输入密码" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>所属机构:</label>
+				     <div class="layui-input-block">
+				      <select name="organizationId" lay-verify="required" class="organization" lay-filter="organizationEdit">
+				     	<option value=""></option>
+				      </select>
+				      <input type="hidden" name="organizationTitle" id="" value="" />
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label"><span class="red">*</span>所属部门:</label>
+				     <div class="layui-input-block">
+				      <select name="deptId"  lay-filter="deptEdit" required  lay-verify="required" class="deptId">
+				      	<option value=""></option>
+				      </select>
+				      <input type="hidden" name="deptName" id="" value="" />
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">手机号码:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="phone" lay-verify="ifcheck" placeholder="请输入手机号码" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">电子邮箱:</label>
+				    <div class="layui-input-block">
+				      <input type="text" name="email"   lay-verify="ifrequired" placeholder="请输入电子邮箱" autocomplete="off" class="layui-input">
+				    </div>
+				</div>
+				<div class="layui-form-item">
+				    <label class="layui-form-label">在职状态:</label>
+				     <div class="layui-input-block">
+				      <select name="jobState" lay-verify="required">
+				        <option value="1">在职</option>
+				        <option value="-1">离职</option>
+				      </select>
+				    </div>
+				</div>
+				<!--<div class="layui-form-item">
+				    <label class="layui-form-label">是否保管员</label>
+				     <div class="layui-input-block">
+				      <select name="isStoreman" lay-verify="required">
+				        <option value="1">是</option>
+				        <option value="-1">否</option>
+				      </select>
+				    </div>
+				</div>	-->
+				<input type="hidden" value="" name="id"  class="nodeId" />
+				<div class="layui-form-item" style="display: none;">
+				    <div class="layui-input-block">
+				      <button class="layui-btn submitEdit" lay-submit lay-filter="formEdit">立即提交</button>
+				      <input type="button"  value="取消" class="layui-btn layui-btn-primary cancleOpen">
+				    </div>
+				</div>
+     	</form>
+    </div>
+    <!--角色选择-->
+    <div class="layui-row chooseAuthority" id="chooseAuthority" style="display: none;"> 
+    	<form class="layui-form roleForm">
+     	<div class="layui-form-item">
+				    <label class="layui-form-label setRole">分配角色<span class="red">*</span></label>
+				     <div class="layui-input-block">
+				      <select name="role" required lay-verify="required" class="roleSelct">
+				      	
+				      </select>
+				      <input type="hidden" name="organizationTitle" id="" value="" />
+				    </div>
+				   <div class="layui-form-item" style="display: none;">
+				    <div class="layui-input-block">
+				      <button class="layui-btn submitrole" lay-submit lay-filter="formrole">立即提交</button>
+				      <input type="button"  value="取消" class="layui-btn layui-btn-primary cancleOpen">
+				    </div>
+				</div>
+		</div>
+		</form>
+    </div>
+      <!--导入excel-->
+     <div class="layui-row uploadExcel" id="uploadExcel" style="display: none;"> 
+     	<p class="uploadExcelTitle">请选择要导入的员工数据文件(excle文件)</p>
+     	<div class="layui-upload uploadExcelBtns">
+		  <button type="button" class="layui-btn" id="chooseFile">选择文件</button> 
+		</div>
+		<div class="startUpload">
+			<a data-method="loadExcel" href="javaScript:;" class="downloadExcel" data-type='2'>点击下载导入模版，填写后上传</a>
+			<button type="button" class="layui-btn" id="uploadBtn">开始上传</button>
+		</div> 
+    </div>
+ </div>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-mini" lay-event="edit"  data-type="auto" >编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-mini delHidden" lay-event="del" style="display:none">删除</a>
+</script>
+
+	<script type="text/javascript" src="../../layui/layui.js"></script>
+	<script type="text/javascript" src="../../js/peizhi.js"></script>
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+	<script type="text/javascript">
+		
+	layui.use(['tree','layer','jquery','table','form','upload'], function(){
+		//var apiUrl='http://192.168.1.246:9070/';
+		var apiUrl=ApiUrl;
+		var nodeId=null;
+		var isOrg=null;
+		var nodeIdParams={}
+		$ = layui.jquery;
+		var table = layui.table,
+		 layer = layui.layer,
+		 upload = layui.upload,
+		 form = layui.form;
+		 
+		function hasClass(elem, cls) {
+		  cls = cls || '';
+		  if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+		  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+		}
+		 
+		function addClass(ele, cls) {
+		  if (!hasClass(ele, cls)) {
+		    ele.className = ele.className == '' ? cls : ele.className + ' ' + cls;
+		  }
+		}
+		 
+		function removeClass(elem, cls) {
+		  if (hasClass(elem, cls)) {
+		    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+		    while (newClass.indexOf(' ' + cls + ' ') >= 0) {
+		      newClass = newClass.replace(' ' + cls + ' ', ' ');
+		    }
+		    elem.className = newClass.replace(/^\s+|\s+$/g, '');
+		  }
+		}
+	function upData(thisUrl,params,successFunc){
+		$.ajax({
+	        		type:"post",
+	        		url:apiUrl+thisUrl,
+	        		data:params,
+	        		async:true,
+	        		xhrFields:{
+    			    withCredentials:true,
+    		        },
+                     crossDomain:true,
+	        		contentType: "application/json",
+	        		success:successFunc
+	        	});
+	}
+
+function changeCS(nodeid,nodeType){
+							var param={}
+							if(nodeType=='1'){
+								param={
+									"organizationId":nodeid
+								}
+							}else{
+								param={
+									"deptId":nodeid
+								}
+							}
+							nodeId=nodeid;
+							isOrg=nodeType;
+							return param;
+							
+						}
+//搜索
+function searchFunc(keyW){
+	nodeIdParams.keyWord=keyW;
+	table.reload('peopleData', {
+					  url: apiUrl+'system/UserFixedCtrl-getUserFixedList'
+					  ,where:nodeIdParams //设定异步数据接口的额外参数
+					  //,height: 300
+		});
+}
+$('input[name="title"]').on('keydown',function(event){
+	if(event.keyCode == 13){
+		var keyW=$(this).val();
+		searchFunc(keyW)
+	}
+})
+$('.searchBox').on('click',function(){
+	var keyW=$('input[name="title"]').val();
+	searchFunc(keyW)
+})
+var dataArr=[];
+$('#treeBox').height($('body').height()-20+'px')
+	$.ajax({
+				type:"get",
+				url:apiUrl+"org/getOrgAndDeptInfo",
+				//url:apiUrl+"origanization/tree",
+				data:{},
+				async:false,
+				xhrFields:{
+    			withCredentials:true,
+    		    },
+                crossDomain:true,
+                contentType: "application/json",
+				success:function(data){
+					if(data.code=='1'){
+					if(data.data.length>0){
+						dataArr=JSON.parse(data.data);
+						//nodeIdParams=changeCS(dataArr[0].id,dataArr[0].isOrg)	
+							layui.tree({
+								  elem: '#treeBox' //传入元素选择器
+								  ,nodes:dataArr
+								,click: function(node){
+								    console.log(node) //node即为当前点击的节点数据
+								     var that=event.target;
+								    if(that.tagName=='CITE'||that.tagName=='cite'){
+									 	nodeIdParams=changeCS(node.id,node.isOrg)	
+									   
+									   	$('#treeBox').find('cite').removeClass('red')
+									   	$('#treeBox').find('cite').css('color','#333333')
+									   	addClass(that, "red")
+									   	that.style.color='red'
+										table.reload('peopleData', {
+										  url: apiUrl+'system/UserFixedCtrl-getUserFixedList'
+										  ,where: nodeIdParams //设定异步数据接口的额外参数
+										  //,height: 300
+										});
+									}
+								 } 
+								,skin:'shihuang'
+								});
+								/*$('#treeBox').find('cite').removeClass('red')
+								$('#treeBox').find('cite').eq(0).addClass('red')
+								$('#treeBox').find('cite').eq(0).css('color','red')*/
+					}
+				}
+						
+			}
+			});
+			
+
+
+/*function findChildren(arr){
+		if(arr.isOrg=="1"){
+			
+		id=arr.id
+			$.ajax({
+				type:"get",
+				url:apiUrl+"org/getOrgAndDeptInfo",
+				data:{
+					"parentId":id
+				},
+				async:false,
+				success:function(data){
+					var DataArr=data.data;
+					arr['children']=DataArr;	
+					if(DataArr.length>0){
+						for(c=0;c<DataArr.length;c++){
+								findChildren(DataArr[c])	
+							}
+					}
+				
+			}
+			});	
+		}		
+}*/
+
+
+//展示已知数据
+ var tableBox= table.render({
+    elem: '#peopleData'
+    ,id:'peopleData'
+   	,url:apiUrl+"system/UserFixedCtrl-getUserFixedList"
+   	,where:nodeIdParams
+    ,height: 'full-65'
+    ,cols: [[ //标题栏
+      {checkbox: true, LAY_CHECKED: false} //默认全选
+      ,{field: 'userCode', title: '员工编码', width: 86, sort: false}
+      ,{field: 'realName', title: '员工姓名', width: 86}
+      ,{field: 'organizationTitle', title: '所属机构', width: 115}
+      ,{field: 'deptName', title: '所属部门', width: 115}
+      ,{field: 'phone', title: '手机号码', width: 117}
+      ,{field: 'email', title: '电子邮箱', width: 142}
+      ,{field: 'jobStateDesc', title: '在职状态', width: 86, sort: false}
+      ,{field: 'isStoremanDesc', title: '保管员', width: 72, sort: false}
+      ,{field: 'isAdminDesc', title: '管理员', width: 72, sort: false}
+      ,{field: 'roleIdsDesc', title: '角色', width: 72, sort: false}
+      ,{align:'left',width: 75, sort: false,toolbar: '#barDemo',fixed:"right"}
+    ]] 
+   // ,skin: 'row' //表格风格
+    ,even: false
+    ,page: true //是否显示分页
+    ,limits: [20, 50, 100]
+    ,limit: 20 //每页默认显示的数量
+  });
+  //
+   table.on('checkbox(peopleDataFilter)', function(obj){
+    console.log(obj)
+  });
+  //监听工具条
+  table.on('tool(peopleDataFilter)', function(obj){
+    var data = obj.data;
+    console.log(obj)
+    if(obj.event === 'detail'){
+     // layer.msg('ID：'+ data.id + ' 的查看操作');
+    } else if(obj.event === 'del'){
+     	obj.del();
+    } else if(obj.event === 'edit'){
+      //layer.alert('编辑行：<br>'+ JSON.stringify(data))
+ 
+      active.offset_edit($(this),data,obj);
+    }
+  });
+  form.verify({
+  ifcheck: function(value,item){
+  	if(value==""){
+  		// $("input[name=email]").attr("lay-verify","ifrequired");
+  	}else{
+  		if(!new RegExp("^((13[0-9])|(14[0-9])|(15([0-9]))|(17[0-9])|(18[0-9]))\\d{8}$").test(value)){
+		      return '手机号码有误';
+		    }
+  		$("input[name=email]").attr("lay-verify","ifemail");
+  	}
+  }
+  ,ifrequired: function(value,item){
+  	if(value==""){
+  		
+  	}else{
+  		if(value!=''&&!new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$").test(value)){
+      return '邮箱格式有误';
+   }
+  	}
+  }
+  ,ifemail: function(value,item){
+  	if(value!=''&&!new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$").test(value)){
+      return '邮箱格式有误';
+  }
+  }
+  ,onlyPhone: function(value, item){ //value：表单的值、item：表单的DOM对象
+  	if(value!=""){
+  		 
+  		
+  	}else{
+  		 $("input[name=email]").attr("lay-verify","required onlyemail");
+  	}
+  }
+  ,onlyemail:function(value, item){ //value：表单的值、item：表单的DOM对象
+  
+  }
+  //我们既支持上述函数式的方式，也支持下述数组的形式
+  //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+  ,pass: [
+    /^[\S]{6,12}$/
+    ,'密码必须6到12位，且不能出现空格'
+  ] 
+});  
+
+   //触发事件
+  var active = {
+    setTop: function(){
+      var that = this; 
+      //多窗口模式，层叠置顶
+      layer.open({
+        type: 1//此处以iframe举例
+        ,title: '添加员工'
+       ,area: ['570px', '460px']
+        ,shade: 0.3
+        ,maxmin: true
+        ,btnAlign: 'r' //按钮居右
+        ,resize:true  //是否允许拉伸
+        ,content: $("#addPeople")
+        ,btn: ['保存','取消'] 
+        ,btn2: function(index){
+          layer.close(index)
+        }
+        ,yes: function(){
+         	layer.msg('保存成功', {icon: 6});
+        }
+        ,zIndex: 1 //重点1
+        ,success: function(layero,index){
+          layer.setTop(layero); //重点2
+         // $('#addPeople').show();
+        }
+      });
+    },
+    offset: function(othis){
+      var type = othis.data('type')
+      ,text = othis.text();
+      var openAdd=layer.open({
+        type: 1
+       	,title: '添加员工'
+       	,area: ['570px', '460px']
+        ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'layerDemo'+type //防止重复弹出
+        ,content: $("#addPeople")
+        ,btn: ["保存",'取消']
+        ,btnAlign: 'r' //按钮居中
+        ,shade: 0.3 //不显示遮罩
+        ,yes: function(){
+         $('.submitAdd').click();
+        }
+        ,btn2: function(){
+        	
+        	 layer.closeAll();
+        
+        	return false
+         //	layer.msg('保存成功', {icon: 6});
+        }
+        ,success:function(){ 
+        	$('.relInput').val('');
+        	upData("org/getOrgInfoByCondition",{},successFunc)
+        	function successFunc(data){
+        		console.log(data)
+        		var parentsOrangName='';
+        		var parentsOrangId='';
+        		if(isOrg=='0'){
+        				var parentParams={"id":nodeId}
+        				$.ajax({
+        					type:"get",
+        					url:apiUrl+"depart/getOrgInfoByDepart",
+        					data:parentParams,
+        					contentType: "application/json",
+        					async:false,
+        					xhrFields:{
+    			    withCredentials:true,
+    		        },
+                    crossDomain:true,
+        					success:function(data){
+        						parentsOrangName=data.data.name;
+        						parentsOrangId=data.data.id;
+        					}
+        				});
+        			}
+        		var oraStr='<option value=""></option>'
+        		for(var i=0;i<data.length;i++){
+        			if(data[i].id==nodeId&&isOrg=='1'){
+        				oraStr+='<option value="'+data[i].id+'" selected>'+data[i].name+'</option>'
+        				$('.addPeople input[name="organizationTitle"]').val(data[i].name)
+        			}else if(isOrg=='0'&&data[i].id==parentsOrangId){
+        				oraStr+='<option value="'+data[i].id+'" selected>'+data[i].name+'</option>'
+        				$('.addPeople input[name="organizationTitle"]').val(data[i].name)
+        			}else{
+        				oraStr+='<option value="'+data[i].id+'">'+data[i].name+'</option>'
+        			}
+        		}
+        		
+        		$('#addPeople .organizationId').html(oraStr)
+        		form.render('select');
+        		$.ajax({//根据组织结构找部门
+        			type:"get",
+        			url:apiUrl+"depart/getDepartmentByCondition",
+        			async:false,
+        			xhrFields:{
+    			    withCredentials:true,
+    		        },
+                    crossDomain:true,
+                    contentType: "application/json",
+        			data:{"organizationId":$('#addPeople .organizationId').val()},
+        			success:function(data){
+        				if(data.data.length){
+        					var deptStr='<option value=""></option>'
+	        				for(var a=0;a<data.data.length;a++){
+	        					if(isOrg=='0'&&data.data[a].id==nodeId){
+	        						deptStr+='<option value="'+data.data[a].id+'" selected>'+data.data[a].departName+'</option>'
+	        					  	$('.addPeople input[name="deptName"]').val(data.data[a].departName)
+	        					}else{
+	        						deptStr+='<option value="'+data.data[a].id+'">'+data.data[a].departName+'</option>'
+	        					}	
+	        				}
+        				}else{
+        					var deptStr='<option value=""></option>'
+        				}
+        				$('#addPeople .deptId').html(deptStr)
+        				//deptId
+        			}
+        		});
+        		form.render('select');
+        	}
+        	
+		  form.on('select(isadmin)', function(data){
+		  	  console.log(data);
+		  	  if(data.value=='-1'){
+		  	  	$("#isadminpasd").hide();
+		  	  	$("input[name=userPassword]").attr("lay-verify","");
+		  	  }else{
+		  	  	$("#isadminpasd").show();
+		  	  	$("input[name=userPassword]").attr("lay-verify","required");
+		  	  }
+		  })
+		  form.on('select(organization)', function(data){
+			  console.log(data.elem); //得到select原始DOM对象
+			  console.log(data.value); //得到被选中的值
+			  console.log(data.othis); //得到美化后的DOM对象
+			  $('.addPeople input[name="organizationTitle"]').val(data.elem.options[data.elem.selectedIndex].text)
+			//  console.log(data.elem.options[data.elem.selectedIndex].text)
+			 //  $('#editPeople .deptId').html("<option value=''></option>")
+			  	$.ajax({//根据组织结构找部门
+        			type:"get",
+        			url:apiUrl+"depart/getDepartmentByCondition",
+        			async:false,
+        			xhrFields:{
+    			    withCredentials:true,
+    		         },
+                    crossDomain:true,
+                    contentType: "application/json",
+        			data:{"organizationId":$('#addPeople .organizationId').val()},
+        			success:function(data){
+        				if(data.data.length){
+        					var deptStr='<option value=""></option>'
+	        				for(var a=0;a<data.data.length;a++){
+	        						deptStr+='<option value="'+data.data[a].id+'">'+data.data[a].departName+'</option>'
+	        				}
+        				}else{
+        					var deptStr='<option value=""></option>'
+        				}
+        				$('#addPeople .deptId').html(deptStr)
+        				form.render('select');
+        			}
+        		});
+			   form.render('select');
+			}); 
+       		form.on('select(dept)', function(data){
+			  console.log(data.elem); //得到select原始DOM对象
+			  console.log(data.value); //得到被选中的值
+			  console.log(data.othis); //得到美化后的DOM对象
+			   $('.addPeople input[name="deptName"]').val(data.elem.options[data.elem.selectedIndex].text)
+			}); 
+			
+        }
+      });
+    },
+     offset_edit: function(othis,objData,obj){
+      var type = othis.data('type')
+      ,text = othis.text();
+      var openAdd=layer.open({
+        type: 1
+       	,title: '修改员工'
+       	,area: ['570px', '460px']
+        ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'layerDemo'+type //防止重复弹出
+        ,content: $("#editPeople")
+        ,btn: ["保存",'取消']
+        ,btnAlign: 'r' //按钮居中
+        ,shade: 0.3 //不显示遮罩
+        ,yes: function(){
+          $('.submitEdit').click();
+        	return false
+        }
+        ,btn2: function(){
+        	layer.closeAll();
+        	
+         //	layer.msg('保存成功', {icon: 6});
+        }
+        ,success: function(){
+          console.log(objData)
+           form.on('select(organizationEdit)', function(data){
+			  console.log(data.elem); //得到select原始DOM对象
+			  console.log(data.value); //得到被选中的值
+			  console.log(data.othis); //得到美化后的DOM对象
+			  $('.editPeople input[name="organizationTitle"]').val(data.elem.options[data.elem.selectedIndex].text)
+			   	$.ajax({//根据组织结构找部门
+        			type:"get",
+        			url:apiUrl+"depart/getDepartmentByCondition",
+        			async:false,
+        			xhrFields:{
+    			    withCredentials:true,
+    		        },
+                    crossDomain:true,
+        			data:{"organizationId":data.value},
+        			contentType: "application/json",
+        			success:function(data){
+        				if(data.data.length){
+        					var deptStr='<option value=""></option>'
+	        				for(var a=0;a<data.data.length;a++){
+	        						deptStr+='<option value="'+data.data[a].id+'">'+data.data[a].departName+'</option>'
+	        				}
+        				}else{
+        					var deptStr='<option value=""></option>'
+        				}
+        				$('.editPeople .deptId').html(deptStr)
+        				form.render('select');
+        				//deptId
+        			}
+        		});
+			}); 
+       		form.on('select(deptEdit)', function(data){
+			  console.log(data.elem); //得到select原始DOM对象
+			  console.log(data.value); //得到被选中的值
+			  console.log(data.othis); //得到美化后的DOM对象
+			
+			   $('.editPeople input[name="deptName"]').val(data.elem.options[data.elem.selectedIndex].text)
+			}); 
+			/* $('.editPeople').find('input[name="userPassword1"]').on('focus',function(){
+			 	$(this).val('')
+			 });*/
+				var timer=0;
+			   $('.editPeople').find('input[name="userPassword1"]').bind('input porpertychange keyup',function(){
+			   	if(timer==0){
+			   		$(this).val('');
+			   	}
+			    $('.editPeople').find('input[name="userPassword"]').val($(this).val());
+			     	timer++;
+			 });
+          $('.editPeople').find('input[name="userCode"]').val(objData.userCode);
+          $('.editPeople').find('input[name="realName"]').val(objData.realName);
+          $('.editPeople').find('input[name="phone"]').val(objData.phone);
+          $('.editPeople').find('input[name="email"]').val(objData.email);
+          $('.editPeople').find('input[name="userPassword1"]').val(objData.userPassword);
+          $('.editPeople').find('select[name=isadmin]').val(objData.isAdmin);
+          if(objData.isAdmin==-1){
+          	$('.editPeople').find('.userpassword').hide();
+          }else if(objData.isAdmin==1){
+          	$('.editPeople').find('.userpassword').show();
+          }
+          form.on('select(isadmin)', function(data){
+		  	  if(data.value=='-1'){
+		  	  	$('.editPeople').find('.userpassword').hide();
+		  	  	$('.editPeople').find("input[name=userPassword1]").attr("lay-verify","");
+		  	  }else{
+		  	  	$('.editPeople').find('.userpassword').show();
+		  	  	$('.editPeople').find("input[name=userPassword1]").val('');
+		  	  	$('.editPeople').find("input[name=userPassword1]").attr("lay-verify","required");
+		  	  }
+		  })
+          $('.editPeople').find('select[name=jobState]').val(objData.jobState);
+          $('.editPeople').find('select[name=isStoreman]').val(objData.isStoreman)
+          upData("org/getOrgInfoByCondition",{},successFunc)
+        	function successFunc(data){
+        		var oraStr='<option value=""></option>'
+        		for(var i=0;i<data.length;i++){
+        			if(data[i].name==objData.organizationTitle){
+        				oraStr+='<option value="'+data[i].id+'" selected>'+data[i].name+'</option>'
+        				$('.editPeople input[name="organizationTitle"]').val(data[i].name)
+        			}else{
+        				oraStr+='<option value="'+data[i].id+'">'+data[i].name+'</option>'
+        			}
+        		}
+        		$('#editPeople .organization').html(oraStr)
+        		$.ajax({//根据组织结构找部门
+        			type:"get",
+        			url:apiUrl+"depart/getDepartmentByCondition",
+        			async:true,
+        			xhrFields:{
+    			      withCredentials:true,
+    		        },
+                    crossDomain:true,
+                    contentType: "application/json",
+        			data:{"organizationId":$('#editPeople .organizationId').val()},
+        			success:function(data){
+        				if(data.data.length){
+        					var deptStr='<option value=""></option>'
+	        				for(var a=0;a<data.data.length;a++){
+	        					if(data.data[a].id==objData.deptId){
+	        						deptStr+='<option value="'+data.data[a].id+'" selected>'+data.data[a].departName+'</option>'
+	        					  	$('.editPeople input[name="deptName"]').val(data.data[a].departName)
+	        					}else{
+	        						deptStr+='<option value="'+data.data[a].id+'">'+data.data[a].departName+'</option>'
+	        					}	
+	        				}
+        				}else{
+        					var deptStr='<option value=""></option>'
+        				}
+        				$('.editPeople .deptId').html(deptStr)
+        				 form.render('select');
+        			}
+        		});
+        		
+        	}
+    	$('.editPeople').find('select[name="deptId"]').find('option').each(function(){
+          	if(	$(this).html()==objData.deptName){
+          		$(this).attr("selected",true);
+          	}
+          })
+    	$('.editPeople').find('select[name="jobState"]').find('option').each(function(){
+          	if(	$(this).html()==objData.jobState){
+          		$(this).attr("selected",true);
+          	}
+          })
+    	$('.editPeople').find('select[name="isStoreman"]').find('option').each(function(){
+          	if(	$(this).html()==objData.isStoreman){
+          		$(this).attr("selected",true);
+          	}
+          })
+    	form.render('select');
+       
+        form.on('submit(formEdit)', function(data){
+			   // layer.closeAll();
+			   //console.log($(".editForm").serialize())
+			   var params={"userCode":data.field.userCode,'id':objData.id}
+			   params=JSON.stringify(params);
+			   var data1 = data;
+  			upData("system/UserFixedCtrl-checkCodeRepeat",params,successFunc)
+  			
+  			function successFunc(data){
+  				console.log(data1)
+  				var zswjb = {
+				'userCode':data1.field.userCode
+				,'realName':data1.field.realName
+				,'isAdmin' : data1.field.isadmin
+				,'userPassword':data1.field.userPassword
+				,'organizationId':data1.field.organizationId
+				,'organizationTitle':data1.field.organizationTitle
+				,'deptId':data1.field.deptId
+				,'deptName':data1.field.deptName
+				,'phone':data1.field.phone
+				,'email':data1.field.email
+				,'jobState':data1.field.jobState
+				,'isStoreman':data1.field.isadmin
+				,'nodeId':data1.field.nodeId
+				,'id':objData.id
+			}
+  			zswjb=JSON.stringify(zswjb);
+  				if(data.data){
+  					$('.nodeId').val(objData.id)
+  					$.ajax({
+			        		type:"post",
+			        		url:apiUrl+"system/UserFixedCtrl-updateUserFixedInfo",
+			        		data:zswjb,//$(".editForm").serialize(),
+			        		async:true,
+			        		xhrFields:{
+						    			withCredentials:true,
+						    		    },
+                            crossDomain:true,
+                            contentType: "application/json",
+			        		success:function(data){
+			        			if(data.status){
+				        			layer.closeAll();
+				        			$('.layui-laypage-btn').click()
+				        			setTimeout(function(){
+				        				layer.msg('编辑成功')
+				        			},1)
+					        	}else{
+					        		layer.msg('编辑失败')
+					        	}		
+			        	}
+			        	});
+  				}else{
+  					layer.msg(data.message)
+  				}
+  			}
+			    return false;
+			  });
+			   }
+      });
+    }
+    ,offset_authority: function(othis){
+      var type = othis.data('type')
+      ,text = othis.text();
+        var checkStatus = table.checkStatus('peopleData')
+	    ,data = checkStatus.data
+	    ,jarr = new Array();
+	  for(var i=0;i<data.length;i++){
+	  	jarr.push(data[i].roleIds);
+	  }
+	  for(var i =0;i<jarr.length-1;i++){
+	  	if(jarr[i]==jarr[i+1]){
+	  	}else{
+	  		layer.msg("角色不同不能批量分配");
+	  		return false;
+	  	}
+	  }
+	  if(data.length){
+      var openAdd=layer.open({
+        type: 1
+       	,title: '分配角色'
+       	,area: ['400px', '360px']
+        ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'layerDemo'+type //防止重复弹出
+        ,content: $("#chooseAuthority")
+        ,btn: ['分配',"取消"]
+        ,btnAlign: 'r' //按钮居中
+        ,shade: 0.3 //不显示遮罩
+        ,btn2: function(){
+          layer.closeAll();
+        }
+        ,yes: function(){
+         //	layer.msg('保存成功', {icon: 6});
+         
+         $('.submitrole').click();
+         
+         return false
+        }
+        ,success:function(){
+      
+        	upData("system/UserFixedRoleCtrl-getUserFixedRoleList",{},successFunc)
+        	function successFunc(data){
+        		console.log(data)
+        		if(data.code=='0'){
+        			var roleStr='<option value=""></option>'
+	        		for(var q=0;q<data.data.length;q++){
+	        			roleStr+='<option value="'+data.data[q].id+'">'+data.data[q].roleName+'</option>'
+	        		}
+	        		$('.roleSelct').html(roleStr);
+	        		//$('.roleSelct').children("option[value=41]").remove();
+	        		//$('.roleSelct').prepend("<option value='"+checkStatus.data.roleIds+"'>"+checkStatus.data.roleIdsDesc+"</option>")
+	        		//$(父元素).children(selector).remove()
+	        		//$('selet[name=role]').val("41");
+	        		
+	        		form.render('select');
+	        		console.log(checkStatus.data[0].roleIdsDesc);
+	        		$(".roleSelct").next().find(".layui-unselect").val(checkStatus.data[0].roleIdsDesc);
+	        		
+	        		
+        		}
+        		
+        	}
+     	}
+      })
+     }else{
+      	layer.msg('请先选择要分配角色的人员！')
+      }
+    }
+   	,offset_uploadExcel: function(othis){
+      var type = othis.data('type')
+      ,text = othis.text();
+      var openAdd=layer.open({
+        type: 1
+       	,title: '导入员工'
+       	,area: ['370px', '260px']
+        ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'layerDemo'+type //防止重复弹出
+        ,content: $("#uploadExcel")
+        ,btn: ["取消"]
+        ,btnAlign: 'r' //按钮居中
+        ,shade: 0.3 //不显示遮罩
+        ,yes: function(){
+          layer.closeAll();
+        }
+      });
+    } 
+     //表格函数
+    ,getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('peopleData')
+      ,data = checkStatus.data;
+        var idArr=[];
+		 for(var i=0;i<data.length;i++){
+		 	idArr.push(data[i].id)
+		 }
+		 //idArr=JSON.stringify(idArr)
+		
+			if(isOrg=='0'){
+				var params={
+						"ids":idArr,"deptId":nodeId
+						}
+			}else{
+				var params={
+					"ids":idArr,"organizationId":nodeId
+					}
+						}
+		   params=JSON.stringify(params)
+	   	   if(data.length){
+	      	layer.confirm('确定删除选中信息？', {icon: 3, title:'提示'}, function(index){
+			upData("system/UserFixedCtrl-deleteUserFixed",params,successFunc)
+			   function successFunc(data){
+			  	console.log(data)
+			  	if(data.code=="0"){
+			  		$('.layui-laypage-btn').click()
+			  			setTimeout(function(){
+				        	layer.msg("删除成功");
+				        			},1)
+			  		
+			  	}else{
+			  		layer.msg("删除失败");
+			  	}
+			  }
+			  layer.close(index);
+			});
+	      	}else{
+	      		layer.msg("请先选择要删除的信息！");
+	      	}
+    }
+    ,getCheckLength: function(){ //获取选中数目
+      var checkStatus = table.checkStatus('peopleData')
+      ,data = checkStatus.data;
+      layer.msg('选中了：'+ data.length + ' 个');
+    }
+    ,isAll: function(){ //验证是否全选
+      var checkStatus = table.checkStatus('peopleData');
+      layer.msg(checkStatus.isAll ? '全选': '未全选')
+    }
+    ,deletPeople:function(){
+    	active.getCheckData();
+    }
+    ,loadExcel:function(){
+    	//var src=$(this).attr('url');
+    	if($(this).attr('data-type')=='2'){
+    		var src="http://wm-iot.oss-cn-shanghai.aliyuncs.com/ExcelOfUserFix/model/importUserModel.xlsx"
+    	}else if($(this).attr('data-type')=='1'){
+    		var nodeIdParamsStr=''
+    		for(var i in nodeIdParams){
+    			nodeIdParamsStr=i+'='+nodeIdParams[i]
+    		}
+    		var src=apiUrl+'system/UserFixedCtrl/Export'+'?'+nodeIdParamsStr
+    	}
+	        if(browserIsIe()){//假如是ie浏览器  
+	                DownLoadReportIMG(src);  
+	        }else{  
+	               NotIeDown(src,'模版')
+	        }  
+	    function DownLoadReportIMG(imgPathURL) {  
+    //如果隐藏IFRAME不存在，则添加  
+	    if (!document.getElementById("IframeReportImg"))  
+	        $('<iframe style="display:none;" id="IframeReportImg" name="IframeReportImg" onload="DoSaveAsIMG();" width="0" height="0" src="about:blank"></iframe>').appendTo("body");  
+	    if (document.all.IframeReportImg.src != imgPathURL) {  
+	        //加载图片  
+	        document.all.IframeReportImg.src = imgPathURL;  
+	    }  
+	    else {  
+	        //图片直接另存为 
+	        DoSaveAsIMG();  
+	    }  
+	}  
+	function DoSaveAsIMG() {  
+		if (document.all.IframeReportImg.src != "about:blank")  
+		window.frames["IframeReportImg"].document.execCommand("SaveAs");  
+	}  
+	//判断是否为ie浏览器  
+	function browserIsIe() {  
+	    if (!!window.ActiveXObject || "ActiveXObject" in window)  
+	        return true;  
+	    else  
+	        return false;  
+	} 
+	function NotIeDown(src,name){
+	      var a = document.createElement("a");
+	            a.href = src;
+	            a.download =name;
+	            a.click();
+	} 
+    }
+  };
+  //按钮
+  $('.peopleTable .layui-btn,.downloadExcel').on('click', function(){
+    var othis = $(this), method = othis.data('method');
+    active[method] ? active[method].call(this, othis) : '';
+  });
+  //表格
+   $('#peopleData .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+  //监听提交
+    form.on('submit(formrole)', function(datae){
+    	   var checkStatus = table.checkStatus('peopleData')
+	      ,data = checkStatus.data;
+	       var idArr=[];
+	      if(data.length){
+			for(var i=0;i<data.length;i++){
+			 	idArr.push(data[i].id)
+			 }
+			}
+			var roleparams={
+					"ids":idArr,
+					"roleIds":datae.field.role
+						}
+		roleparams=JSON.stringify(roleparams)
+         upData("system/UserFixedCtrl-updateUserFixedInfo",roleparams,successFunc)
+         function successFunc(data){
+         	console.log(data)
+         	if(data.code=="0"){
+         		layer.closeAll();
+         		$('.layui-laypage-btn').click();
+         		setTimeout(function(){
+				        layer.msg('分配成功！')
+				        			},1)
+         		
+         	}else{
+         		layer.msg('分配失败！')
+         	}
+         }
+    	return false
+    })
+  form.on('submit(formDemo)', function(data){
+   // layer.msg(JSON.stringify(data.field));
+   // layer.closeAll();
+   var params={"userCode":data.field.userCode,"phone":data.field.phone,"email":data.field.email}
+   params=JSON.stringify(params);
+   var data1 = data;
+  	upData("system/UserFixedCtrl-checkCodeRepeat",params,successFunc)
+  	function successFunc(data){
+  		console.log(data)
+  		if(data.data){
+  			if(isOrg=='0'){
+  				var nodeParams={
+  					"deptId":nodeId
+  				}
+  			}else{
+  				var nodeParams={
+  					"organizationId":nodeId
+  				}
+  			}
+  			
+			var zswjb = {
+				'userCode':data1.field.userCode
+				,'realName':data1.field.realName
+				,'isAdmin' : data1.field.isadmin
+				,'userPassword':data1.field.userPassword
+				,'organizationId':data1.field.organizationId
+				,'organizationTitle':data1.field.organizationTitle
+				,'deptId':data1.field.deptId
+				,'deptName':data1.field.deptName
+				,'phone':data1.field.phone
+				,'email':data1.field.email
+				,'jobState':data1.field.jobState
+				,'isStoreman':data1.field.isadmin
+				,'nodeId':data1.field.nodeId
+			}
+  			zswjb=JSON.stringify(zswjb);
+		  	$.ajax({
+		        		type:"post",
+		        		url:apiUrl+"system/UserFixedCtrl-updateUserFixedInfo",
+		        		data:zswjb,//$(".addForm").serialize(),
+		        		async:true,
+		        		xhrFields:{
+    			    withCredentials:true,
+    		        },
+                    crossDomain:true,
+		        		contentType: "application/json",
+		        		success:function(data){
+		        			layer.closeAll();
+		        			table.reload('peopleData', {
+							  url: apiUrl+'system/UserFixedCtrl-getUserFixedList'
+							 ,where:nodeParams//设定异步数据接口的额外参数
+							  //,height: 300
+							});
+							setTimeout(function(){
+								layer.msg('添加成功！')
+							},1)
+		        		}
+		        	});
+   		}else{
+   			layer.msg(data.message)
+   		}
+  	}
+    return false;
+  });
+  
+
+  //上传
+  //选完文件后不自动上传
+  upload.render({
+    elem: '#chooseFile'
+    ,url: '/upload/'
+    ,auto: false
+    //,multiple: true
+    ,bindAction: '#uploadBtn'
+    ,done: function(res){
+      console.log(res)
+    }
+  });
+  
+});  
+	</script>
+</body>
+
+
+    
+
+
+</html>

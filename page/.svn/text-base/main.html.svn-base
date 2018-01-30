@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>首页--layui后台管理模板</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../layui/css/layui.css" media="all" />
+		<link rel="stylesheet" type="text/css" href="../mainFont/iconfont.css">
+		<link rel="stylesheet" type="text/css" href="../css/nanoscroller.css" />
+		<style type="text/css">
+			html,
+			body {
+				width: 100%;
+				/*height: 100%;*/
+			}
+			
+			.mainbox {
+				width: 100%;
+				height: 100%;
+				background: #ECF0F5;
+				padding: 20px 0;
+			}
+			
+			.hei70 {
+				height: 70px;
+				line-height: 70px;
+				text-align: center;
+			}
+			
+			.mainChooseBtn .iconfont {
+				font-size: 35px;
+				color: #FFFFFF;
+			}
+			
+			.hei35 {
+				height: 35px;
+				line-height: 38px;
+				padding-left: 10px;
+			}
+			
+			.titleFont {
+				font-size: 18px;
+				color: #FFFFFF;
+			}
+			
+			.numberFont {
+				font-size: 18px;
+				color: #FFFFFF;
+			}
+			
+			.halfBox {
+				background: #FFFFFF;
+				height: 580px;
+				margin-bottom: 30px;
+				border-radius: 4px;
+				overflow-y: auto;
+			}
+			
+			.propertyTitle {
+				padding: 10px;
+				border-bottom: 1px solid #f4f4f4;
+				border-top: 3px solid #d2d6de;
+				font-size: 18px;
+			}
+			
+			.yearTitle {
+				height: 38px;
+				line-height: 38px;
+			}
+			
+			.progressBarBox {
+				margin-top: 10px;
+			}
+			
+			.progressBar {
+				margin-top: 10px;
+				height: 20px;
+				background: #f5f5f5;
+			}
+			
+			.progressBarSuccess {
+				height: 20px;
+			}
+			
+			.showProgress,
+			.showProgress2 {
+				height: 428px;
+			}
+			
+			.showTreeParent {
+				position: relative;
+			}
+			
+			.orTreeBox {
+				width: 100%;
+				position: absolute;
+				left: 0px;
+				top: 40px;
+				background: #FFFFFF;
+				z-index: 2;
+				overflow: auto;
+				box-shadow: 0 2px 13px rgba(0, 0, 0, 0.125) !important;
+			}
+			/*滚动条*/
+			/* 	.nano  .nano-content { padding: 10px; } */
+			
+			.nano .nano-pane {
+				background: #fff;
+				width: 5px;
+			}
+			
+			.nano .nano-pane .nano-slider {
+				background: #c1c1c1;
+				width: 5px;
+				border-radius: 2px;
+			}
+			blockquote{
+				font-weight: bold;
+				background: #FFFFFF!important;
+			}
+			blockquote #cookie-ip{
+				margin-right: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mainbox">
+			<div class="layui-fluid">
+				<blockquote class="site-text layui-elem-quote">
+					最近一次登录IP:<span id="cookie-ip"> </span>
+					最近一次登录时间:<span id="cookie-time"> </span>
+				</blockquote>
+				<div class="layui-row layui-col-space30 mainChooseBtn">
+					<div class="layui-col-md3">
+						<div class="layui-row tabTitle">
+							<div class="layui-col-md3 hei70" style="background: #356FA2;border-radius: 3px  0  0 3px;">
+								<i class="iconfont icon-money"></i>
+							</div>
+							<div class="layui-col-md9" style="background: #428BCA;border-radius:0 3px 3px 0 ;">
+								<p class="propertyAllTitle hei35 titleFont">
+									资产总数
+								</p>
+								<p class="propertyAllNumber hei35 numberFont">
+									0
+								</p>
+							</div>
+						</div>
+
+					</div>
+					<div class="layui-col-md3">
+						<div class="layui-row tabTitle">
+							<div class="layui-col-md3 hei70" style="background: #4A934A;border-radius: 3px  0  0 3px">
+								<i class="iconfont icon-zichan"></i>
+							</div>
+							<div class="layui-col-md9" style="background: #5CB85C;border-radius:0 3px 3px 0 ;">
+								<p class="propertyAllCountTitle hei35 titleFont">
+									资产总额
+								</p>
+								<p class="propertyAllCountNumber hei35 numberFont">
+									0
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="layui-col-md3">
+						<div class="layui-row tabTitle">
+							<div class="layui-col-md3 hei70" style="background: #C08B3E;border-radius: 3px  0  0 3px">
+								<i class="iconfont icon-lifang"></i>
+							</div>
+							<div class="layui-col-md9" style="background: #F0AD4E;border-radius:0 3px 3px 0 ;">
+								<p class="normalPropertyTitle hei35 titleFont">
+									正常资产数量
+								</p>
+								<p class="normalPropertyNumber hei35 numberFont">
+									0
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="layui-col-md3">
+						<div class="layui-row tabTitle">
+							<div class="layui-col-md3 hei70" style="background: #AE423F;border-radius: 3px  0  0 3px">
+								<i class="iconfont icon-shanchu"></i>
+							</div>
+							<div class="layui-col-md9" style="background: #D9534F;border-radius:0 3px 3px 0 ;">
+								<p class="worthlessPropertyTitle hei35 titleFont">
+									已报废资产数量
+								</p>
+								<p class="worthlessPropertyNumber hei35 numberFont">
+									0
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="showCharts layui-row layui-col-space30">
+					<div class="layui-col-md6">
+						<div class="layui-row halfBox">
+							<div class="propertyTitle">
+								资产使用情况
+							</div>
+							<div>
+								<div class="layui-tab" lay-filter="chartsShow">
+									<ul class="layui-tab-title">
+										<li class="layui-this" lay-id='1'>数量</li>
+										<li lay-id='2'>金额</li>
+									</ul>
+									<div class="layui-tab-content">
+										<div class="layui-tab-item layui-show">
+											<div class="layui-row">
+												<div class="layui-col-md7 layui-row">
+													<div class="layui-col-md4 yearTitle">
+														请选择年月：
+													</div>
+													<div class="layui-col-md8">
+														<div class="layui-row">
+															<div class="layui-input-inline">
+																<input type="text" class="layui-input" id="chooseYearMonth" placeholder="yyyyMM">
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="layui-col-md5  showTreeParent layui-row">
+													<input type="text" placeholder="点击显示机构树" class="layui-input showOrTree" readonly="readonly" idval='-1' value="全部">
+													<div class="orTreeBox layui-row">
+														<ul id="orTree"></ul>
+													</div>
+												</div>
+											</div>
+											<div class="layui-row mainBox">
+												<div id="main" style="width: 100%;height:400px;"></div>
+											</div>
+										</div>
+										<div class="layui-tab-item">
+											<div class="layui-row">
+												<div class="layui-col-md7 layui-row">
+													<div class="layui-col-md4 yearTitle">
+														请选择年月：
+													</div>
+													<div class="layui-col-md8">
+														<div class="layui-row">
+															<div class="layui-input-inline">
+																<input type="text" class="layui-input" id="chooseYearMonth2" placeholder="yyyyMM">
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="layui-col-md5">
+													<input type="text" placeholder="点击显示机构树" class="layui-input showOrTree2" readonly="readonly" idval='-1' value="全部">
+													<div class="orTreeBox layui-row">
+														<ul id="orTree2"></ul>
+													</div>
+												</div>
+											</div>
+											<div class="layui-row main2Box">
+												<div id="main2" class="main2 layui-row" style="height:400px;"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="layui-col-md6 ">
+						<div class="layui-row halfBox">
+							<div class="propertyTitle">
+								资产分类占比（%）
+							</div>
+							<div>
+								<div class="layui-tab" lay-filter="chartsShow2">
+									<ul class="layui-tab-title">
+										<li class="layui-this" lay-id='11'>数量</li>
+										<li lay-id='22'>金额</li>
+									</ul>
+									<div class="layui-tab-content">
+										<div class="layui-tab-item layui-show showProgress">
+											<div class="nano">
+												<ul class="nano-content">
+												</ul>
+											</div>
+											<div>
+											</div>
+										</div>
+										<div class="layui-tab-item showProgress2">
+											<div class="nano">
+												<ul class="nano-content">
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="../layui/layui.js"></script>
+		<script type="text/javascript" src="../js/peizhi.js"></script>
+		<script src="../js/echart.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcss.com/jquery/1.8.3/jquery.js"></script>
+		<script src="../jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery.nanoscroller.js" type="text/javascript" charset="utf-8"></script>
+		<!--[if lt IE 9]>
+		  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+		  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"></script>
+		  <script src="http://www.json.org/json2.js"></script>
+		<![endif]-->
+		<script type="text/javascript">
+			layui.use(['tree', 'layer', 'jquery', 'table', 'form', 'upload', 'element', 'laydate'], function() {
+				var $ = layui.jquery;
+				var tabStop = '1'
+				var tabStop2 = '11'
+				var element = layui.element;
+				var laydate = layui.laydate;
+				console.log($('.tabTitle').width())
+				$('.tabTitle').height($('.tabTitle').width()*(70/257)+'px')
+				$('.hei70').height($('.tabTitle').width()*(70/257)+'px')
+				$('.hei70').css('lineHeight',$('.tabTitle').width()*(70/257)+"px")
+				$('.hei35').height($('.tabTitle').width()*(70/257)/2+'px')
+				$('.hei35').css('lineHeight',$('.tabTitle').width()*(70/257)/2+"px")
+				laydate.render({
+					elem: '#chooseYearMonth',
+					type: 'month',
+					value: new Date(),
+					done: function(value, date, endDate) {
+						var month = date.month;
+						// console.log(value); //得到日期生成的值，如：2017-08-18
+						//  console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
+						//  console.log(endDate); //得结束的日期时间对象，开启范围选择（range: true）才会返回。对象成员同上。
+						if(date.month < 10) {
+							month = '0' + month.toString()
+						} else {
+							month = month.toString()
+						}
+						showChart(date.year.toString() + month, $('.showOrTree').attr('idval'))
+					}
+				});
+				laydate.render({
+					elem: '#chooseYearMonth2',
+					type: 'month',
+					value: new Date(),
+					done: function(value, date, endDate) {
+						var month = date.month;
+						//  console.log(value); //得到日期生成的值，如：2017-08-18
+						//  console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
+						// console.log(endDate); //得结束的日期时间对象，开启范围选择（range: true）才会返回。对象成员同上。
+						if(date.month < 10) {
+							month = '0' + month.toString()
+						} else {
+							month = month.toString()
+						}
+						showChart(date.year.toString() + month, $('.showOrTree2').attr('idval'))
+					}
+				});
+
+				function hasClass(elem, cls) {
+					cls = cls || '';
+					if(cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+					return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+				}
+
+				function addClass(ele, cls) {
+					if(!hasClass(ele, cls)) {
+						ele.className = ele.className == '' ? cls : ele.className + ' ' + cls;
+					}
+				}
+
+				function removeClass(elem, cls) {
+					if(hasClass(elem, cls)) {
+						var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+						while(newClass.indexOf(' ' + cls + ' ') >= 0) {
+							newClass = newClass.replace(' ' + cls + ' ', ' ');
+						}
+						elem.className = newClass.replace(/^\s+|\s+$/g, '');
+					}
+				}
+				var mianWidth = $('#main').width()
+				$('#main2').width(mianWidth)
+				var myChart = echarts.init(document.getElementById('main'));
+				var myChart2 = echarts.init(document.getElementById('main2'));
+				// 指定图表的配置项和数据
+				option = {
+					title: {
+						text: ''
+					},
+					tooltip: {
+						trigger: 'axis'
+					},
+					legend: {
+						data: []
+					},
+					grid: {
+						left: '3%',
+						right: '4%',
+						bottom: '3%',
+						containLabel: true
+					},
+					toolbox: {
+						/*feature: {
+						    saveAsImage: {}
+						}*/
+					},
+					xAxis: {
+						type: 'category',
+						boundaryGap: false,
+						data: []
+					},
+					yAxis: {
+						type: 'value'
+					},
+					series: [{
+						name: '数量',
+						type: 'line',
+						stack: '总量',
+						data: []
+					}]
+				};
+
+				// 使用刚指定的配置项和数据显示图表。
+				myChart.setOption(option);
+				myChart2.setOption(option);
+				/*   laydate.render({
+				    elem: '#chooseMonth'
+				    ,type: 'month'
+				  });*/
+
+				$.ajax({
+					type: "get",
+					url: ApiUrl + "category/getIndexInfoForTopCount",
+					xhrFields: {
+							withCredentials: true,
+						},
+					crossDomain: true,
+					data: {},
+					success: function(data) {
+						if(data.code==0){
+							$('.propertyAllNumber').html(data.propertyCount)
+							$('.propertyAllCountNumber').html("¥  " + (data.normalPrice).toFixed(2))
+							$('.normalPropertyNumber').html(data.normalCount)
+							$('.worthlessPropertyNumber').html(data.worthlessCount)
+						}
+					}
+				});
+
+				var timeStr = '';
+				var d = new Date();
+				var monthStr = (new Date().getMonth() + 1);
+				if(monthStr < 10) {
+					monthStr = "0" + monthStr
+				} else {
+					monthStr = monthStr.toString()
+				}
+				timeStr = d.getFullYear() + monthStr
+
+				function getDate(elem) {
+					var inputDate = $('' + elem + '').val();
+					timeStr = inputDate.split('-')[0] + inputDate.split('-')[1]
+					return timeStr;
+				}
+				showChart(timeStr)
+
+				function showChart(timeStr, orId) {
+					if(!orId || orId == '-1') {
+						var params = {
+							yearMonth: timeStr
+						}
+					} else {
+						var params = {
+							yearMonth: timeStr,
+							organizationId: orId
+						}
+					}
+
+					$.ajax({
+						type: "get",
+						url: ApiUrl + "category/getIndexInfoByLeftChart",
+						data: params,
+						async: false,
+						xhrFields: {
+							withCredentials: true,
+						},
+						crossDomain: true,
+						success: function(data) {
+							if(data.state == '0') {
+								if(tabStop == '1') {
+									myChart.setOption({
+										xAxis: {
+											type: 'category',
+											boundaryGap: false,
+											data: data.dataX
+										},
+										yAxis: {
+											name: '（件）',
+											type: 'value'
+										},
+										tooltip: {
+											formatter: function(params) //数据格式
+											{
+												console.log(params)
+												var dateStr = $('#chooseYearMonth').val()
+												var relVal = '日期：' + dateStr + '-' + params[0].axisValue + "<br/>";
+												relVal += params[0].seriesName + ' : ' + params[0].value + "<br/>";
+												return relVal;
+											}
+										},
+										series: [{
+											name: '数量',
+											type: 'line',
+											stack: '总量',
+											data: data.dataCount
+										}]
+									});
+									$('.orTreeBox').animate({ height: '0' })
+								} else if(tabStop == '2') {
+									var newdataMoney = []
+									data.dataMoney.forEach(function(val) {
+										if(val == null) {
+											val = 0
+										} else {
+											val = (val / 10000).toFixed(4)
+										}
+
+										newdataMoney.push(val)
+									})
+									myChart2.setOption({
+										xAxis: {
+											type: 'category',
+											boundaryGap: false,
+											data: data.dataX
+										},
+										yAxis: {
+											name: '（万元）',
+											type: 'value'
+										},
+										tooltip: {
+											formatter: function(params) //数据格式
+											{
+												console.log(params)
+												var dateStr = $('#chooseYearMonth2').val()
+												var relVal = '日期：' + dateStr + '-' + params[0].axisValue + "<br/>";
+												relVal += params[0].seriesName + ' : ' + params[0].value + "万元<br/>";
+												return relVal;
+											}
+										},
+										series: [{
+											name: '金额',
+											type: 'line',
+											stack: '总量',
+											data: newdataMoney
+										}]
+									});
+									$('.orTreeBox').animate({ height: '0' })
+								}
+							}
+						}
+					});
+				}
+				$(document).click(function() {
+					$('.orTreeBox').animate({ height: '0' })
+				});
+				$('.orTreeBox').click(function(e) {
+					e.stopPropagation();
+				})
+				$('.showOrTree,.showOrTree2').on('click', function(e) {
+					var _that = $(this)
+					$.ajax({
+						type: "get",
+						url: ApiUrl + "category/getIndexOrgTree",
+						data: {},
+						async: true,
+						xhrFields: {
+							withCredentials: true,
+						},
+						crossDomain: true,
+						success: function(data) {
+							//	console.log(data)
+							if(data.status) {
+								$('#orTree').html('')
+								$('#orTree2').html('')
+								var dataArr = JSON.parse(data.data)
+								dataArr.unshift({ 'name': "全部", "id": '-1' })
+								//	console.log(dataArr)
+								if(tabStop == '1') {
+									var elemTree = '#orTree'
+								} else if(tabStop == '2') {
+									var elemTree = '#orTree2'
+								}
+								layui.tree({
+									elem: elemTree //传入元素选择器
+										,
+									nodes: dataArr,
+									click: function(node) {
+										var that = event.target;
+										if(that.tagName == 'CITE' || that.tagName == 'cite') {
+											$('#orTree').find('cite').removeClass('red')
+											$('#orTree').find('cite').css('color', '#333333')
+											addClass(that, "red")
+											that.style.color = 'red'
+											if(tabStop == '1') {
+												showChart(getDate('#chooseYearMonth'), node.id)
+											} else if(tabStop == '2') {
+												showChart(getDate('#chooseYearMonth2'), node.id)
+											}
+											_that.val(that.innerHTML)
+											_that.attr('idval', node.id)
+										}
+									},
+									skin: 'shihuang'
+								});
+								$('.orTreeBox').animate({ height: '410' })
+							}
+						}
+					});
+					e.stopPropagation();
+				})
+
+				element.on('tab(chartsShow)', function() {
+					if($(this).attr('lay-id') == '2') {
+						tabStop = '2'
+						$('#main2').width(mianWidth)
+						showChart(getDate('#chooseYearMonth2'))
+					} else if($(this).attr('lay-id') == '1') {
+						tabStop = '1'
+						showChart(getDate('#chooseYearMonth'))
+					}
+				});
+
+				element.on('tab(chartsShow2)', function() {
+					if($(this).attr('lay-id') == '22') {
+						tabStop2 = '22'
+						showProgressleft()
+					} else if($(this).attr('lay-id') == '11') {
+						tabStop2 = '11'
+						showProgressleft()
+					}
+				});
+				//右侧进度条
+				showProgressleft()
+
+				function showProgressleft() {
+					$.ajax({
+						type: "get",
+						url: ApiUrl + "category/getIndexInfoByRightChart",
+						data: {},
+						async: true,
+						xhrFields: {
+							withCredentials: true,
+						},
+						crossDomain: true,
+						success: function(data) {
+							if(data.code==0){
+							var progressStr = '';
+							if(tabStop2 == '11') {
+								for(var i = 0; i < data.list.length; i++) {
+									var percent = (Number((data.list[i].cateCount / data.totalCount)) * 100).toFixed(4) + '%'
+									progressStr += '<div class="progressBarBox layui-row">'
+									progressStr += '<div class="progressBarTitle layui-row">'
+									progressStr += '<div class="layui-col-md6">' + data.list[i].cateName + '</div>'
+									progressStr += '<div class="layui-col-md6" style="text-align: right;">' + percent + '(' + data.list[i].cateCount + ')</div></div>'
+									progressStr += '<div class="progressBar layui-row">'
+									progressStr += '<div class="progressBarSuccess" style="width:' + percent + ';background: #C23531;"></div></div></div>'
+								}
+								$('.showProgress ul').html(progressStr)
+							} else if(tabStop2 == '22') {
+								for(var i = 0; i < data.list.length; i++) {
+									var percent1 = (Number((data.list[i].catePrice / data.totalPrice)) * 100).toFixed(4) + '%'
+									progressStr += '<div class="progressBarBox layui-row">'
+									progressStr += '<div class="progressBarTitle layui-row">'
+									progressStr += '<div class="layui-col-md6">' + data.list[i].cateName + '</div>'
+									progressStr += '<div class="layui-col-md6" style="text-align: right;">' + percent1 + '(' + data.list[i].catePrice + ')</div></div>'
+									progressStr += '<div class="progressBar layui-row">'
+									progressStr += '<div class="progressBarSuccess" style="width:' + percent1 + ';background: #f39c12;"></div></div></div>'
+								}
+								$('.showProgress2 ul').html(progressStr)
+							}
+							}
+						},
+						complete: function() {
+							$(".nano").nanoScroller();
+						}
+					});
+				}
+				
+				//登录IP和时间
+				var lastLoginIp = $.cookie("lastLoginIp");     //登录人
+ 		 		var lastLoginTime = $.cookie("lastLoginTime");   //集团id
+ 		 		$("#cookie-ip").html(lastLoginIp);
+ 		 		$("#cookie-time").html(lastLoginTime);
+
+			})
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>修改资产</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" >
+    <div class="layui-row layui-form-item">
+        <input type="hidden" id="sourceType" name="sourceType" value="1">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>资产类别:</label>
+            <div class="layui-col-xs6 treeWrap">
+                <input type="text" id="categoryId" name="categoryId" lay-verify="required" placeholder="请选择资产分类" class="layui-input" readonly>
+                <div class="categoryTree" id="categoryTree"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>资产名称:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="propertyName" name="propertyName" lay-verify="required" placeholder="请输入资产名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>规格型号:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="specification" name="specification" lay-verify="required" placeholder="请输入规格型号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">品牌:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="brand" name="brand" placeholder="请输入品牌" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>单位:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="unit" name="unit" required lay-verify="required" placeholder="请输入单位" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title"><span class="red-point">*</span>金额:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="price" name="price" lay-verify="required|price" placeholder="请输入金额" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用公司:</label>
+            <div class="layui-col-xs6">
+                <select id="organizationId" name="organizationId" lay-filter="organizationId">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用部门:</label>
+            <div class="layui-col-xs6">
+                <select id="deptId" name="deptId" lay-filter="deptId">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用人:</label>
+            <div class="layui-col-xs6">
+                <select id="personnelId" name="personnelId" lay-filter="personnelId">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            <!--<a class="layui-col-xs2">新增</a>-->
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">入库时间:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="storageinDate" name="storageinDate" class="layui-input" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">存放地:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="depositAdress" name="depositAdress" placeholder="请输入存放地" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用期限:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="serviceLife" name="serviceLife" lay-verify="num" placeholder="请输入使用期限" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-col-xs2">
+                <label class="follow">月</label>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">序列号:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="snno" name="snno" placeholder="请输入序列号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">处理人:</label>
+            <div class="layui-col-xs6">
+                <input type="text" id="disposePersonname" name="disposePersonname" class="layui-input" disabled>
+                <input type="hidden" id="disposePersonid" name="disposePersonid" placeholder="请输入处理人" autocomplete="off" class="layui-input" value="">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">备注:</label>
+        <div class="nine-xs8">
+            <input type="text" id="remark" name="remark" placeholder="请输入备注" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-row layui-form-item layui-hide">
+        <div class="layui-col-xs4">
+            <button class="layui-btn" lay-submit="" lay-filter="property" type="button" id="sumbit">立即提交</button>
+        </div>
+    </div>
+
+</form>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['form','laydate','jquery','tree'], function() { //独立版的layer无需执行这一句
+        var form = layui.form;
+        var $ = layui.$;
+        var laydate = layui.laydate;
+        var layer = layui.layer;
+        var tree = layui.tree
+        laydate.render({
+            elem: '#storageinDate'
+            ,position: 'fixed'
+            ,type: 'datetime'
+        });
+        var logCount;
+        //类别树
+        $.ajax({
+            type:"get",
+            url:ApiUrl+"category/getCategoryInfoByTree",
+            async:true,
+            success:function(res){
+                datatree = res;
+                layui.tree({
+                    elem: '#categoryTree' //传入元素选择器
+                    ,nodes: datatree
+                    ,skin:'shihuang'
+                    ,click: function(node){
+                        if(node.children==null){
+                            $("#categoryTree").hide();
+                            $("#categoryId").val(node.title);
+                            $("#categoryId").attr('categoryId',node.id);
+                            $("#categoryId").attr('parentIdPath',node.parentIdPath);
+                        }
+                    }
+                });
+            }
+        });
+        //树点击收起
+        $(document).bind('click', function(e) {       //点击事件
+            var e = e || window.event; //浏览器兼容性
+            var elem = e.target || e.srcElement;
+            while (elem) { //循环判断至跟节点，防止点击的是div子元素
+                if (elem.id && (elem.id == 'categoryId' || elem.id == "categoryTree" )) {
+                    return;
+                }
+                elem = elem.parentNode;
+            }
+            $('#categoryTree').hide();
+        });
+        //分类选择
+        $("#categoryId").on('click', function(){
+            $("#categoryTree").show();
+        })
+        //获取资产信息
+        $.ajax({
+            type:"get",
+            url:ApiUrl+"zhProperty/getZhpropertybyid?id="+localStorage.propertyCode,
+            async:false,
+            success:function(res){
+                $("#categoryId").val(res.result.categoryName);
+                $("#categoryId").attr('categoryId',res.result.categoryId);
+                $("#categoryId").attr('categoryidPath',res.result.categoryidPath);
+                $("#sourceType").val(res.result.sourceType)
+                $("#propertyName").val(res.result.propertyName)
+                $("#specification").val(res.result.specification)
+                $("#brand").val(res.result.brand)
+                $("#unit").val(res.result.unit)
+                $("#price").val(res.result.price)
+                $("#storageinDate").val(res.result.storageinDate)
+                $("#depositAdress").val(res.result.depositAdress)
+                $("#serviceLife").val(res.result.serviceLife)
+                $("#snno").val(res.result.snno)
+                $("#remark").val(res.result.remark)
+                $("#disposePersonid").val(res.result.disposePersonid)
+                $("#disposePersonname").val(res.result.disposePersonname)
+                logCount= res.result.logCount
+                var organizationId = res.result.organizationId
+                var deptId = res.result.deptId
+                var personnelId = res.result.personnelId
+                //获取公司
+                $.ajax({
+                    type:"get",
+                    url:ApiUrl + "org/getOrgInfoByCondition",
+                    async:false,
+                    success:function(res){
+                        var departmentlist = "";
+                        for(var i=0;i<res.length;i++){
+                            if(organizationId==res[i].id){
+                                departmentlist+="<option organizationIdPath='"+res[i].parentIdPath+"' value='"+res[i].id+"' selected>"+res[i].name+"</option>"
+                            }else {
+                                departmentlist+="<option organizationIdPath='"+res[i].parentIdPath+"' value='"+res[i].id+"'>"+res[i].name+"</option>"
+                            }
+                        }
+                        $("#organizationId").append(departmentlist);
+                        form.render('select');
+                    }
+                });
+                if(organizationId==''||organizationId==null) {
+
+                }else {
+                    //获取部门
+                    $.ajax({
+                        type:"get",
+                        url:ApiUrl + "depart/getDepartmentByCondition?organizationId="+organizationId,
+                        async:false,
+                        success:function(res){
+                            var res = res.data;
+                            var departmentlist = "";
+                            for(var i=0;i<res.length;i++){
+                                if(deptId==res[i].id){
+                                    departmentlist+="<option value='"+res[i].id+"'selected>"+res[i].departName+"</option>"
+                                }else{
+                                    departmentlist+="<option value='"+res[i].id+"'>"+res[i].departName+"</option>"
+                                }
+
+                            }
+                            $("#deptId").append(departmentlist);
+                            form.render('select');
+                        }
+                    });
+                    //获取人员
+                    if(personnelId!=''&&personnelId!=null){
+                        $.ajax({
+                            type:'get',
+                            url: ApiUrl+"system/UserFixedCtrl-getUserFixedList?deptId="+deptId,
+                            async:false,
+                            success:function(res){
+                                var userlist = "";
+                                var res = res.data;
+                                for(var i=0;i<res.length;i++){
+                                    if(personnelId==res[i].id){
+                                        userlist+="<option value='"+res[i].id+"' selected>"+res[i].realName+"</option>"
+                                    }else{
+                                        userlist+="<option value='"+res[i].id+"'>"+res[i].realName+"</option>"
+                                    }
+                                }
+                                $("#personnelId").append(userlist);
+                                form.render('select');
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        var organizationId;//公司ID
+        var deptId//部门ID
+        //监听获取部门
+        form.on('select(organizationId)', function(data){
+            organizationId = data.value;
+            $("#deptId").html('<option value="">请选择</option>');
+            $("#personnelId").html('<option value="">请选择</option>');
+            form.render('select');
+            if(organizationId==''){
+                return false
+            }
+            $.ajax({
+                type:"get",
+                url:ApiUrl + "depart/getDepartmentByCondition?organizationId="+organizationId,
+                async:true,
+                success:function(res){
+                    var res = res.data;
+                    var departmentlist = "";
+                    for(var i=0;i<res.length;i++){
+                        departmentlist+="<option value='"+res[i].id+"'>"+res[i].departName+"</option>"
+                    }
+                    $("#deptId").append(departmentlist);
+                    form.render('select');
+                }
+            });
+        });
+        //监听获取人员
+        form.on('select(deptId)',function(data){
+            deptId = data.value;
+            $("#personnelId").html('<option value="">请选择</option>');
+            form.render('select');
+            if(deptId==''){
+                return false
+            }
+            $.ajax({
+                type:'get',
+                url: ApiUrl+"system/UserFixedCtrl-getUserFixedList?deptId="+deptId,
+                async:true,
+                success:function(res){
+                    var userlist = "";
+                    var res = res.data;
+                    for(var i=0;i<res.length;i++){
+                        userlist+="<option value='"+res[i].id+"'>"+res[i].realName+"</option>"
+                    }
+                    $("#personnelId").append(userlist);
+                    form.render('select');
+                }
+            });
+        })
+        form.verify({
+            price: [/(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/, '输入正确的金额'],
+            num:[/^[0-9]*$/, '输入正确的金额']
+        });
+        //提交修改
+        form.on('submit(property)', function(data){
+            if(logCount>1){
+                layer.msg('此资产已有处理记录无法修改')
+                return
+            }
+            data.field['id'] = localStorage.propertyCode;
+            data.field['groupCode'] = $.cookie("groupCode");
+            data.field['categoryId'] = $("#categoryId").attr('categoryId');
+            data.field['categoryName'] = $("#categoryId").val();
+            data.field['categoryidPath'] = $("#categoryId").attr('categoryidPath');
+            data.field['organizationId'] = $("#organizationId").val();
+            data.field['organizationName'] = $("#organizationId option:selected").text();
+            data.field['organizationIdPath'] = $("#organizationId option:selected").attr('organizationIdPath')
+            data.field['deptId'] = $("#deptId").val();
+            if($("#deptId").val()!=''){
+                data.field['deptName'] = $("#deptId option:selected").text();
+            }
+            data.field['personnelId'] = $("#personnelId").val();
+            if($("#personnelId").val()!=''){
+                data.field['personnelName'] = $("#personnelId option:selected").text();
+            }
+            $(this).attr("disabled","disabled");
+            $.ajax({
+                url:ApiUrl+"zhProperty/updateByPrimaryKeySelective",
+                async:true,
+                data:data.field,
+                type:'POST',
+                success : function(result) {
+                    if(result.code==0){
+                        layer.msg("保存成功",{time:2000},function () {
+                            parent.location.reload()
+                        });
+                    }else{
+                        layer.msg(result.message)
+                    }
+                },
+                error:function () {
+                    return false
+                }
+            });
+        });
+    })
+</script>
+</body>
+</html>

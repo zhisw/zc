@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>物品档案</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<style>
+		    .header-top{position:relative;margin-top:10px;margin-left:20px;}
+			.header button{
+					display: inline-block;
+				    height: 30px;
+				    line-height: 30px;
+				    padding:0 6px;
+				    color: #fff;
+				    white-space: nowrap;
+				    text-align: center;
+				    font-size: 14px;
+				    border: none;
+				    border-radius: 15px;
+				    cursor: pointer;
+				    margin-right:10px;
+		    }
+		    .newadd-sel{position:absolute;left:-1px;top:31px;display:none;}
+		    .newadd-sel ul li{border:1px solid #d9d9d9;padding:5px 10px;cursor:pointer;background:#fff;}
+		    .newadd{background:#46CE4E;}
+		    .newadd:hover{opacity: 0.7;}
+		    .newgood{background:#46CE4E;}
+		    .newgood:hover{opacity: 0.7;}
+		    .uploadConsumableData{background:#46CE4E;}
+		    .uploadConsumableData:hover{opacity: 0.7;}
+		    .cont-left{
+		    	     width:17%;
+		             /*height:400px;
+		             border:1px solid #d9d9d9;*/
+		             float:left;
+		             margin-top:20px;
+		    }
+		    .cont-right{
+		    	width:80%;
+		    	height:400px;
+		    	float:left;
+		    	margin-top:20px;
+		    	margin-left:10px;
+		    	/*border:1px solid #d9d9d9;*/
+		    	
+		    }
+		     body .layui-tree-skin-shihuang .layui-tree-branch{color: #EDCA50;}
+		     .layui-inline{margin-left:15px;}
+			.layui-form-label{width:90px !important;}
+	        .layui-input-inline{width:205px;}
+	        .layui-input-inline input{height:32px !important;}
+	        .red{color: red !important;}
+	        .toDetail{
+	        	cursor: pointer;
+	        }
+		</style>
+	</head>
+<body class="childrenBody">
+	<div class="header">
+		<div class="header-top">
+			<button class="newadd">新增分类管理</button>
+			<div class="newadd-sel">
+				<ul>
+					<li data-ji="1">新增顶级分类</li>
+					<li style="border-top:0;" data-ji="2">新增下级分类</li>
+					<li style="border-top:0;" data-ji="3">修改分类</li>
+					<li style="border-top:0;" data-ji="4">删除分类</li>
+					<li style="border-top:0;" data-ji="5">导出分类</li>
+				</ul>
+			</div>
+			<button class="newgood">新增物品</button>
+			<button class="findout">导出物品</button>
+			<button class="findin">导入物品</button>
+			<button class="uploadConsumableData">生成盘点清单</button>
+				<div class="layui-input-inline" style="margin-left: 10px;">	
+				    <input type="text" name="search"  placeholder="物资编码或物品名称" autocomplete="off" class="layui-input ">   
+				</div>
+			    <div class="layui-inline searchBox" style="margin-left: 0;cursor: pointer;">
+			     	<i class="layui-icon" style="font-size: 23px;">&#xe615;</i>  
+			    </div>
+		</div>
+	</div>
+	<div class="content">
+		<div class="cont-left">
+			<ul id="goodtree"></ul>
+		</div>
+		<div class="cont-right">
+			<table class="layui-table" id="idText"  lay-filter="demo"></table>
+		</div>
+	</div>
+</body>
+</html>
+<div id="addclass" style="display:none;padding-top:20px">
+	<form class="layui-form">
+	<div class="layui-inline">
+	    <label class="layui-form-label"><font color="red">*</font>物品分类编码 </label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodclasscode" lay-verify="required" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label"><font color="red">*</font>物品分类名称 </label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodclassname" lay-verify="required" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">上级分类编码 </label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodtopclasscode"  autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">上级分类名称 </label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodtopclassname"  autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <!--<div class="layui-inline">
+	    <label class="layui-form-label">备注 </label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodremark" lay-verify="title" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>-->
+    <button id="addtop" lay-submit="" lay-filter="demo1" style="display: none;">立即提交</button>
+    </form>
+</div>
+<div id="addgood" style="display:none;padding-top:20px">
+	<form class="layui-form">
+    <div class="layui-inline">
+	    <label class="layui-form-label"><font color="red">*</font>物品名称 </label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodname" lay-verify="required" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">品牌</label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodbrand" lay-verify="title" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">规格型号</label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodsex" lay-verify="title" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">物品类别</label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodclass" lay-verify="title" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">单位</label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodunit" lay-verify="title" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label">单价</label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodprice" lay-verify="price" autocomplete="off"  class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-inline">
+	    <label class="layui-form-label"><font color="red">*</font>库存数量</label>
+	    <div class="layui-input-inline">
+			<input type="text" name="goodmuch" lay-verify="required" autocomplete="off"  class="layui-input" disabled="disabled" value="0">
+	    </div>
+    </div>
+    <button id="addbottom" lay-submit="" lay-filter="demo2" style="display: none;">立即提交</button>
+    </form>
+</div>
+<div id="todetail" style="display: none;">
+	<div style="padding: 5px 8px;">
+		<span>生成盘点单成功！</span><a href="javaScript:;" class="toDetail" style="display: inline-block;"></a>,<br/><span>点击盘点单号可查看单据详情</span>
+	</div>
+	
+</div>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+<script>
+var xiugai = "";
+var url = "";
+var xiugaiid = "";
+var addcheck = "";//是否在选中分类新增下一级全局变量
+var addparentCode = 0;//上级父类编码
+var addaddparentName = "";//上级父类名称
+var addparentidPath = "";//路径
+var addparentId = 0;//父ID
+var addparentcode = "";//父编码
+var addfenleiname = "";//分类名称（修改分类使用）
+var addeditcode = "";//分类编码
+var organizationId = localStorage.getItem("organizationId");//登录人员的机构ID
+var addmycode = "";//新增下级分类，本级编码
+var zzcp = "";
+var only = new Array();//编码唯一性
+var xiugaicode = "";//修改上级分类编码
+var ifxiugai = "";
+var check='';
+var fatherid = "";
+layui.use(['layer','tree','table','form','element'],function(){
+var layer = layui.layer ,tree = layui.tree, $ = layui.$,table = layui.table,form = layui.form;
+var element = layui.element;
+form.verify({
+  price: function(value,item){
+  	if(value==""){
+  		
+  	}else{
+  		var reg = /^(([1-9]\d{0,9})|0)(\.\d{1,2})?$/;
+	  	 if(reg.test(value) === false)  
+	          {  
+	          return '价格不符合'
+	          }  
+  	}
+  	
+  }
+});
+
+  table.render({
+				    elem: '#idText'
+				    ,id:'idText'
+				   	,url:ApiUrl+"zhConsumable/getZhConsumableListPage"
+				   	//,where:{'state':state,'startTime':startTime,'endTime':endTime,'keywork':keywork}
+				   	
+				    ,height: 'full-100'
+				    ,cols: [[ //标题栏
+						  	{checkbox: true}
+						    ,{field:'consumableCode',title: '物品编码', width:140}
+						    ,{field:'consumableName', title:'物品名称',width:90}
+						    ,{field:'categoryName', title:'物品类别',width:90}
+						    ,{field:'brand', title:'品牌',width:100}
+						    ,{field:'unit',title:'单位', width:100}
+						    ,{field:'specification',title:'规格', width:90}
+						    ,{field:'price', title:'单价',width:80}
+						    ,{field:'stockNum',title:'库存数量', width:90}
+						    ,{field:'right', title:'操作' ,width:120, align:'center', toolbar: '#barDemo'}
+				     
+				    ]] 
+				    //,skin: 'row' //表格风格
+				    //,even: true
+				    ,page: true //是否显示分页
+				    ,limits: [20, 50, 100]
+				    ,limit: 20 //每页默认显示的数量
+				  });
+form.on('submit(demo1)', function(data){ //分类表单事件
+	               var onlye = JSON.stringify(only);
+	               var onlyr = onlye.indexOf(data.field.goodclasscode);
+	               if(ifxiugai==1){
+	               	$("#addtop").attr("disabled",true);
+	               	
+	               	$("input[name=goodclasscode]").attr("lay-verify","");
+	               	$("input[name=goodclassname]").attr("lay-verify","");
+	               	var param = {
+			       		'categoryCode' : data.field.goodclasscode//分类编码
+			       		,'categoryName' : data.field.goodclassname//分类名称
+			       		,'parentCode' : addparentcode//上一级父类编码
+			       		,'parentidPath' : addparentidPath//路径
+			       		,'parentId' : fatherid//父ID
+			       		,'organizationId' : 1//登录者机构id organizationId
+			       		,'id' : addparentId
+			       	}
+			       	 $.ajax({
+				    	type:"post",
+				    	url: ApiUrl+"zhConsumableCategory/updateCategory",
+				    	async:true,
+				    	xhrFields:{
+				    			withCredentials:true,
+				    		    },
+				                crossDomain:true,
+				    	data:param,
+				    	success:function(res){
+				    		if(res.code==0){
+				    			layer.msg("修改成功");
+				    			setInterval(function(){location.reload();},2000)
+				    		}else{
+				    			layer.msg("修改失败");
+				    			$("#addtop").attr("disabled",false);
+				    		}
+				    	},
+				    	error:function(){
+				    		alert("")
+				    	}
+				    })
+				    //layer.close(layer.index);
+				    return false;
+	               }else{
+	               	$("#addtop").attr("disabled",true);
+	               	if(onlyr!=-1){
+	               	layer.msg("分类编码重复，请重新填写");
+	               	$("#addtop").attr("disabled",false);
+	               	return false;
+	               }
+	              
+	               	var param = {
+			       		'categoryCode' : data.field.goodclasscode//分类编码
+			       		,'categoryName' : data.field.goodclassname//分类名称
+			       		,'parentCode' : addparentCode//上一级父类编码
+			       		,'parentidPath' : addparentidPath//路径
+			       		,'parentId' : addparentId//父ID
+			       		,'organizationId' : 1//登录者机构id organizationId
+			       	}
+			       	 $.ajax({
+				    	type:"post",
+				    	url: ApiUrl+"zhConsumableCategory/insertCategory",
+				    	async:true,
+				    	xhrFields:{
+				    			withCredentials:true,
+				    		    },
+				                crossDomain:true,
+				    	data:param,
+				    	success:function(res){
+				    		if(res.code==0){
+				    			layer.msg("新增成功");
+				    			setInterval(function(){location.reload();},2000)
+				    		}else{
+				    			layer.msg("新增失败")
+				    			$("#addtop").attr("disabled",false);
+				    		}
+				    	},
+				    	error:function(){
+				    		alert("")
+				    	}
+				    })
+				    //layer.close(layer.index);
+				    return false;
+	               }
+	              
+			       
+ });
+form.on('submit(demo2)', function(data){ //物品表单事件
+	//console.log(data);
+		$("#addbottom").attr("disabled",true);
+	var goodparam = {};
+	if(xiugai==1){
+		//console.log(data.field.id);
+		url = ApiUrl+"zhConsumableCategory/updateZhConsumable";
+		goodparam = {
+		'consumableCode' : data.field.goodcode
+		,'consumableName' : data.field.goodname
+		,'specification' : data.field.goodsex
+		,'brand' : data.field.goodbrand
+		,'unit' : data.field.goodunit
+		,'price' : data.field.goodprice
+		,'stockNum' : data.field.goodmuch
+		,'categoryId' : addparentId
+		,'categoryName' : data.field.goodclass
+		,'categoryidPath' : addparentidPath
+		,"id" : xiugaiid
+	}
+		
+	}else{
+		url = ApiUrl+"zhConsumableCategory/insertZhConsumable";
+		 goodparam = {
+		'consumableCode' : data.field.goodcode
+		,'consumableName' : data.field.goodname
+		,'specification' : data.field.goodsex
+		,'brand' : data.field.goodbrand
+		,'unit' : data.field.goodunit
+		,'price' : data.field.goodprice
+		,'stockNum' : data.field.goodmuch
+		,'categoryId' : addparentId
+		,'categoryName' : data.field.goodclass
+		,'categoryidPath' : addparentidPath
+	}
+	}
+	$.ajax({
+		type:"post",
+		url:url,
+		async:true,
+		
+    	xhrFields:{
+    			withCredentials:true,
+    		    },
+                crossDomain:true,
+		data: goodparam,
+		success:function(res){
+			if(res.code==0){
+				if(xiugai==1){
+					layer.msg("修改成功");
+				}else{
+					layer.msg("新增成功");
+				}
+				
+				setInterval(function(){location.reload();},2000)
+			}
+		},error:function(){
+			layer.msg("哦哦，出错了")
+		}
+	});
+	return false;
+});
+$.ajax({
+	type:"get",
+	url:ApiUrl+"zhConsumableCategory/getCategoryList?organizationId=1",
+	async:true,
+    xhrFields:{
+    			withCredentials:true,
+    		    },
+    crossDomain:true,
+	success:function(res){
+		for(var i =0 ;i<res.data.length;i++){
+			only.push(res.data[i].categoryCode);
+		}
+		datatree = res.data;
+		layui.tree({
+			  elem: '#goodtree' //传入元素选择器
+			  ,nodes: datatree
+			  ,skin:'shihuang'
+			  ,click: function(node){
+			  	console.log(node); 
+			  	var that = event.target;
+			  	//$("cite").style.color = '#333';
+			    that.style.color = 'red';
+			  	//console.log(node);
+			  	addcheck = 1;
+			  	zzcp = node;
+			  	addparentCode = node.categoryCode;
+			  	addparentName = node.categoryName;
+			  	addparentidPath  = node.parentidPath;
+			  	addfenleiname = node.name;
+			  	addparentId = node.id;
+			  	fatherid = node.parentId;
+			  	addeditcode = node.categoryCode;
+			  	addmycode = node.groupCode;
+			  	addparentcode = node.parentCode;
+			  	xiugaicode = node.parentcategoryName;
+			    check = node.parentidPath;
+			    if(that.tagName=='CITE'||that.tagName=='cite'){				   
+				$('#goodtree').find('cite').removeClass('red')
+				$('#goodtree').find('cite').css('color','#333333')
+				addClass(that, "red")
+			    table.render({
+				    elem: '#idText'
+				    ,id:'idText'
+				   	,url:ApiUrl+"zhConsumable/getZhConsumableListPage?categoryidPath="+check
+				   	//,where:{'state':state,'startTime':startTime,'endTime':endTime,'keywork':keywork}
+				   	
+				    ,height: 'full-100'
+				    ,cols: [[ //标题栏
+						   {checkbox: true}
+						   ,{field:'consumableCode',title: '物品编码', width:140}
+						    ,{field:'consumableName', title:'物品名称',width:90}
+						    ,{field:'categoryName', title:'物品类别',width:90}
+						    ,{field:'brand', title:'品牌',width:100}
+						    ,{field:'unit',title:'单位', width:100}
+						    ,{field:'specification',title:'规格', width:90}
+						    ,{field:'price', title:'单价',width:80}
+						    ,{field:'stockNum',title:'库存数量', width:90}
+						    ,{field:'right', title:'操作' ,width:120, align:'center', toolbar: '#barDemo'}
+				     
+				    ]] 
+				    ,skin: 'row' //表格风格
+				    ,even: true
+				    ,page: true //是否显示分页
+				    ,limits: [20, 50, 100]
+				    ,limit: 20 //每页默认显示的数量
+				  });
+				  }
+			    //console.log(check) //node即为当前点击的节点数据
+			  } 
+			 
+});
+ 
+	}
+});
+$(".newadd").on('click',function(){
+	$(".newadd-sel").show();
+	event.stopPropagation();
+	$("body").click(function(){
+				$(".newadd-sel").hide();
+	})
+});
+$(".newadd-sel ul li").on("click",function(){
+		$(".newadd-sel").hide();
+		var jibie = $(this).attr("data-ji");
+		if(jibie==1){     //新增顶级分类
+			ifxiugai = "";
+			    addparentCode = 0;//上级父类编码
+                addaddparentName = "";//上级父类名称
+                addparentidPath = "";//路径
+                addparentId = 0;//父ID
+            $("input[name=goodclasscode]").val("");
+            $("input[name=goodclasscode]").attr('disabled',false);
+			$("input[name=goodclassname]").val("");
+			$("input[name=goodtopclasscode]").attr('disabled',true);
+			$("input[name=goodtopclasscode]").parent().parent().hide();
+			$("input[name=goodtopclasscode]").val("0");
+			$("input[name=goodtopclassname]").attr('disabled',true);
+			$("input[name=goodtopclassname]").parent().parent().hide();
+			$("input[name=goodtopclassname]").val("0");
+			layer.open({
+			       type: 1
+			       ,title: '新增分类管理'
+			       ,area: ['400px', '350px']
+			       ,content: $("#addclass")//这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+			       ,btn: ['保存','取消']
+			       ,yes: function(){
+			       	document.getElementById("addtop").click();
+			       }
+			    });
+		}else if(jibie==2){//新增下级分类
+			ifxiugai = "";
+			if(addcheck==""){
+				layer.msg("未选中任何分类新增下一级");
+				return false;
+			}
+			$.ajax({
+				type:"get",
+				url: ApiUrl+"zhConsumable/getConsumablecountBycateid?categoryId="+zzcp.id,
+				async:true,
+				success:function(res){
+					if(res.count>0){
+						 layer.confirm('该分类有商品，新增下级分类，商品默认放到下一级', {icon: 3, title:'提示'},function(index){
+						 	addcheck = "";
+							$("input[name=goodclasscode]").val("");
+							$("input[name=goodclasscode]").attr('disabled',false);
+							$("input[name=goodclassname]").val("");
+							$("input[name=goodtopclasscode]").attr('disabled',true);
+							$("input[name=goodtopclasscode]").parent().parent().show();
+							$("input[name=goodtopclasscode]").val(addeditcode);
+							$("input[name=goodtopclassname]").attr('disabled',true);
+							$("input[name=goodtopclassname]").parent().parent().show();
+							$("input[name=goodtopclassname]").val(addparentName);
+							layer.open({
+							       type: 1
+							       ,title: '新增分类管理'
+							       ,area: ['400px', '350px']
+							       ,content: $("#addclass")//这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+							       ,btn: ['保存','取消']
+							       ,yes: function(){
+							       	document.getElementById("addtop").click();
+							       }
+							     })
+						 })
+					}else{
+						addcheck = "";
+							$("input[name=goodclasscode]").val("");
+							$("input[name=goodclasscode]").attr('disabled',false);
+							$("input[name=goodclassname]").val("");
+							$("input[name=goodtopclasscode]").attr('disabled',true);
+							$("input[name=goodtopclasscode]").parent().parent().show();
+							$("input[name=goodtopclasscode]").val(addeditcode);
+							$("input[name=goodtopclassname]").attr('disabled',true);
+							$("input[name=goodtopclassname]").parent().parent().show();
+							$("input[name=goodtopclassname]").val(addparentName);
+							layer.open({
+							       type: 1
+							       ,title: '新增分类管理'
+							       ,area: ['400px', '350px']
+							       ,content: $("#addclass")//这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+							       ,btn: ['保存','取消']
+							       ,yes: function(){
+							       	document.getElementById("addtop").click();
+							       }
+							     })
+					}
+				}
+			});
+			
+		}else if(jibie==3){//修改分类
+			ifxiugai = 1;
+			if(addcheck==""){
+				layer.msg("未选中任何分类新增下一级");
+				return false;
+			}
+			addcheck = "";
+			$("input[name=goodclasscode]").val(addeditcode)
+			$("input[name=goodclasscode]").attr('disabled',true);
+			$("input[name=goodclassname]").val(addfenleiname);
+			$("input[name=goodtopclasscode]").attr('disabled',false);
+			$("input[name=goodtopclasscode]").parent().parent().show();
+			$("input[name=goodtopclasscode]").val(addparentcode);
+			$("input[name=goodtopclasscode]").attr('disabled',true);
+			$("input[name=goodtopclassname]").parent().parent().show();
+			$("input[name=goodtopclassname]").val(xiugaicode);
+			$("input[name=goodtopclassname]").attr('disabled',true);
+			layer.open({
+			       type: 1
+			       ,title: '修改分类管理'
+			       ,area: ['400px', '350px']
+			       ,content: $("#addclass")//这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+			       ,btn: ['保存','取消']
+			       ,yes: function(){
+			       	document.getElementById("addtop").click();
+			       }
+			     })
+		}else if(jibie==4){
+			if(addcheck==""){
+				layer.msg("未选中任何分类新增下一级");
+				return false;
+			}
+			$.ajax({
+				type:"get",
+				url: ApiUrl+"zhConsumable/getConsumablecountBycateid?categoryId="+zzcp.id,
+				async:true,
+				success:function(res){
+					if(res.count>0){
+						layer.msg("该分类有子分类或商品不能删除");
+						return false;
+					}else if(zzcp.children!=null){
+						layer.msg("该分类有子分类或商品不能删除");
+						return false;
+					}else{
+						addcheck = "";
+						$.ajax({
+							type:'post',
+							url:ApiUrl+"zhConsumableCategory/deleteconsumableByPath?parentidPath="+addparentidPath,
+				            async:true,
+				            success:function(res){
+				            	if(res.code==0){
+				            		layer.msg("删除成功");
+				            		setInterval(function(){location.reload();},2000)
+				            	}
+				            }
+						})
+					}
+				}
+			});
+		}
+	});
+$(".newgood").on('click',function(){
+	xiugai = "";
+	if(addcheck==""){
+				layer.msg("未选中任何分类");
+				return false;
+			}
+	if(zzcp.children!=null){
+		layer.msg("请在子分类新增商品");
+		return false;
+	}
+	$("input[name=goodclass]").val(addfenleiname);
+	$("input[name=goodclass]").attr("disabled",true);
+	  $("input[name=goodcode]").val("");
+      $("input[name=goodname]").val("");
+      $("input[name=goodbrand]").val("");
+      $("input[name=goodsex]").val("");
+      $("input[name=goodunit]").val("");
+      $("input[name=goodprice]").val("");
+      $("input[name=goodmuch]").val("0")
+	layer.open({
+			       type: 1
+			       ,title: '新增物品档案'
+			       ,area: ['400px', '500px']
+			       ,content: $("#addgood")//这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+			       ,btn: ['保存','取消']
+			       ,yes: function(){
+			       	document.getElementById("addbottom").click();
+			       
+			          //layer.close(layer.index);
+			       }
+			    });
+})
+
+$('.uploadConsumableData').on('click',function(){
+	var checkStatus = table.checkStatus('idText');
+	var _this=$(this);
+	var consumParams={}
+	 consumParams.consArr=[];
+	if(checkStatus.data.length){
+	for(var i=0;i<checkStatus.data.length;i++){
+		consumParams.consArr.push(checkStatus.data[i].consumableCode)
+	}
+	$.ajax({        	
+				type:'post',
+				url:ApiUrl+"consumableCheck/createConsumable",
+				contentType: "application/json",
+	            async:true,	
+	            cache:false,
+	            data:JSON.stringify(consumParams),
+	            beforeSend:function(){
+	            	_this.attr('disabled','disabled')
+	            },
+    	        xhrFields:{
+    			   withCredentials:true,
+    		    },
+                crossDomain:true,
+	            success:function(res){
+	            	if(res.code==0){
+	            		var checkCode='';
+						_this.attr('disabled',false)
+						$('.toDetail').html('盘点单号:<span>'+res.idCheck+'</span>')
+						checkCode=res.idCheck;
+							layer.open({
+						       type: 1
+						       ,title: '提示'
+						       ,area: ['280px', '200px']
+						       ,content:$("#todetail") //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+						       ,btn: ['确定']
+						       ,success:function(index){
+							       	$('.toDetail').on('click',function(){
+							       		window.parent.$('.layui-nav-item').find('dd').each(function(){
+							       			if($(this).find('cite').html()=='耗材盘点'){
+							       				sessionStorage.pdSession=$('.toDetail span').html();
+							       				window.parent.addTab($(this).find('a'),$('.toDetail span').html());
+							       				layer.closeAll();
+							       			}
+							       		})
+							       	})
+						       }
+			    			});
+
+						
+						
+						
+	            	}else{
+	            		_this.attr('disabled',false)
+	            		layer.alert('生成盘点单失败！')
+	            		/*layer.msg('生成盘点单失败！', {
+						  time: 2000 //2秒关闭（如果不配置，默认是3秒）
+						}, function(){
+						  _this.attr('disabled',false)
+						});*/
+	            	}
+	            },
+	            error:function(){
+	            	layer.msg('网络错误！', {
+						  time: 1500 //2秒关闭（如果不配置，默认是3秒）
+						}, function(){
+						//  _this.attr('disabled',false)
+						});
+	            }
+        })
+		
+	}else{
+		layer.msg('请先选择要盘点的物资！')
+	}
+})
+
+//搜索
+function searchFunc(keyW){
+	var tableUrl="zhConsumable/getZhConsumableListPage";
+	if(check){
+		var params={
+			categoryidPath:check,
+			consumableName:keyW
+		}
+	}else{
+			var params={
+				consumableName:keyW
+			}
+	}
+	table.reload('idText', {
+					url: ApiUrl+tableUrl
+					,where:params
+		});
+}
+$('input[name="search"]').on('keydown',function(event){
+	if(event.keyCode == 13){
+		var keyW=$(this).val();
+		searchFunc(keyW)
+	}
+})
+$('.searchBox').on('click',function(){
+	var keyW=$('input[name="search"]').val();
+	searchFunc(keyW)
+})
+
+ table.on('tool(demo)', function(obj){
+    var data = obj.data;
+    //console.log(data);
+    if(obj.event === 'detail'){
+      layer.msg('ID：'+ data.id + ' 的查看操作');
+    } else if(obj.event === 'del'){
+      if(data.stockNum>0){
+      	layer.msg("该物品有库存数量，不能删除!");
+      	return false;
+      }
+      layer.confirm('确定删除吗', {icon: 3, title:'提示'},function(index){
+        $.ajax({        	
+				type:'post',
+				url:ApiUrl+"zhConsumableCategory/deleteZhConsumable",
+	            async:true,	
+	            data:{"id":data.id},
+    	        xhrFields:{
+    			   withCredentials:true,
+    		    },
+                crossDomain:true,
+	            success:function(res){
+	            	if(res.code==0){
+	            		layer.msg("删除成功");
+	            		setInterval(function(){location.reload();},2000)
+	            	}
+	            }
+        })
+        layer.close(index);
+      });
+    } else if(obj.event === 'edit'){
+      //layer.alert('编辑行：<br>'+ JSON.stringify(data));
+      $("input[name=goodcode]").val(data.consumableCode);
+      $("input[name=goodcode]").attr("disabled",true);
+      $("input[name=goodname]").val(data.consumableName);
+      $("input[name=goodbrand]").val(data.brand);   
+      $("input[name=goodsex]").val(data.specification);
+      $("input[name=goodclass]").val(data.categoryName);
+      $("input[name=goodclass]").attr("disabled",true);
+      $("input[name=goodunit]").val(data.unit);
+     
+      $("input[name=goodprice]").val(data.price);
+      $("input[name=goodmuch]").val(data.stockNum);
+      xiugaiid = data.id;
+      xiugai = 1;
+      layer.open({
+			       type: 1
+			       ,title: '修改物品档案'
+			       ,area: ['400px', '500px']
+			       ,content: $("#addgood")//这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+			       ,btn: ['保存','取消']
+			       ,yes: function(){
+			       	document.getElementById("addbottom").click();
+			       	
+			          //layer.close(layer.index);
+			       }
+			    });
+    }
+  });
+  
+  
+  
+	
+})
+function hasClass(elem, cls) {
+		  cls = cls || '';
+		  if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+		  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+		}
+function addClass(ele, cls) {
+		  if (!hasClass(ele, cls)) {
+		    ele.className = ele.className == '' ? cls : ele.className + ' ' + cls;
+		  }
+		}
+		 
+		function removeClass(elem, cls) {
+		  if (hasClass(elem, cls)) {
+		    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+		    while (newClass.indexOf(' ' + cls + ' ') >= 0) {
+		      newClass = newClass.replace(' ' + cls + ' ', ' ');
+		    }
+		    elem.className = newClass.replace(/^\s+|\s+$/g, '');
+		  }
+		}
+</script>

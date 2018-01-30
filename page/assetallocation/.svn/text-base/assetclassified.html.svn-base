@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>资产分类使用清单 </title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/allocation.css">
+	<style>
+		.layui-form-item{clear:inherit !important;}
+		 .header-bottom{clear:both;}
+        .header-bottom h6{background:#999;height:30px;line-height:30px;padding-left:20px;}
+         body .layui-tree-skin-shihuang .layui-tree-branch{color: #EDCA50;}
+         .red{color: red !important;} 
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="header">
+		<!--<form class="layui-form">
+		<div class="layui-form-item">
+		    <label class="layui-form-label">所属公司</label>
+		    <div class="layui-input-block">
+		      <select name="interest" lay-filter="aihao">
+		        <option value=""></option>
+		        <option value="0">阿里巴巴</option>
+		        <option value="1" selected="">腾旭游戏</option>
+		        <option value="2">富士康</option>
+		        <option value="3">京东商城</option>
+		        <option value="4">恒生电子</option>
+		      </select>
+		      
+		    </div>
+        </div>
+        <div class="layui-form-item">
+		    <label class="layui-form-label">部门</label>
+		    <div class="layui-input-block">
+		      <select name="interest" lay-filter="aihao">
+		        <option value=""></option>
+		        <option value="0">产品运维部</option>
+		        <option value="1" selected="">技术研发部</option>
+		        <option value="2">在线客服部</option>
+		        <option value="3">人力资源部</option>
+		        <option value="4"></option>
+		      </select>
+		      
+		    </div>
+        </div>
+		
+        </form>-->
+        <div class="anniu">
+            <button class="newImport" style="margin-bottom:20px;background:#6866E9">导出</button> 
+        </div>
+        <div class="header-bottom">
+			<h6>资产分类使用清单</h6>
+			<div class="category-conent">
+				<ul id="assettree"></ul>
+				<div style="left:250px;width:890px;position:absolute;top:70px;">
+					<table class="layui-table" id="idText"  lay-filter="demo">
+				    </table>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+var str = "";
+layui.use(['layer','tree','table'],function(){
+var $ = layui.jquery , layer = layui.layer ,tree = layui.tree, table = layui.table;
+var groupCode = $.cookie("groupCode"); 
+table.render({
+		    elem: '#idText'
+			,id:'idText'
+			,url:ApiUrl+"receive/getCategoryList?groupCode="+groupCode
+				   	//,where:{'state':state,'startTime':startTime,'endTime':endTime,'keywork':keywork}
+			,height: 'full-100'
+			,cols: [[ //标题栏
+			{field:'categoryName',title: '类别名称', width:100}
+			,{field:'unused',title: '闲置数量', width:100}
+			,{field:'receive', title:'领用数量',width:100}
+			,{field:'borrow',title:'借用数量', width:100}
+			,{field:'allot',title:'调拨数量', width:100}
+			,{field:'repairs', title:'维修数量',width:100}
+			,{field:'scrap', title:'报废数量',width:100}
+			,{field:'recycle',title:'回收数量', width:100}
+			,{field:'countAll',title:'总数量', width:80}
+			]] 
+			,skin: 'row' //表格风格
+			,even: true
+			,page: false //是否显示分页
+			,limits: [20, 50, 100]
+			,limit: 7 //每页默认显示的数量
+				    
+		});
+$.ajax({
+	type:"get",
+	url:ApiUrl+"receive/getCategoryTree?groupCode="+groupCode,
+	contentType:'application/json',
+	success:function(res){
+		
+		if(res.code==0){
+		var datatree = JSON.parse(res.data);
+		layui.tree({
+			  elem: '#assettree' //传入元素选择器
+			  ,nodes: datatree
+			  ,skin:'shihuang'
+			  ,click: function(node){
+			  	var nextCategoryPath = "";
+			  	if(node.children.length==0){
+			  		//layer.msg("无子类文件，不可查询");
+			  		nextCategoryPath = 0;
+			  	}
+			   var that = event.target;
+			   if(that.tagName=='CITE'||that.tagName=='cite'){				   
+				$('#assettree').find('cite').removeClass('red')
+				$('#assettree').find('cite').css('color','#333333')
+				addClass(that, "red");
+			   check = node;
+			   var categoryPath = node.categoryPath;
+			   //console.log(check) //node即为当前点击的节点数据
+			   table.render({
+				    elem: '#idText'
+				    ,id:'idText'
+				   	,url:ApiUrl+"receive/getCategoryList?categoryPath="+categoryPath+"&groupCode="+groupCode+"&nextCategoryPath="+nextCategoryPath
+				   	//,where:{'state':state,'startTime':startTime,'endTime':endTime,'keywork':keywork}
+				    ,height: 'full-100'
+				    ,cols: [[ //标题栏
+						    {field:'categoryName',title: '类别名称', width:100}
+						    ,{field:'unused',title: '闲置数量', width:100}
+						    ,{field:'receive', title:'领用数量',width:100}
+						    ,{field:'borrow',title:'借用数量', width:100}
+						    ,{field:'allot',title:'调拨数量', width:100}
+					        ,{field:'repairs', title:'维修数量',width:100}
+						    ,{field:'scrap', title:'报废数量',width:100}
+						    ,{field:'recycle',title:'回收数量', width:100}
+						    ,{field:'countAll',title:'总数量', width:80}
+				    ]] 
+				    ,skin: 'row' //表格风格
+				    ,even: true
+				    ,page: false //是否显示分页
+				    ,limits: [20, 50, 100]
+				    ,limit: 7 //每页默认显示的数量
+				    
+				  });
+				 }
+			  } 
+        });
+       }else{
+       	//layer.msg("哦哦，出错了");
+       }
+	}
+});
+$(".newImport").on('click',function(){
+		window.location.href = ApiUrl+"receive/exportExecl";
+			
+	})
+	
+})
+layui.use(['form', 'layedit', 'laydate'], function(){
+  var form = layui.form
+  ,layer = layui.layer
+  ,layedit = layui.layedit
+  ,laydate = layui.laydate
+  ,$ = layui.$;
+  
+  //日期
+  laydate.render({
+    elem: '#date'
+  });
+  laydate.render({
+    elem: '#date1'
+  });
+  
+  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+ 
+  //自定义验证规则
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '标题至少得5个字符啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+  
+  //监听提交
+  form.on('submit(demo1)', function(data){
+    layer.alert(JSON.stringify(data.field), {
+      title: '最终的提交信息'
+    })
+    return false;
+  });
+  
+  
+});
+
+function hasClass(elem, cls) {
+		  cls = cls || '';
+		  if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+		  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+		}
+function addClass(ele, cls) {
+		  if (!hasClass(ele, cls)) {
+		    ele.className = ele.className == '' ? cls : ele.className + ' ' + cls;
+		  }
+		}
+		 
+function removeClass(elem, cls) {
+		  if (hasClass(elem, cls)) {
+		    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+		    while (newClass.indexOf(' ' + cls + ' ') >= 0) {
+		      newClass = newClass.replace(' ' + cls + ' ', ' ');
+		    }
+		    elem.className = newClass.replace(/^\s+|\s+$/g, '');
+		  }
+		}
+</script>

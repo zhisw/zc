@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>资产</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<div class="layui-form search-wrap">
+    <div class="layui-inline">
+        <lable class="title">所属公司:</lable>
+        <div class="layui-input-inline">
+            <select id="createOrganizationId">
+                <option value="">请选择</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">使用公司:</lable>
+        <div class="layui-input-inline">
+            <select id="organizationId">
+                <option value="">请选择</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">资产状态:</lable>
+        <div class="layui-input-inline">
+            <select id="status">
+                <option value=""></option>
+                <option value="0">闲置</option>
+                <option value="1">领用</option>
+                <option value="2">维修</option>
+                <option value="3">报废</option>
+                <option value="4">回收</option>
+                <option value="5">借用</option>
+                <option value="6">调拨</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">资产条码:</lable>
+        <div class="layui-input-inline">
+            <input type="text" name="title" id="propertyCode" lay-verify="title" autocomplete="off" placeholder="请输入资产条码" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">资产名称:</lable>
+        <div class="layui-input-inline">
+            <input type="text" name="title" id="propertyName" lay-verify="title" autocomplete="off" placeholder="请输入资产名称" class="layui-input">
+        </div>
+    </div>
+    <!--<div class="layui-inline">
+        <label class="layui-form-label" style="width:90px">资产金额合计</label>
+        <div class="layui-input-inline">
+            <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+        </div>
+    </div>-->
+    <div class="layui-inline btn-box">
+        <button class="layui-btn btns-blue" data-method="reload">查询</button>
+        <button class="layui-btn btns-green" data-method="propertyAdd" data-type="auto">新建</button>
+        <!--<button class="layui-btn btns" data-method="propertyWMList">新建2</button>-->
+        <button class="layui-btn btns-blue" data-method="disposeRecord" data-type="auto">处理记录</button>
+        <button class="layui-btn btns-blue" data-method="printcode" data-type="auto">打印</button>
+        <button class="layui-btn btns-blue" data-method="derive" data-type="auto">导出</button>
+    </div>
+</div>
+<table class="layui-hide" id="property_table" lay-filter="user"></table>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['layer','table','laydate'], function(){ //独立版的layer无需执行这一句
+        var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var form = layui.form;
+        //获取公司
+        $.ajax({
+            type:"get",
+            url:ApiUrl + "org/getOrgInfoByCondition",
+            async:true,
+            success:function(res){
+                var departmentlist = "";
+                for(var i=0;i<res.length;i++){
+                    departmentlist+="<option value='"+res[i].id+"'>"+res[i].name+"</option>"
+                }
+                $("#organizationId").append(departmentlist);
+                $("#createOrganizationId").append(departmentlist);
+                form.render('select');
+            }
+        });
+        table.render({
+            elem: '#property_table'
+            ,url: ApiUrl+'zhProperty/getZhPropertyListPage'
+            ,cols: [[
+                {checkbox: true, fixed: true}
+                ,{field:'id', title: 'ID', width:60}
+                ,{field:'status', title: '资产状态', width:90,templet: '#statusTpl'}
+                ,{field:'propertyCode', title: '资产条码', width:180}
+                ,{field:'propertyName', title: '资产名称', width:200}
+                ,{field:'categoryName', title: '资产类别', width:120}
+                ,{field:'specification', title: '规格型号', width:120}
+                ,{field:'unit', title: '单位', width:60}
+                ,{field:'brand', title: '品牌', width:120}
+                ,{field:'price', title: '金额', width:120}
+                ,{field:'createOrganizationName', title: '所属公司', width:120}
+                ,{field:'organizationName', title: '使用公司', width:120}
+                ,{field:'deptName', title: '使用部门', width:120}
+                ,{field:'personnelName', title: '使用人', width:120}
+                ,{field:'storageinDate', title: '入库时间', width:120}
+                ,{field:'depositAdress', title: '存放地', width:120}
+                ,{title: '操作', width:120, toolbar: '#detail'}
+            ]]
+            ,id: 'property_table'
+            ,page: true
+            ,limits:[20,50,100]
+            ,height: 'full-125'
+        });
+        laydate.render({
+            elem: '#test1'
+            ,type: 'datetime'
+            ,range: '~'
+            ,format: 'yyyy年M月d日'
+        });
+        //触发事件
+        var active = {
+            //新增资产
+            propertyAdd: function(othis){
+                var type = othis.data('type')
+                    ,text = othis.text();
+                var submitLYObj={}
+                layer.open({
+                    type: 2
+                    ,offset: type
+                    ,title:'新增资产'
+                    ,content: 'propertyAdd.html'
+                    ,resize:false
+                    ,maxmin: true
+                    ,btn: ['保存', '取消'] //只是为了演示
+                    ,yes: function(){
+                        submitLYObj.submitLYFunc()
+                    }
+                    ,btn2: function(index){
+                        layer.close(index);
+                    }
+                    ,area:  ['900px', '430px']
+                    ,success: function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        submitLYObj.submitLYFunc=function(){
+                            body.find('#sumbit').click();
+                        }
+
+                    }
+                });
+            },
+            //处理记录
+            disposeRecord: function(othis){
+                var type = othis.data('type')
+                    ,text = othis.text();
+                var checkStatus = table.checkStatus('property_table')
+                if(checkStatus.data.length!=1){
+                    layer.msg('请选择一条处理记录')
+                    return false
+                }
+                localStorage.propertyCode=checkStatus.data[0].propertyCode;
+                localStorage.propertyId=checkStatus.data[0].id;
+                localStorage.propertyName=checkStatus.data[0].propertyName;
+                localStorage.categoryName=checkStatus.data[0].categoryName;
+                localStorage.specification=checkStatus.data[0].specification;
+                layer.open({
+                    type: 2
+                    ,offset: type
+                    ,title:'资产处理记录'
+                    ,resize:false
+                    ,maxmin: true
+                    ,content: 'disposeRecord.html'
+                    ,btn: ['确定'] //只是为了演示
+                    ,yes: function(index){
+                        layer.close(index);
+                    }
+                    ,area:  ['900px', '480px']
+                });
+            },
+            //新增完美资产列表
+            propertyWMList: function(othis){
+                var type = othis.data('type')
+                    ,text = othis.text();
+                layer.open({
+                    type: 2
+                    ,offset: type
+                    ,resize:false
+                    ,maxmin: true
+                    ,title:'订单列表'
+                    ,content: 'propertyWMList.html'
+                    ,area:  ['900px', '480px']
+                });
+            },
+            //查询
+            reload: function(){
+                table.reload('property_table', {
+                    where: {
+                        userId:'18'
+                        ,organizationId:$('#organizationId').val()
+                        ,createOrganizationId:$('#createOrganizationId').val()
+                        ,status:$('#status').val()
+                        ,propertyCode:$('#propertyCode').val()
+                        ,propertyName:$('#propertyName').val()
+                    }
+                });
+            },
+            //打印
+            printcode:function () {
+                var checkStatus = table.checkStatus('property_table');
+                if(checkStatus.data.length<1){
+                    layer.msg('至少选择一条资产打印');
+                    return false
+                }
+                var printlist=[]
+                for(var i=0;i<checkStatus.data.length;i++){
+                    printlist[i] = {
+                        id:checkStatus.data[i].id,
+                        orderdetailodId:checkStatus.data[i].orderdetailodId,
+                        propertyName:checkStatus.data[i].propertyName,
+                        brand:checkStatus.data[i].brand,
+                        unit:checkStatus.data[i].unit,
+                        specification:checkStatus.data[i].specification,
+                        propertyCode:checkStatus.data[i].propertyCode,
+                        depositAdress:checkStatus.data[i].depositAdress,
+                        createOrganizationName:checkStatus.data[i].createOrganizationName
+                    };
+                }
+                localStorage.printlist=JSON.stringify(printlist)
+                //printlist =JSON.parse(localStorage.printlist)
+                layer.open({
+                    type: 2
+                    ,title:'资产打印'
+                    ,resize:false
+                    ,maxmin: true
+                    ,content: 'propertyPrint.html'
+                    ,btn: ['打印'] //只是为了演示
+                    ,yes: function(index){
+                        document.getElementsByTagName('iframe')[0].contentWindow.print();
+                    }
+                    ,area:  ['800px', '480px']
+                });
+            },
+            //导出
+            derive:function () {
+                window.location.href=ApiUrl+"zhProperty/execl"
+            }
+        };
+        $('.layui-form .layui-btn').on('click', function(){
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+        //监控操作栏
+        table.on('tool(user)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                localStorage.propertyCode= data.id
+                var submitLYObj={}
+                //修改资产
+                layer.open({
+                    type: 2
+                    ,title:'修改资产'
+                    ,resize:false
+                    ,maxmin: true
+                    ,content: 'propertyEdit.html'
+                    ,btn: ['保存', '取消'] //只是为了演示
+                    ,yes: function(){
+                        submitLYObj.submitLYFunc()
+                    }
+                    ,btn2: function(index){
+                        layer.close(index);
+                    }
+                    ,area:  ['900px', '430px']
+                    ,success: function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        submitLYObj.submitLYFunc=function(){
+                            body.find('#sumbit').click();
+                        }
+                    }
+                });
+            }
+            if(obj.event === 'detail'){
+                localStorage.propertyCode= data.id
+                //修改资产
+                layer.open({
+                    type: 2
+                    ,title:'资产详情'
+                    ,resize:false
+                    ,maxmin: true
+                    ,content: 'propertyDetail.html'
+                    ,btn: ['确定'] //只是为了演示
+                    ,yes: function(index){
+                        layer.close(index);
+                    }
+                    ,area:  ['900px', '430px']
+                });
+            }
+        });
+    });
+    //完美订单入库
+    function wmadd(){
+        layui.use('layer', function() {
+            var $ = layui.jquery, layer = layui.layer;
+            var submitLYObj={}
+            layer.open({
+                type: 2
+                ,title:'订单入库'
+                ,resize:false
+                ,maxmin: true
+                ,content: 'propertyWMAdd.html'
+                ,btn: ['保存', '取消'] //只是为了演示
+                ,yes: function(){
+                    submitLYObj.submitLYFunc()
+                }
+                ,btn2: function(index){
+                    layer.close(index);
+                }
+                ,area:  ['1000px', '480px']
+                ,success: function(layero, index){
+                    var body = layer.getChildFrame('body', index);
+                    submitLYObj.submitLYFunc=function(){
+                        body.find('.sumbit').click();
+                    }
+
+                }
+            });
+        });
+    }
+</script>
+<script type="text/html" id="statusTpl">
+    {{#  if(d.status === 0){ }}
+    {{ '闲置' }}
+    {{#  } else if(d.status === 1){ }}
+    {{ '领用' }}
+    {{#  } else if(d.status === 2){ }}
+    {{ '维修' }}
+    {{#  } else if(d.status === 3){ }}
+    {{ '报废' }}
+    {{#  } else if(d.status === 4){ }}
+    {{ '回收' }}
+    {{#  } else if(d.status === 5){ }}
+    {{ '借用' }}
+    {{#  } else if(d.status === 6){ }}
+    {{ '调拨' }}
+    {{#  } }}
+</script>
+<script type="text/html" id="detail">
+    <a class="layui-btn layui-btn-mini" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-mini" lay-event="detail">详情</a>
+</script>
+</body>
+</html>

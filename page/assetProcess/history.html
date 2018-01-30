@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html>
+
+	<head lang="en">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>F2M物联网营商全生命周期资产管理系统</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0
+			}
+			
+			body {
+				font: "微软雅黑", "Microsoft Yahei", 'Arial', 'san-serif';
+				color: #666;
+				margin: 0;
+				padding: 0
+			}
+			
+			.fl {
+				float: left;
+			}
+			
+			.fr {
+				float: right;
+			}
+			
+			.clearfix:after {
+				content: "";
+				display: block;
+				height: 0;
+				clear: both;
+			}
+			
+			.clearfix {
+				zoom: 1;
+			}
+			
+			#conent {
+				width: 100%;
+				min-width: 320px;
+				max-width: 750px;
+				margin: 0 auto;
+				overflow: hidden;
+				background: #FFFFFF;
+			}
+			
+			#conent .part-one {
+				width: 100%;
+				font-size: 0.3rem;
+			}
+			
+			#conent .part-one .info-item {
+				height: 1rem;
+				line-height: 1rem;
+				border-bottom: 1px solid #F0F0F0;
+			}
+			
+			#conent .part-one .left {
+				color: #525766;
+				width: 25%;
+				text-align: right;
+			}
+			
+			#conent .part-one .right {
+				color: #6866E9;
+				width: 65%;
+				text-align: right;
+				margin-right: 5%;
+			}
+			
+			#conent .part-one .color-red {
+				color: #FF3B30;
+			}
+			
+			#conent .part-two {
+				width: 100%;
+				font-size: 0.3rem;
+			}
+			
+			#conent .part-two .bar-box {
+				width: 100%;
+				position: relative;
+			}
+			
+			.part-two .bar-box .bar-img {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.part-two .bar-box .bar-title {
+				position: absolute;
+				top: 0.3rem;
+				left: 1rem;
+				color: #FFFFFF;
+				font-size: 0.3rem;
+				opacity: 0.9;
+			}
+			
+			.part-two .info-process {
+				width: 92%;
+				font-size: 0.3rem;
+				margin: 0.5rem 0.3rem;
+			}
+			
+			.info-process .process-item {
+				position: relative;
+				padding-left: 0.25rem;
+				padding-bottom: 0.55rem;
+				border-left: 1px dashed #6866E9;
+			}
+			
+			.process-item .blue-dot {
+				position: absolute;
+				top: 0;
+				left: -0.15rem;
+				width: 0.3rem;
+				height: 0.3rem;
+				border-radius: 50%;
+				background: #6866E9;
+			}
+			
+			.process-item .item-name {
+				margin-bottom: 0.2rem;
+			}
+			
+			.process-item .item-name span {
+				margin-right: 0.25rem;
+			}
+			
+			.process-item .item-cont {
+				color: #999999;
+			}
+			
+			.process-item .item-cont .left {
+				width: 24%;
+			}
+			
+			.process-item .item-cont .right {
+				width: 74%;
+			}
+			
+			/*添加*/
+			#conent .add-detalis {
+				width: 100%;
+				font-size: 0.3rem;
+			}
+			.add-detalis .detalis-left {
+				width:1.4rem;
+				height:1.4rem;
+				margin:0.24rem 0.24rem;
+			}
+			.add-detalis .detalis-left img {
+				width:100%;
+				height:100%;
+			}
+			.add-detalis .detalis-right {
+				width:5.3rem;
+			}
+			.add-detalis .detalis-right .detalis-name{
+				font-size:0.3rem;
+				width:100%;
+				color:#4D4D4D;
+				margin-top:0.25rem;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 1;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				display:-webkit-box;
+			}
+			.add-detalis .detalis-right .detalis-much{
+				font-size:0.26rem;
+				color:#B5BECA;
+				margin-top:0.15rem;
+			}
+			.detalis-right .detalis-much span:first-child{
+				margin-right: 0.2rem;
+			}
+			.add-detalis .detalis-right  .detalis-price{
+				font-size:0.26rem;
+				color:#DA251C;
+				margin-top:0.2rem;
+			}
+			#conent .add-company{
+				font-size:0.3rem;
+				background: #F5F5F5;
+    			padding: 0.3rem 0;
+			}
+			#conent .add-company p span.icon{
+				display: inline-block;
+				width: 0.35rem;
+				height: 0.35rem;
+				background: url(img/chanshang.png) no-repeat;
+				background-size: 100% 100%;
+				margin-left: 0.3rem;
+				margin-right: 0.1rem;
+			}
+			
+			#conent .add-company #star{
+				float: right;
+				margin-right: 0.3rem;
+			}
+			#conent .add-info{
+				position: relative;
+				font-size: 0.3rem;
+			}
+			#conent .add-info .grade{
+				position: absolute;
+			    right: 0;
+			    top: 0;
+			    background: #fff;
+			    text-align: center;
+			    font-size: 0.26rem;
+			    color: #B5BECA;
+			    padding: 0 0.5rem;
+			}
+			.add-info .grade .score{
+				font-size: 1rem;
+    			color: #DA251C;
+    		}
+    		#conent .add-info .info{
+    			width:90%;
+				font-size:0.26rem;
+				color:#B5BECA;
+				padding:0.3rem 0;
+				margin-left: 0.24rem;
+				border-bottom:1px dashed #e6e6e6;
+			}
+
+			.body-bottom .info:last-child{
+				border-bottom:0px dashed #e6e6e6;
+			}
+			#conent .bg-bar{
+				width: 100%;
+				height: 0.4rem;
+				background: #F5F5F5;
+			}	
+		</style>
+
+	</head>
+
+	<body>
+		<div id="conent">
+			<div class="add-detalis clearfix">
+				<!--<div class="detalis-left fl">
+					<img src="../../images/face.jpg">
+				</div>
+				<div class="detalis-right fl">
+					<p class="detalis-name">录音电话机</p>
+					<p class="detalis-much">
+						<span>型号:SD160</span>
+						<span>颜色:黑色</span>
+					</p>
+					<p class="detalis-price">￥350.00元</p>
+				</div>-->
+			</div>
+			<div class="add-company">
+				<p class="clearfix">
+					<span class="icon"></span>
+					<span class="name"></span>
+					<b id="star">
+						<img src="img/allstar.png"/>
+						<img src="img/allstar.png"/>
+						<img src="img/allstar.png"/>
+						<img src="img/allstar.png"/>
+						<img src="img/halfstar.png"/>
+					</b>
+				</p>
+			</div>
+			<!--<div class="add-info">
+				<div class="grade">
+					<p class="score">98</p>
+					<p>资质评分</p>
+				</div>
+				<p class="info">商品编码: 123356</p>
+				<p class="info">品牌: 654321</p>
+				<p class="info">产品名称: 123456</p>
+				<p class="info">生产批号: JS17B014  606RB</p>
+				<p class="info">生产日期: 2017-05-02  21:52</p>
+				<p class="info">生产厂商: 123456</p>
+				<p class="info">生产产地: 中国浙江省</p>
+				<p class="info">质检员: 01</p>
+			</div>
+			<div class="bg-bar"></div>-->
+			<div class="part-one">
+				<!--<div class="info-item clearfix">
+					<p class="fl left">资产条码：</p>
+					<p class="fr right">GWZZ690752</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">资产名称：</p>
+					<p class="fr right">笔记本电脑</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">资产类别：</p>
+					<p class="fr right">掌上电脑</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">规格型号：</p>
+					<p class="fr right">笔记本电脑</p>
+				</div>
+
+				<div class="info-item clearfix">
+					<p class="fl left">金额：</p>
+					<p class="fr right">20000.00元</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">所属公司：</p>
+					<p class="fr right">浙江完美物联科技有限公司</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">入库时间：</p>
+					<p class="fr right">2017-10-09 16:30</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">存放地点：</p>
+					<p class="fr right">仓库A</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">使用公司：</p>
+					<p class="fr right color-red">杭州完美物联科技有限公司</p>
+				</div>
+				<div class="info-item clearfix">
+					<p class="fl left">使用人：</p>
+					<p class="fr right color-red">技术部 李清照</p>
+				</div>-->
+			</div>
+			<div class="part-two">
+				<div class="bar-box">
+					<img src="img/bg.png" class="bar-img" />
+					<p class="bar-title">资产处理记录</p>
+				</div>
+				<div class="info-process">
+					<!--<div class="process-item">
+						<p class="item-name">
+							<span>2017.10.28</span>
+							<span>处理方式：借用</span>
+							<span>处理人：张天</span>
+						</p>
+						<div class="item-cont clearfix">
+							<div class="left fl">处理内容：</div>
+							<div class="right fl">
+								1.将使用人字段变更为“刘启明” 2.将存放地点字段变更为“技术部仓库”
+							</div>
+						</div>
+						<span class="blue-dot"></span>
+					</div>
+					<div class="process-item">
+						<p class="item-name">
+							<span>2017.10.28</span>
+							<span>处理方式：借用</span>
+							<span>处理人：张天</span>
+						</p>
+						<div class="item-cont clearfix">
+							<div class="left fl">处理内容：</div>
+							<div class="right fl">
+								处理内容：在2017年10月25日12时将保管员改为“王琪”
+							</div>
+						</div>
+						<span class="blue-dot"></span>
+					</div>-->
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		(function(doc, win) {
+			var docEl = "";
+			docEl = doc.documentElement, resizeEvt = "orientationchange" in window ? "orientationchange" : "resize", recalc = function() {
+				var clientWidth = docEl.clientWidth;
+				if(!clientWidth) {
+					return
+				} else {
+					if(clientWidth > 640) {
+						docEl.style.fontSize = 85.33 + "px"
+					} else {
+						if(clientWidth < 320) {
+							docEl.style.fontSize = 42.67 + "px"
+						} else {
+							if(clientWidth <= 640 || clientWidth >= 320) {
+								docEl.style.fontSize = (clientWidth / 750) * 100 + "px"
+							}
+						}
+					}
+				}
+				//window.localStorage.setItem("rem_px", docEl.style.fontSize);
+			};
+			if(!doc.addEventListener) {
+				return
+			}
+			win.addEventListener(resizeEvt, recalc, false);
+			doc.addEventListener("DOMContentLoaded", recalc, false)
+		})(document, window);
+	</script>
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/peizhi.js"></script>
+	<script>
+		//获取地址栏参数
+		function GetQueryString(name){
+		     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+		     var r = window.location.search.substr(1).match(reg);
+		     if(r!=null)return  unescape(r[2]); return null;
+		}
+		layui.use('jquery',function(){
+			var $ = layui.jquery;	
+			var propertyId = GetQueryString("id");
+			var odId = GetQueryString("orderdetailodId");
+			
+			$.ajax({           
+				type:"get",
+				url: ApiUrl + "login/getinfobyorderdetailid",
+				dataType:'json',
+				xhrFields: {
+                     withCredentials: true,
+                },
+                crossDomain: true,
+				data: {
+					odId: odId
+//					odId: 735
+				},
+				success:function(data){	
+					var str = "";
+					str = "<div class='detalis-left fl'>"  
+								+"<img src='http://wm-iot.oss-cn-shanghai.aliyuncs.com/"+ data.sp_img +"'>"
+							+"</div>"
+							+"<div class='detalis-right fl'>"
+								+"<p class='detalis-name'>"+ data.sp_mc +"</p>"
+								+"<p class='detalis-much'>"
+									+"<span>品牌:"+ data.pp_mc +"</span>"
+									+"<span>规格:"+ data.model_mc  +"</span>"
+								+"</p>"
+								+"<p class='detalis-price'>￥"+ data.pt_xsj +"元</p>"
+							+"</div>";
+					$("#conent .add-detalis").html(str);
+					$(".add-company p .name").html(data.supplier_mc);
+				}
+			});
+			
+			$.ajax({           
+				type:"get",
+				url: ApiUrl + "login/getZhpropertybyid",
+				dataType:'json',
+				xhrFields: {
+                     withCredentials: true,
+                },
+                crossDomain: true,
+				data: {
+					id: propertyId
+//					id: 219
+				},
+				success:function(data){	
+					var myData = data.result;
+					var str = ""; 
+					if(myData.personnelName == null){
+						myData.personnelName = "";
+					}
+					str = "<div class='info-item clearfix'>"
+								+"<p class='fl left'>资产条码：</p>"
+								+"<p class='fr right'>"+ myData.propertyCode +"</p>"
+						    +"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>资产名称：</p>"
+								+"<p class='fr right'>"+ myData.propertyName +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>资产类别：</p>"
+								+"<p class='fr right'>"+ myData.categoryName +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>规格型号：</p>"
+								+"<p class='fr right'>"+ myData.specification +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>金额：</p>"
+								+"<p class='fr right'>"+ myData.price +"元</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>所属公司：</p>"
+								+"<p class='fr right'>"+ myData.createOrganizationName +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>入库时间：</p>"
+								+"<p class='fr right'>"+ myData.storageinDate +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>存放地点：</p>"
+								+"<p class='fr right'>"+ myData.depositAdress +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>使用公司：</p>"
+								+"<p class='fr right color-red'>"+ myData.organizationName +"</p>"
+							+"</div>"
+							+"<div class='info-item clearfix'>"
+								+"<p class='fl left'>使用人：</p>"
+								+"<p class='fr right color-red'>"+ myData.personnelName +"</p>"
+							+"</div>";
+							
+					$("#conent .part-one").html(str);
+				}
+			});	
+			$.ajax({
+				type:"get",
+				url: ApiUrl + "login/getZhPropertyLogPage",
+				dataType:'json',
+				xhrFields: {
+                     withCredentials: true,
+                },
+                crossDomain: true,
+				data: {
+					propertyId: propertyId
+//					propertyId: 219
+				},
+				success:function(data){	
+					var myData = data.data;
+					var str1 = ""; 
+					//资产处理记录
+					for (var i=0; i<myData.length; i++) {
+						var statusMethod;  
+						if(myData[i].disposeType == 1){
+							statusMethod = "入库";
+						}
+						if(myData[i].disposeType == 2){
+							statusMethod = "领用";
+						}
+						if(myData[i].disposeType == 3){
+							statusMethod = "退库";
+						}
+						if(myData[i].disposeType == 4){
+							statusMethod = "借用";
+						}
+						if(myData[i].disposeType == 5){
+							statusMethod = "调拨";
+						}
+						if(myData[i].disposeType == 6){
+							statusMethod = "维修";
+						}
+						if(myData[i].disposeType == 7){
+							statusMethod = "报废";
+						}
+						if(myData[i].disposeType == 8){
+							statusMethod = "回收";
+						}
+						if(myData[i].disposeType == 9){
+							statusMethod = "撤销回收";
+						}
+						if(myData[i].disposeType == 10){
+							statusMethod = "归还";
+						}
+						if(myData[i].disposeType == 11){
+							statusMethod = "调拨中";
+						}
+						if(myData[i].disposeType == 12){
+							statusMethod = "调入确认";
+						}
+						if(myData[i].disposeType == 13){
+							statusMethod = "取消调拨";
+						}
+						if(myData[i].disposeType == 14){
+							statusMethod = "维修完成";
+						}
+						if(myData[i].disposeType == 15){
+							statusMethod = "维修撤销";
+						}
+						
+						str1 += "<div class='process-item'>"
+									+"<p class='item-name'>"
+										+"<span>"+ myData[i].createat +"</span>"
+										+"<span>处理方式："+ statusMethod +"</span>"
+										+"<span>处理人："+ myData[i].disposePersonName +"</span>"
+									+"</p>"
+									+"<div class='item-cont clearfix'>"
+										+"<div class='left fl'>处理内容：</div>"
+										+"<div class='right fl'>"+ myData[i].describes +"</div>"
+									+"</div>"
+									+"<span class='blue-dot'></span>"
+								+"</div>";
+								
+						$(".part-two .info-process").html(str1);
+					}
+				}
+			});	
+		});
+	</script>
+</html>

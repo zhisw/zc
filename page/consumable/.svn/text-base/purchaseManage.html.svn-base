@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>溯源采购管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+    <style>
+        #topsearch{
+            position: fixed;
+            top: 0px;
+            width: 100%;
+            background: #FFFFFF;
+            z-index: 11;
+        }
+        #propertyWM_table{
+            width: 100%;
+            margin:80px 0  55px 0;
+            min-width: 1100px;
+        }
+        #listpage{
+            position: fixed;
+            bottom: 0px;
+            width: 100%;
+            background: #FFFFFF;
+            padding-left: 15px;
+        }
+        #toptable{
+            position: fixed;
+            top: 60px;
+            width: 100%;
+            min-width: 1100px;
+            background: #FFFFFF;
+            z-index: 11;
+            margin: 0;
+        }
+        .layui-form-selected dl{
+            max-height: 190px;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form search-wrap" id="topsearch">
+    <div class="layui-inline">
+        <lable class="title">订单编码:</lable>
+        <div class="layui-input-inline">
+            <input type="text" id="orderNo" lay-verify="title" autocomplete="off" placeholder="请输入订单编码" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">下单日期:</lable>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="orderDateStrat" placeholder="yyyy-MM-dd" style="width:110px">
+        </div>
+        至
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="orderDateEnd" placeholder="yyyy-MM-dd" style="width:110px">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <lable class="title">商品信息:</lable>
+        <div class="layui-input-inline">
+            <input type="text" id="seachKey" lay-verify="title" autocomplete="off" placeholder="请输入编码、品牌、规格" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline btn-box">
+        <button class="layui-btn btns-blue" id="search">查询</button>
+        <button class="layui-btn btns-blue" id="storags">入库</button>
+    </div>
+</div>
+<table class="layui-table layui-form" id="toptable">
+    <thead>
+    <tr>
+        <th style="width:20px"><input type="checkbox" lay-filter="allcheckd" lay-skin="primary"></th>
+        <th style="width:110px">商品编码</th>
+        <th style="width:200px">商品名称</th>
+        <th style="width:100px">品牌</th>
+        <th style="width:140px">规格</th>
+        <th style="width:50px">单位</th>
+        <th style="width:60px">数量</th>
+        <th style="width:60px">金额</th>
+        <th style="width:70px">入库状态</th>
+        <th style="width:50px">操作</th>
+        <th style="width:auto"></th>
+    </tr>
+    </thead>
+</table>
+<table class="layui-table layui-form" id="propertyWM_table">
+    <thead>
+    <tr>
+        <th style="width:20px"></th>
+        <th style="width:110px"></th>
+        <th style="width:200px"></th>
+        <th style="width:100px"></th>
+        <th style="width:140px"></th>
+        <th style="width:50px"></th>
+        <th style="width:60px"></th>
+        <th style="width:60px"></th>
+        <th style="width:70px"></th>
+        <th style="width:50px"></th>
+        <th style="width:auto"></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<div id="listpage"></div>
+<div id="storage" class="layui-form popup-form" style="display: none">
+    <div class="layui-inline">
+        <lable class="title">类型:</lable>
+        <div class="layui-input-inline" style="width:140px">
+            <select id="propertyType" lay-filter="propertyType" >
+                <option value="0">固定资产</option>
+                <option value="1">低值易耗</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-inline propertyTree">
+        <lable class="title">资产分类:</lable>
+        <div class="layui-input-inline" style="width:140px">
+            <div class="treeWrap">
+                <input type="text" id="categoryId" name="categoryId" lay-verify="required" placeholder="请选择资产分类" class="layui-input" readonly>
+                <div class="categoryTree" id="categoryTree"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-inline goodsTree-wrap" style="display: none;">
+        <lable class="title">物品类别:</lable>
+        <div class="layui-input-inline" style="width:140px">
+            <div class="treeWrap">
+                <input type="text" id="goodsId" name="goodsId" placeholder="请选择物品分类" class="layui-input" readonly>
+                <div class="categoryTree" id="goodsTree"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-inline propertyTree">
+        <lable class="title">所属公司:</lable>
+        <div class="layui-input-inline">
+            <select id="createOrganizationId" lay-filter="createOrganizationId">
+            </select>
+        </div>
+    </div>
+    <table class="layui-table" id="goodsList" style="display: none">
+        <thead>
+        <tr>
+            <th width="14">序号</th>
+            <th width="50">订单商品</th>
+            <th width="28">数量</th>
+            <th width="50">物品档案</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['jquery','laypage','laydate','layer','form','tree'], function(){
+        var $ = layui.jquery
+        var laypage = layui.laypage
+        var layer = layui.layer;
+        var form = layui.form;
+        var tree = layui.tree;
+        dateFunc('#orderDateStrat','#orderDateEnd')
+        var types = 1;
+        search();
+        $("#search").on('click', function(){
+            search();
+        })
+        //获取公司
+        $.ajax({
+            type:"get",
+            url:ApiUrl + "org/getOrgInfoByCondition",
+            async:true,
+            success:function(res){
+                var departmentlist = "";
+                for(var i=0;i<res.length;i++){
+                    departmentlist+="<option value='"+res[i].id+"'>"+res[i].name+"</option>"
+                }
+                $("#createOrganizationId").append(departmentlist);
+                form.render('select');
+            }
+        });
+        //搜索列表
+        function search(page,limit,nowpage) {
+            $("#propertyWM_table tbody").html('');
+            var orderNo=$("#orderNo").val();
+            var orderDateStrat = $("#orderDateStrat").val()
+            var orderDateEnd = $("#orderDateEnd").val()
+            if(typeof(page)=="undefined"){
+                page=1;
+            }
+            if(typeof(limit)=="undefined"){
+                limit=10;
+            }
+            if(typeof(nowpage)=="undefined"){
+                nowpage=1;
+            }
+            var parm={
+                cgrId:$.cookie("adminId")
+                ,orderNo:$("#orderNo").val()
+                ,orderDateStrat:orderDateStrat
+                ,orderDateEnd:orderDateEnd
+                ,seachKey:$("#seachKey").val()
+                ,page:page
+                ,limit:limit
+            }
+            $.ajax({
+                url:ApiUrl+"zhOrder/getOrderPage",
+                async:true,
+                data:parm,
+                type:'GET',
+                success : function(result) {
+                    if(result.code==0){
+                        laypage.render({
+                            elem: 'listpage'
+                            ,count: result.count
+                            ,curr:nowpage
+                            ,layout: ['count', 'prev', 'page', 'next',  'skip']
+                            ,jump: function(obj,first){
+                                if(!first){
+                                    search(obj.curr,obj.limit,obj.curr)
+                                }
+                            }
+                        });
+                        for(var i=0;i<result.data.length;i++){
+                            var trhtml='<tr><td colspan="10">' +
+                                '<span> 订单编码: '+result.data[i].orderNo+' </span>' +
+                                '<span> 下单日期: '+result.data[i].orderDate+' </span>' +
+                                '<span> 订单总价:'+result.data[i].orderZj+' </span></td></tr>'
+                            for(var j=0;j<result.data[i].detailList.length;j++){
+                                var detailList =result.data[i].detailList[j]
+                                if(detailList.spNum<=detailList.propertyGrnnum){
+                                    trhtml+='<tr odId="'+detailList.odId+'" spSrl='+detailList.spSrl+detailList.sku+'><td></td>' +
+                                        '<td>'+detailList.spSrl+detailList.sku+'</td>' +
+                                        '<td>'+detailList.spMc+'</td>'+
+                                        '<td>'+detailList.ppMc+'</td>'+
+                                        '<td>'+detailList.modelMc+'</td>'+
+                                        '<td>'+detailList.spUnit+'</td>'+
+                                        '<td>'+detailList.spNum+'</td>'+
+                                        '<td>'+detailList.spZxsj+'</td>'+
+                                        '<td>已入库</td><td></td></tr>'
+                                }else{
+                                    trhtml+='<tr odId="'+detailList.odId+'" spSrl='+detailList.spSrl+detailList.sku+'><td><input type="checkbox" name="choose" lay-skin="primary"></td>' +
+                                        '<td>'+detailList.spSrl+detailList.sku+'</td>' +
+                                        '<td>'+detailList.spMc+'</td>'+
+                                        '<td>'+detailList.ppMc+'</td>'+
+                                        '<td>'+detailList.modelMc+'</td>'+
+                                        '<td>'+detailList.spUnit+'</td>'+
+                                        '<td>'+detailList.spNum+'</td>'+
+                                        '<td>'+detailList.spZxsj+'</td>'+
+                                        '<td>未入库</td><td><a class="storaglist layui-btn layui-btn-mini">入库</a></td></tr>'
+                                }
+                            }
+                            $("#propertyWM_table tbody").append(trhtml);
+                            form.render();
+                        }
+                    }
+                }
+            });
+        }
+        //资产分类树
+        $.ajax({
+            url:ApiUrl+"category/getCategoryInfoByTree",
+            async:true,
+            type:"GET",
+            success:function(res){
+                layui.tree({
+                    elem: '#categoryTree' //传入元素选择器
+                    ,nodes: res
+                    ,skin:'shihuang'
+                    ,click: function(node){
+                        if(node.children==null){
+                            $("#categoryTree").hide();
+                            $("#categoryId").val(node.title);
+                            $("#categoryId").attr('categoryId',node.id);
+                            $("#categoryId").attr('parentIdPath',node.parentIdPath);
+                        }
+                    }
+                });
+            }
+        });
+        //资产分类选择
+        $("#categoryId").on('click', function(){
+            $("#categoryTree").show();
+        })
+        //物品类别树
+        $.ajax({
+            url: ApiUrl + "zhConsumableCategory/getCategoryList",
+            async:true,
+            type:"GET",
+            success:function(res){
+                layui.tree({
+                    elem: '#goodsTree' //传入元素选择器
+                    ,nodes: res.data
+                    ,skin:'shihuang'
+                    ,click: function(node){
+                        if(node.children==null){
+                            $("#goodsTree").hide();
+                            $("#goodsId").val(node.categoryName);
+                            $("#goodsId").attr('categoryId',node.id);
+                            $("#goodsId").attr('parentidPath',node.parentidPath);
+                            $.ajax({
+                                url:ApiUrl+"zhConsumable/getZhConsumableListPage?categoryidPath="+node.parentidPath,
+                                async:false,
+                                type:"GET",
+                                success:function(res){
+                                    var trhtml='<option value="">新建物品</option>'
+                                    for(var i=0;i<res.data.length;i++){
+                                        trhtml+='<option value="'+res.data[i].id+'" consumableCode="'+res.data[i].consumableCode+'">'+res.data[i].consumableName+'</option>'
+                                    }
+                                    $(".pipeilist").each(function () {
+                                        $(this).html(trhtml)
+                                    })
+                                    form.render('select');
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        //物品分类选择
+        $("#goodsId").on('click', function(){
+            $("#goodsTree").show();
+        })
+        //树点击收起
+        $(document).bind('click', function(e) {       //点击事件
+            var e = e || window.event; //浏览器兼容性
+            var elem = e.target || e.srcElement;
+            while (elem) { //循环判断至跟节点，防止点击的是div子元素
+                if (elem.id && (elem.id == 'categoryId' || elem.id == "categoryTree" || elem.id == "goodsId" || elem.id == "goodsTree")) {
+                    return;
+                }
+                elem = elem.parentNode;
+            }
+            $('#categoryTree').hide();
+            $('#goodsTree').hide();
+        });
+        //全选
+        form.on('checkbox(allcheckd)', function(data){
+            if(data.elem.checked){
+                $("input[name='choose']").prop('checked',true)
+                form.render();
+            }else{
+                $("input[name='choose']").prop('checked',false)
+                form.render();
+            }
+        });
+        //多条入库
+        $("#storags").on('click', function(){
+            var datalist=[]
+            $("input[name='choose']:checked").each(function (index) {
+                datalist[index]=$(this).parents('tr').prevAll().length
+            })
+            if(datalist.length==0){
+                layer.msg('请选择一条记录入库')
+                return false
+            }
+            stroage(datalist)
+        })
+        //单条入库
+        $("body").on('click', '.storaglist', function(event) {
+            stroage([$(this).parents('tr').prevAll().length])
+        });
+        //选择入库
+        var parm_consumable=[];//易耗数据
+        var parm_fixation=[];//固定数据
+        function stroage(data){
+            //获取选择数据
+            var sum=0
+            for(var i=0;i<data.length;i++){
+                var num =$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(6).html()//数量
+                for(var j=0;j<num;j++){
+                    parm_fixation[sum]={
+                        propertyName:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(2).html()//资产名称
+                        ,unit:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(5).html()//单位
+                        ,price:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(7).html()//金额
+                        ,specification:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(4).html()//规格型号
+                        ,brand:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(3).html()//品牌
+                        ,num:num//数量
+                        ,spSrl:$('#propertyWM_table tbody').find('tr').eq(data[i]).attr('spSrl')
+                        ,odId:$('#propertyWM_table tbody').find('tr').eq(data[i]).attr('odId')
+                        ,id:$('#propertyWM_table tbody').find('tr').eq(data[i]).attr('spSrl')
+                    }
+                    sum++
+                }
+                parm_consumable[i]={
+                    propertyName:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(2).html()//资产名称
+                    ,unit:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(5).html()//单位
+                    ,price:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(7).html()//金额
+                    ,specification:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(4).html()//规格型号
+                    ,brand:$('#propertyWM_table tbody').find('tr').eq(data[i]).find('td').eq(3).html()//品牌
+                    ,num:num//数量
+                    ,spSrl:$('#propertyWM_table tbody').find('tr').eq(data[i]).attr('spSrl')
+                    ,odId:$('#propertyWM_table tbody').find('tr').eq(data[i]).attr('odId')
+                }
+            }
+            //打开入库窗口
+            layer.open({
+                type: 1
+                ,title:'采购入库'
+                ,content:$('#storage')
+                ,resize:false
+                ,maxmin: true
+                ,btn: ['保存', '取消'] //只是为了演示
+                ,yes: function(){
+                    if(types==1){
+                        fixedassets($(this))
+                    }else{
+                        consumable($(this))
+                    }
+                }
+                ,btn2: function(index){
+                    $(".propertyTree").show();
+                    $(".goodsTree-wrap").hide();
+                    $("#goodsList").hide();
+                    $("#propertyType").val(0)
+                    form.render('select');
+                    $("#categoryId").val("")
+                    $("#goodsId").val("")
+                    $("#goodsList tbody").html('')
+                }
+                ,area:  ['740px', '400px']
+                ,success: function(layero, index){
+
+                }
+                ,cancel: function(index, layero){
+                    $(".propertyTree").show();
+                    $(".goodsTree-wrap").hide();
+                    $("#goodsList").hide();
+                    $("#propertyType").val(0)
+                    form.render('select');
+                    $("#categoryId").val("")
+                    $("#goodsId").val("")
+                    $("#goodsList tbody").html('')
+                }
+            });
+        }
+        //资产类别选择
+        form.on('select(propertyType)', function(data){
+            if($("#propertyType").val()==1){
+                $(".goodsTree-wrap").show();
+                $("#goodsList").show();
+                $(".propertyTree").hide();
+                $("#goodsList tbody").html('')
+                types=2
+                //查询全部物品
+                var goodslist
+                $.ajax({
+                    url:ApiUrl+"zhConsumable/getZhConsumableListPage",
+                    async:false,
+                    type:"GET",
+                    success:function(res){
+                        goodslist=res.data;
+                    }
+                });
+                var goodsselect='<option value="">新建物品</option>'
+                //拼物品表格
+                var trhtml=''
+                for(var i=0;i<parm_consumable.length;i++){
+                    var matching_val=''
+                    for(var j=0;j<goodslist.length;j++){
+                        if(parm_consumable[i].spSrl==goodslist[j].consumableCode){
+                            matching_val =goodslist[j].consumableName
+                            parm_consumable[i].grnid=goodslist[j].id;
+                            break;
+                        }
+                        if(i==0){
+                            goodsselect+='<option value="'+goodslist[j].id+'" consumableCode="'+goodslist[j].consumableCode+'">'+goodslist[j].consumableName+'</option>'
+                        }
+                    }
+                    if(matching_val!=''){
+                        trhtml+='<tr><td>'+(i+1)+'</td>' +
+                            '<td>'+parm_consumable[i].propertyName+'</td>' +
+                            '<td>'+parm_consumable[i].num+'</td>' +
+                            '<td>'+matching_val+'</td></tr>'
+                    }else{
+                        trhtml+='<tr><td>'+(i+1)+'</td>' +
+                            '<td>'+parm_consumable[i].propertyName+'</td>' +
+                            '<td>'+parm_consumable[i].num+'</td>' +
+                            '<td><select class="pipeilist">'+goodsselect+'</select></td></tr>'
+                    }
+                }
+                $("#goodsList tbody").append(trhtml);
+                form.render('select');
+            }else{
+                $(".propertyTree").show();
+                $(".goodsTree-wrap").hide();
+                $("#goodsList").hide();
+                types =1;
+            }
+        });
+        //固定资产提交
+        function fixedassets(obj){
+            if($("#categoryId").val()==''){
+                layer.msg('请选择资产分类')
+                return false
+            }
+            var parms={}
+            parms.createOrganizationId=$("#createOrganizationId").val();
+            parms.createOrganizationName=$("#createOrganizationId option:selected").text();
+            for(var i=0;i<parm_fixation.length;i++){
+                parms['zhpropertyList['+i+'].propertyName']=parm_fixation[i].propertyName//资产名称
+                parms['zhpropertyList['+i+'].unit']=parm_fixation[i].unit//单位
+                parms['zhpropertyList['+i+'].price']=parm_fixation[i].price//金额
+                parms['zhpropertyList['+i+'].specification']=parm_fixation[i].specification//规格型号
+                parms['zhpropertyList['+i+'].brand']=parm_fixation[i].brand//品牌
+                parms['zhpropertyList['+i+'].orderdetailodId']=parm_fixation[i].odId
+                parms['zhpropertyList['+i+'].categoryId']=$("#categoryId").attr('categoryId')//资产类别id
+                parms['zhpropertyList['+i+'].categoryName']=$("#categoryId").val()//资产类别名称
+                parms['zhpropertyList['+i+'].categoryidPath']=$("#categoryId").attr('parentIdPath')//资产类别路径
+                parms['zhpropertyList['+i+'].disposePersonid']=$.cookie("id")
+                parms['zhpropertyList['+i+'].disposePersonname']=$.cookie("realName")
+                parms['zhpropertyList['+i+'].sourceType']=2//资产来源
+            }
+            obj.attr("disabled","disabled");
+            $.ajax({
+                url:ApiUrl+"zhProperty/insertPropertyGrnList",
+                async:false,
+                data:parms,
+                type:'POST',
+                dataType: 'json',
+                success : function(result) {//返回数据根据结果进行相应的处理
+                    if(result.code==0){
+                        layer.msg("新增成功",{time:2000},function () {
+                            location.reload()
+                        });
+                    }else{
+                        layer.msg('错误信息'+result.message)
+                    }
+                }
+            });
+        }
+        //易耗品提交
+        function consumable(obj){
+            var parms={}
+            var newArr=[]
+            var bool=true
+            var repetition=true
+            for(var i=0;i<parm_consumable.length;i++){
+                var pass=true
+                var repeat = false;
+                //列表选择判断  同商品不能选不同 不同商品必须选不同
+                for(var j=0;j<newArr.length;j++){
+                    if(parm_consumable[i].spSrl == newArr[j].spSrl){
+                        repeat = true;
+                        var spl = $("#goodsList tbody tr").eq(i).find(".pipeilist").val()
+                        if(spl!=newArr[j].grnid&&spl!=''&&spl!=undefined){
+                            bool=false;
+                        }
+                        break;
+                    }else{
+                        var spl = $("#goodsList tbody tr").eq(i).find(".pipeilist").val()
+                        if(spl==newArr[j].grnid&&spl!=''&&spl!=undefined){
+                            repetition=false;
+                        }
+                    }
+                }
+                //
+                if($('#goodsList tbody').find('tr').eq(i).find(".pipeilist").val()!=''){
+                    if($('#goodsList tbody').find('tr').eq(i).find(".pipeilist").val()!=undefined){
+                        parm_consumable[i].grnid=$("#goodsList tbody tr").eq(i).find(".pipeilist").val();
+                    }
+                    pass=false
+                }
+                if(!repeat){
+                    newArr.push(parm_consumable[i]);
+                }
+                if(pass){
+                    if($("#goodsId").val()==''){
+                        layer.msg('请选择物品分类')
+                        return false
+                    }
+                    parms['zhPropertyConsumableList['+i+'].categoryId']=$("#goodsId").attr('categoryId')
+                    parms['zhPropertyConsumableList['+i+'].categoryName']=$("#goodsId").val()
+                    parms['zhPropertyConsumableList['+i+'].categoryidPath']=$("#goodsId").attr('parentidPath')
+                    parms['zhPropertyConsumableList['+i+'].specification']=parm_consumable[i].specification
+                    parms['zhPropertyConsumableList['+i+'].brand']=parm_consumable[i].brand
+                    parms['zhPropertyConsumableList['+i+'].unit']=parm_consumable[i].unit
+                    parms['zhPropertyConsumableList['+i+'].price']=parm_consumable[i].price
+                    parms['zhPropertyConsumableList['+i+'].stockNum']=parm_consumable[i].num
+                    parms['zhPropertyConsumableList['+i+'].grncode']=parm_consumable[i].spSrl
+                    parms['zhPropertyConsumableList['+i+'].consumableCode']=parm_consumable[i].spSrl
+                    parms['zhPropertyConsumableList['+i+'].consumableName']=parm_consumable[i].propertyName
+                    parms['zhPropertyConsumableList['+i+'].orderdetailid']=parm_consumable[i].odId
+                    parms['zhPropertyConsumableList['+i+'].grnid']=''
+                    parms['zhPropertyConsumableList['+i+'].id']=''
+                    parms['zhPropertyConsumableList['+i+'].groupCode']=$.cookie("groupCode")
+                    parms['zhPropertyConsumableList['+i+'].disposePersonid']=$.cookie("id")
+                    parms['zhPropertyConsumableList['+i+'].disposePersonname']=$.cookie("realName")
+                    parms['zhPropertyConsumableList['+i+'].createOrganizationId']=$.cookie("organizationId")
+                    parms['zhPropertyConsumableList['+i+'].createOrganizationName']=$.cookie("organizationTitle")
+
+                }else{
+                    parms['zhPropertyConsumableList['+i+'].price']=parm_consumable[i].price
+                    parms['zhPropertyConsumableList['+i+'].stockNum']=parm_consumable[i].num
+                    parms['zhPropertyConsumableList['+i+'].grnid']=parm_consumable[i].grnid
+                    parms['zhPropertyConsumableList['+i+'].grncode']=parm_consumable[i].spSrl
+                    parms['zhPropertyConsumableList['+i+'].id']=parm_consumable[i].grnid
+                    parms['zhPropertyConsumableList['+i+'].orderdetailid']=parm_consumable[i].odId
+                }
+            }
+            if(!repetition){
+                layer.msg('不同同商品请选择不同物品')
+                return
+            }
+            if(!bool){
+                layer.msg('相同商品请选择同一物品')
+                return
+            }
+            obj.attr("disabled","disabled");
+            $.ajax({
+                url:ApiUrl+"zhConsumable/consumablePO",
+                async:false,
+                data:parms,
+                type:'POST',
+                dataType: 'json',
+                success : function(result) {//返回数据根据结果进行相应的处理
+                    if(result.code==0){
+                        layer.msg("新增成功",{time:2000},function () {
+                            location.reload()
+                        });
+                    }else{
+                        layer.msg('错误信息'+result.message)
+                    }
+                }
+            });
+        }
+    })
+</script>
+</body>
+</html>

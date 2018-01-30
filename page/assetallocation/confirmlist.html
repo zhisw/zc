@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>确认调拨单</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<style>
+	.header{
+		padding-top:10px;
+	}
+	    .layui-inline{margin-left:40px;}
+	    .layui-form-label{
+	    	margin-top:-3px;
+	    }
+	    .layui-form-label{width:100px !important;}
+		.layui-input-inline select{
+			width:135px;
+			height:30px;
+			border: 1px solid #e6e6e6;
+            background-color: #fff;
+            border-radius: 2px;
+		}
+		.layui-input-inline input{
+			width:135px;
+			height:30px;
+			border: 1px solid #e6e6e6;
+            background-color: #fff;
+            border-radius: 2px;
+		}
+		.layui-inline button{
+			display: inline-block;
+		    height: 30px;
+		    line-height: 30px;
+		    width:75px;
+		    color: #fff;
+		    background:#6866E9;
+		    white-space: nowrap;
+		    text-align: center;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 15px;
+		    cursor: pointer;
+		    margin-right:10px;
+		}
+		.xuanzezichan{
+			display: inline-block;
+		    height: 30px;
+		    line-height: 30px;
+		    width:75px;
+		    color: #fff;
+		    background:#6866E9;
+		    white-space: nowrap;
+		    text-align: center;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 15px;
+		    cursor: pointer;
+		    margin-right:10px;
+		    margin-left:20px;
+		}
+		.zichandel{
+			display: inline-block;
+		    height: 30px;
+		    line-height: 30px;
+		    width:75px;
+		    color: #fff;
+		    background:#6866E9;
+		    white-space: nowrap;
+		    text-align: center;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 15px;
+		    cursor: pointer;
+		    margin-right:10px;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="header">
+	  <form class="layui-form">
+      <div class="layui-inline">
+	      <label class="layui-form-label">调入管理员</label>
+	      <div class="layui-input-inline">
+	        <input name="drgly" disabled="disabled">
+	      </div>
+	      
+     </div>
+     <div class="layui-inline">
+	      <label class="layui-form-label">调入日期</label>
+	      <div class="layui-input-inline">
+	      	<input name="drrq" disabled="disabled">
+	      </div>
+	 </div>
+	 <div class="layui-inline" lay-filter="company">
+	      <label class="layui-form-label">调入使用公司</label>
+	      <div class="layui-input-inline">
+	        <select name="company" lay-filter="company" lay-verify="required" lay-search=""> 
+	         
+	        </select>
+	      </div>
+	</div>
+	<div class="layui-inline" lay-filter="department">
+	      <label class="layui-form-label">调入使用部门</label>
+	      <div class="layui-input-inline">
+	        <select name="department" lay-filter="department" lay-search="">
+	           
+	        </select>
+	      </div>     
+     </div>
+    <div class="layui-inline">
+	      <label class="layui-form-label">调入使用人</label>
+	      <div class="layui-input-inline">
+	        <select name="user"  lay-search="" lay-search="">
+	           
+	        </select>
+	      </div>     
+     </div>
+	 <div class="layui-inline">
+	      <label class="layui-form-label">调入存放地</label>
+	      <div class="layui-input-inline">
+	        <input name="cunfangdi" lay-verify="required" lay-search="" lay-verify="required">
+	         
+	      </div>     
+   </div>
+    <div class="layui-inline" style="width:90%">
+		      <label class="layui-form-label">调入说明 </label>
+		      <div class="layui-input-inline">
+		        <input type="sm" name="diaorushuoming" lay-verify="title" autocomplete="off" placeholder="" class="layui-input" style="width:520px">
+		      </div>
+        </div>
+    <button id="qurendiaobotijiao" lay-submit="" lay-filter="demo2" style="display:none;" type="button">立即提交</button>
+    </form>
+    <table id="demo"></table>
+ </div>	
+</body>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+	layui.use(['form', 'layedit', 'laydate','layer'], function(){
+  var form = layui.form
+  ,layer = layui.layer
+  ,layedit = layui.layedit
+  ,laydate = layui.laydate
+  ,$ = layui.$;
+  
+  //日期
+  laydate.render({
+    elem: '#date'
+  });
+  laydate.render({
+    elem: '#date1'
+  });
+  
+  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+    $("input[name=drgly]").val($.cookie("realName"));
+     var now=new Date();
+     var year=now.getFullYear();
+     var month=now.getMonth();
+     var day=now.getDate();
+    $("input[name=drrq]").val(year+"-"+(month+1)+"-"+day);
+  //监听提交
+  form.on('submit(demo2)', function(data){
+  	     var arry = new Array();
+  	     var brr = JSON.parse(localStorage.getItem("qurendata"));
+  	     for(var i=0;i<brr.length;i++){
+  	     	arry.push(brr[i].propertyCode);
+  	     }
+         var callinUserName = localStorage.getItem("callinUserName");//调入使用人民称
+         var callinUserId = localStorage.getItem("callinUserId");//调入使用人ID
+         var callinOrganizationId = localStorage.getItem("callinOrganizationId");//组织ID
+         var callinOrganization = localStorage.getItem("callinOrganization");//组织名称
+         var callinDeptId = localStorage.getItem("callinDeptId");//部门ID
+         var callinDeptName = localStorage.getItem("callinDeptName");//部门名称
+         var allotRemark = localStorage.getItem("allotRemark");//调入说明
+         var callinAddress = localStorage.getItem("callinAddress");//存放地
+
+         var property = {
+         	'propertyCodes':arry
+         	,'callinAddress':data.field.cunfangdi
+            ,'allotRemark':data.field.sm
+            ,'callinDeptName':$("select[name=department] option:checked").html()
+            ,'callinDeptId':data.field.department
+            ,'callinOrganization':$("select[name=company] option:checked").html()
+            ,'callinOrganizationId':data.field.company
+            ,'callinUserId':data.field.user
+            ,'callinUserName':$("select[name=user] option:checked").html()
+         };
+         var propertyCodes = JSON.stringify(property);
+         $.ajax({
+         	type:"post",
+         	url:ApiUrl+"allocation/confirmalocation",
+          	contentType:'application/json',
+         	data:propertyCodes,
+         	success:function(res){
+         		var res = res.status;
+         		if(res==true){
+         			layer.msg("调拨成功");
+         			setInterval(function(){
+  					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭  
+  					parent.location.reload();
+  				},2000);   
+         		}else{
+         			layer.msg("调拨失败")
+         			return false
+         		}
+         	}
+         })
+  });
+
+});
+</script>
+<script>
+layui.use(['table', 'form'],function(){
+  var table = layui.table,$ = layui.$,form = layui.form;
+  var datajson = JSON.parse(localStorage.getItem("qurendata"));
+  $.ajax({
+  	type:"get",
+  	url:ApiUrl+"org/getOrgInfoByCondition",
+  	async:true,
+  	success:function(res){
+  		var companylist = "";
+  		for(var i=0;i<res.length;i++){
+  			companylist+="<option value='"+res[i].id+"'>"+res[i].name+"</option>"
+  		}
+  		$("select[name=company]").html("<option value=''>请选择</option>"+companylist);
+  		form.render('select');
+  	}
+  	
+  });
+form.on('select(company)', function(data){
+	//console.log(data.othis);
+	    localStorage.setItem("organizationId",data.value);//组织ID
+	    localStorage.setItem("organization",data.elem.options[data.elem.selectedIndex].text);//组织名称
+	    var organizationId = data.value;
+	    $.ajax({
+	    	type:"get",
+	    	url: ApiUrl+"depart/getDepartmentByCondition?organizationId="+organizationId,
+	    	async:true,
+	    	success:function(res){
+	    		var res = res.data;
+	    		var departmentlist = "";
+	    		for(var i=0;i<res.length;i++){
+	    			departmentlist+="<option value='"+res[i].id+"'>"+res[i].departName+"</option>"
+	    		}
+	    		$("select[name=department]").append("<option value=''>请选择</option>"+departmentlist);
+	    		form.render('select');
+	    	}
+	    });
+          
+        });
+form.on('select(department)',function(data){
+	localStorage.setItem("deptId",data.value);//部门ID
+	localStorage.setItem("deptName",data.elem.options[data.elem.selectedIndex].text);//部门名称
+	 var deptId = data.value;
+	    $.ajax({
+	    	type:"get",
+	    	url: ApiUrl+"system/UserFixedCtrl-getUserFixedList?deptId="+deptId,
+	    	async:true,
+	    	success:function(res){
+	    		var userlist = "";
+	    		var res = res.data;
+	    		for(var i=0;i<res.length;i++){
+	    			userlist+="<option value='"+res[i].id+"'>"+res[i].realName+"</option>"
+	    		}
+	    		$("select[name=user]").html("<option value=''>请选择</option>"+userlist);
+	    		form.render('select');
+	    	}
+	    });
+});
+  //展示已知数据
+  table.render({
+    elem: '#demo'
+    ,data: datajson
+    ,height: 250
+    ,cols: [[ //标题栏
+      
+      {field: 'propertyCode', title: '资产条码', width: 90}
+      ,{field: 'propertyName', title: '资产名称', width: 90}
+      ,{field: 'calloutOrganization', title: '调出公司', width: 90}
+      ,{field: 'calloutDeptName', title: '调出部门', width: 90}
+     
+      ,{field: 'calloutAdmin', title: '调出管理员', width: 100}
+      ,{field: 'originalAddress', title: '调出存放地', width: 100}
+      
+      ,{field: 'propertyCatagory', title: '资产种类', width: 90}
+      ,{field:'createOrganizationName',title:'所属公司', width:120}
+    ]] 
+    ,skin: 'row' //表格风格
+    ,even: true
+    ,page: true //是否显示分页
+    ,limits: [20, 50, 100]
+    ,limit: 20 //每页默认显示的数量
+  });
+});
+layui.use('layer',function(){
+var $ = layui.jquery, layer = layui.layer;
+var active = {
+  setTop: function(){
+      var that = this; 
+      //多窗口模式，层叠置顶
+      layer.open({
+        type: 2 //此处以iframe举例
+        ,title: '选择资产'
+        ,area: ['780px', '380px']
+        ,shade: 0
+        ,maxmin: true
+        
+        ,content: 'choice.html  '
+        ,btn: ['取消', '确定'] //只是为了演示
+        ,yes: function(){
+          layer.close(layer.index);
+        }
+        ,btn2: function(){
+         
+        }
+        
+        ,zIndex: layer.zIndex //重点1
+        ,success: function(layero){
+          layer.setTop(layero); //重点2
+        }
+      });
+   }
+}
+$('.xuanzezichan').on('click', function(){
+    var othis = $(this), method = othis.data('method');
+    active[method] ? active[method].call(this, othis) : '';
+  });
+})
+</script>
+</html>

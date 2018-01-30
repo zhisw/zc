@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/public.css" media="all" />
+	<style>
+		.btn-box {
+		    margin-left: 10px;
+		}
+		.btns-del{
+		    height: 30px;
+		    line-height: 30px;
+		    color: #1B2E4B;
+		    background: #FFFFFF;
+		    border: 1px solid #CECED9;
+		    opacity: 0.7;
+		    filter: alpha(opacity=70);
+		    border-radius: 15px;
+		    font-weight: bold;
+		}
+		.btns-del:hover{
+			color: #FF5E3A;
+		    opacity: 1;
+		    filter: alpha(opacity=100);
+		}
+		.childrenBody{
+			padding: 0 10px;
+		}
+		.search-bar{
+			margin-top: 20px;
+			margin-bottom: 10px;
+			padding-left: 10px;
+		}
+		.search-bar .distance{
+			margin-left: 5px;
+			margin-right: 10px;
+			width: 176px;
+		}
+		.search-bar .distance1{
+			margin-left: 5px;
+			margin-right: 10px;
+			width: 146px;
+		}
+		/*去除table自带的margin*/
+		.layui-table-view{
+			margin: 10px 0 0 0 !important;
+		}
+	</style>
+</head>
+<body class="childrenBody">
+	<div class="search-bar layui-form">
+  		回收单号
+		<div class="layui-inline distance">
+	        <div class="layui-input-inline">
+	        	<input type="text" class="layui-input recycleCode">
+	      	</div>
+	    </div>    
+		处理人
+		<div class="layui-inline distance1">
+	        <div class="layui-input-inline">
+	        	<input type="text" class="layui-input handlerName">
+	      	</div>
+	    </div> 
+		回收日期
+		<div class="layui-inline distance1">
+			<input type="text" placeholder="yyyy-mm-dd" class="layui-input" id="start-time">
+		</div>
+		至
+		<div class="layui-inline distance1">
+			<input type="text" placeholder="yyyy-mm-dd" class="layui-input" id="end-time">
+		</div>
+		
+		<div class="layui-inline btn-box">
+			<button class="layui-btn btns-blue" id="search-btn">查询</button>
+			<button class="layui-btn btns-green" id="add-btn" data-method="huiShou" data-type="auto">新增</button>
+			<button class="layui-btn btns-blue" id="cancel-btn">撤销</button>
+	    </div>
+	</div>
+	<table class="layui-table" id="recover-table" lay-filter="recover-table"></table>
+</body>
+	<script type="text/html" id="operation-bar">
+	  <a class="layui-btn layui-btn-mini" lay-event="detail">详情</a>
+	</script>
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/peizhi.js"></script>
+	<script>
+		layui.use(['form','laydate','layer','table'],function(){
+			var $ = layui.jquery;
+			var form = layui.form;			
+			var laydate = layui.laydate;	
+			var layer = layui.layer;		
+			var table = layui.table;	
+			
+			//日期选择
+			/*laydate.render({
+			    elem: '#start-time'
+			});
+			laydate.render({
+			    elem: '#end-time'
+			});*/
+			dateFunc('#start-time','#end-time');
+			
+			
+			var renerData={};
+			var selectData = {};
+			var selectDataDel = {};
+			var count=0;
+			var submitLYObj={}
+			
+			//弹窗
+			var dialog = {
+			  	huiShou: function(othis){
+			        var type = othis.data('type');
+			      	layer.open({
+			        	type: 2  
+			        	,title: '回收单'
+			        	,content: 'huiShouDan.html'
+			        	,area:  ['900px', '480px']
+			        	,offset: '15px'
+			        	,btn: ['保存', '取消'] 
+			        	,maxmin: true
+			        	,btnAlign: 'r' 
+			        	,shade: 0.3 
+			        	,resize:false 
+			        	,btn1: function(index){
+							submitLYObj.submitLYFunc();
+							return false;
+				        }
+			        	,btn2: function(index){
+			          		layer.close(index);
+			        	}
+			        	,success:function(layero, index){
+			        		var body = layer.getChildFrame('body', index);
+			        		
+			        		var iframeWin = window[layero.find('iframe')[0]['name']]; 
+			        		//得到iframe页的窗口对象，执行iframe页的方法：
+			        		renerData = {
+			        		 	renerDataFunc:function(obj){
+			        		 		iframeWin.renderTable(obj);
+			        		 	}
+			        		}		 
+			        		//添加人员
+						    body.find('#add-people').on('click', function(){
+						    	dialog.addPeople();
+						  	});
+						  	//表單提交
+						  	submitLYObj.submitLYFunc = function(){
+						  		body.find('.submitLY').click();
+						  	}
+			        		//选择资产
+						    body.find('#select-asset').on('click', function(){
+						    	dialog.selectAsset();
+						    	//多次选择资产
+						    	selectData = {
+				        		 	selectDataFunc:function(i,data){
+				        		 		iframeWin.selectData(i,data);
+				        		 	}
+				        		}
+						    	//删除资产
+						    	selectDataDel = {
+				        		 	selectDataDelFunc:function(dataDel){
+				        		 		iframeWin.selectDataDel(dataDel);
+				        		 	}
+				        		}
+						  	});
+						  	//选择资产的删除
+						  	body.find('#del-btn').on('click', function(){
+						  		//选择删除的数据	
+						  		var checkStatusDel = iframeWin.layui.table.checkStatus('idTest');
+					        	var dataDel = checkStatusDel.data;
+					        	var myDataDel = JSON.stringify(dataDel);
+					        	if(!dataDel || dataDel.length<1){
+					        		layer.msg('未选择资产',{
+										time: 2000 //   （如果不配置，默认是3秒）
+									});
+					        	}else{
+					        		selectDataDel.selectDataDelFunc(myDataDel);
+						        	var selectDataDelStr = localStorage.getItem("dataDel"); //获得删除的字符串
+						        	renerData.renerDataFunc(selectDataDelStr);
+						        	localStorage.setItem("data1",selectDataDelStr);  //保存删除后的数据
+					        	}
+						  	});
+			        	}
+			        	,cancel: function(index, layero){  //右上角关闭回调
+						    layer.close(layer.index);
+						}
+			        	,end: function(index, layero){   //层销毁后触发的回调
+			          		localStorage.removeItem('data1');    //清除选择资产的存储
+				    		localStorage.removeItem('dataDel');  //清除选择资产有删除过的的存储
+			          		count=0;   //选择资产的次数初始化
+						}
+			      	});
+			    },
+			    selectAsset: function(){
+			      	var that = this; 
+			      	count++;
+			      	//多窗口模式，层叠置顶
+			      	layer.open({
+				        type: 2 //此处以iframe举例
+				        ,title: '选择资产'
+				        ,area: ['700px', '450px']
+				        ,offset: '30px'
+				        ,shade: 0.3
+				        ,content: 'selectAssetUse.html'
+			        	,resize:false
+			        	,maxmin: true
+			        	,zIndex: layer.zIndex
+			        	,success: function(layero, index){
+			        		var propertyStatus = [3];
+			        		localStorage.setItem("propertyStatus",JSON.stringify(propertyStatus));  //传资产状态值,报废为3
+			        		
+						    var body = layer.getChildFrame('body', index);
+						    var iframeWin = window[layero.find('iframe')[0]['name']]; 
+						    //选择资产添加按钮事件
+						    body.find('#sure-btn').on('click', function(){	
+						       //选中数据
+						        var checkStatus = iframeWin.layui.table.checkStatus('asset-table');
+					        	var data = checkStatus.data;
+					        	var myData = JSON.stringify(data);
+					        	if(myData=="[]"){
+							      	layer.msg('未选择任何资产',{
+										time: 1000 //   （如果不配置，默认是3秒）
+									});
+							    }else{
+							      	selectData.selectDataFunc(count,myData);
+						        	var concatDataStr = localStorage.getItem("data1"); //获得合并的字符串
+						        	renerData.renerDataFunc(concatDataStr);
+						        	layer.close(index);
+							    }
+						  	});
+						}
+			        	,cancel: function(index, layero){  //右上角关闭回调
+						   localStorage.setItem("data1","[]");
+						}
+				    });
+			    }
+			};
+			  
+		    $('.search-bar #add-btn').on('click', function(){
+		    	var othis = $(this), method = othis.data('method');
+		    	dialog[method] ? dialog[method].call(this, othis) : '';
+		  	});
+		  	
+		  	//加载回收初始数据
+			getData();
+			
+			//条件查询回收数据
+			$('.search-bar #search-btn').on('click',function(){
+				//时间差
+				var dataDiffer = $(".search-bar #end-time").val().replace(/-/g,"") - $(".search-bar #start-time").val().replace(/-/g,"");
+				
+				if(dataDiffer >= 0){
+					getData();
+					$(".search-bar #start-time").val("");
+					$(".search-bar #end-time").val("");
+				}else{
+					layer.confirm('结束时间应该大于开始时间，请重新选择',{icon: 3, title:'提示'}, function(index){
+						layer.close(index);
+						$(".search-bar #start-time").val("");
+						$(".search-bar #end-time").val("");
+					});    
+				}
+//				getData();
+			});
+			
+			//领用获得数据方法
+			function getData(){
+				var recycleCode = $(".search-bar .recycleCode").val();
+				var handlerName = $(".search-bar .handlerName").val();
+				var startTime = $(".search-bar #start-time").val();
+				var endTime = $(".search-bar #end-time").val();
+				
+				table.render({
+			    	elem: '#recover-table'
+			    	,id: 'recoverTable'
+			    	,url: ApiUrl + "recycle/getRecycleList"
+				    ,where: {
+				    	recycleCode: recycleCode,   
+				    	handlerName: handlerName,
+				    	startTime: startTime,
+				    	endTime: endTime,
+				    }
+				    ,cols: [[ //标题栏
+				       {checkbox: true}
+				      ,{field: 'recycleCode', title: '回收单号', width: 190}
+				      ,{field: 'recyclePrice', title: '回收金额', width: 120}
+				      ,{field: 'createAt', title: '回收日期', width: 140}
+				      ,{field: 'handlerName', title: '处理人', width: 130}
+				      ,{field: 'remark', title: '备注', width: 200}
+				      ,{field: 'proName', title: '摘要', width: 220}
+				      ,{field: '', title: '操作', width: 70, toolbar: '#operation-bar'}
+				    ]] 
+				    ,width: '90%'
+//				    ,height: 'full-80'
+//				    ,skin: 'row' //表格风格
+				    ,page: true //是否显示分页
+				    ,limit: 20 //每页默认显示的数量
+				    ,limits:[20,50,100]
+				});
+			}
+			
+			//撤销按钮
+			$(".search-bar #cancel-btn").on('click',function(){
+				var checkStatus = table.checkStatus('recoverTable');
+				var data = checkStatus.data;
+				var cancelId = [];
+				for (var i=0; i<data.length; i++) {
+					cancelId.push(data[i].id);					
+				}
+				var param = {
+				    	idList:cancelId,
+				    }
+				if(data.length > 0){
+					layer.confirm('确定要撤销？',{icon: 3, title:'提示'}, function(index){
+					    $.ajax({
+							type:"post",
+							url:ApiUrl + "recycle/deleteRecycleList",
+							traditional: true,
+							dataType:'json',
+						    data: param,
+						    success:function(data){
+						    	if(data.code == 0){
+						    		layer.close(index);
+						    		layer.msg('撤销成功！',{
+										time: 1500 
+									});
+						    		table.reload('recoverTable');
+						    	}else{
+						    		console.log(data);
+						    	}
+						    }
+						});
+					});     
+				}else{
+					layer.msg('未选择需要撤回的单据！',{
+						time: 1500 
+					});
+				}
+			});
+
+
+			//监听工具条
+			table.on('tool(recover-table)', function(obj){
+			    if(obj.event === 'detail'){
+				   /*window.location.href = 'printRecover.html?recycleId='+ recycleId;*/
+	                //查看回收单
+	                var recycleId = obj.data.id;
+	                localStorage.setItem("recycleId",recycleId);
+	                layer.open({
+	                    type: 2
+	                    ,title:'回收单详情'
+	                    ,content: 'printRecover.html'
+	                    ,area:  ['900px', '500px']
+	                    ,btn: ['打印'] //只是为了演示
+	                    ,yes: function(index){
+	                        document.getElementsByTagName('iframe')[0].contentWindow.print();
+	                    }
+	                });
+			    } 
+			});
+		});
+	</script>
+</html>

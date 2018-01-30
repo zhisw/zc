@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>修改资产</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+</head>
+<body>
+<form class="layui-form popup-form" >
+    <div class="layui-row layui-form-item">
+        <input type="hidden" id="sourceType" name="sourceType" value="1">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">资产类别:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="categoryName"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">资产名称:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="propertyName"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">规格型号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="specification"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">品牌:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="brand"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">单位:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="unit"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">金额:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="price"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用公司:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="organizationName"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用部门:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="deptName"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用人:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="personnelName"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">所属公司:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="createOrganizationName"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">入库时间:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="storageinDate"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">存放地:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="depositAdress"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">使用期限:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="serviceLife"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">序列号:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="snno"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <label class="layui-col-xs4 title">处理人:</label>
+            <div class="layui-col-xs6">
+                <div class="layui-form-mid layui-word-aux" id="disposePersonname"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-form-item">
+        <label class="nine-xs1 title">备注:</label>
+        <div class="nine-xs8">
+            <div class="layui-form-mid layui-word-aux" id="remark"></div>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/peizhi.js"></script>
+<script>
+    layui.use(['form','laydate','jquery','tree'], function() { //独立版的layer无需执行这一句
+        var $ = layui.$;
+        //获取资产信息
+        $.ajax({
+            type:"get",
+            url:ApiUrl+"zhProperty/getZhpropertybyid?id="+localStorage.propertyCode,
+            async:false,
+            success:function(res){
+                debugger
+                $("#categoryName").html(res.result.categoryName)
+                $("#propertyName").html(res.result.propertyName)
+                $("#specification").html(res.result.specification)
+                $("#brand").html(res.result.brand)
+                $("#unit").html(res.result.unit)
+                $("#price").html(res.result.price)
+                $("#storageinDate").html(res.result.storageinDate)
+                $("#depositAdress").html(res.result.depositAdress)
+                if(res.result.serviceLife!=0){
+                    $("#serviceLife").html(res.result.serviceLife+'月')
+                }
+                $("#snno").html(res.result.snno)
+                $("#remark").html(res.result.remark)
+                $("#disposePersonname").html(res.result.disposePersonname)
+                $("#personnelName").html(res.result.personnelName)
+                $("#organizationName").html(res.result.organizationName)
+                $("#deptName").html(res.result.deptName)
+                $("#createOrganizationName").html(res.result.createOrganizationName)
+            }
+        });
+
+    })
+</script>
+</body>
+</html>
